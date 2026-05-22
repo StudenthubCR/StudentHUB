@@ -1,4 +1,4 @@
-const CACHE_NAME = 'studenthub-cache-v4';
+const CACHE_NAME = 'studenthub-cache-v10';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -8,9 +8,11 @@ const ASSETS_TO_CACHE = [
   './assets/SHlogo.svg',
   './assets/SHlarge.svg',
   './assets/student.png',
-  './assets/news_graduation.png',
-  './assets/news_sports.png',
-  './assets/news_workshop.png'
+  './assets/news_dia_estudiante.png',
+  './assets/news_expotecnica.png',
+  './assets/news_feria_cientifica.png',
+  './assets/news_feria_vocacional.png',
+  './assets/news_torneo_futsal.png'
 ];
 
 // Evento de Instalación (Install): Almacena los archivos estáticos base en el caché

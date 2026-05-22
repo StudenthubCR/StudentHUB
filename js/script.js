@@ -264,20 +264,63 @@ document.addEventListener('DOMContentLoaded', () => {
         history.back();
     });
 
-    // Lógica del Carrusel de Noticias
+    // Lógica del Carrusel de Noticias con Controles Manuales y Auto-Rotación
     const slides = document.querySelectorAll('.carousel-slide');
+    const btnPrev = document.getElementById('carousel-prev');
+    const btnNext = document.getElementById('carousel-next');
     let currentSlide = 0;
+    let carouselInterval;
 
-    const nextSlide = () => {
+    const showSlide = (index) => {
         if (slides.length === 0) return;
+        
+        // Quitar la clase active del slide actual
         slides[currentSlide].classList.remove('active');
-        currentSlide = (currentSlide + 1) % slides.length;
+        
+        // Calcular el índice circular
+        currentSlide = (index + slides.length) % slides.length;
+        
+        // Mostrar el nuevo slide
         slides[currentSlide].classList.add('active');
     };
 
-    // Cambio automático cada 30 segundos (30000ms)
+    const nextSlide = () => {
+        showSlide(currentSlide + 1);
+    };
+
+    const prevSlide = () => {
+        showSlide(currentSlide - 1);
+    };
+
+    const startAutoplay = () => {
+        stopAutoplay();
+        carouselInterval = setInterval(nextSlide, 8000); // Rota automáticamente cada 8 segundos
+    };
+
+    const stopAutoplay = () => {
+        if (carouselInterval) {
+            clearInterval(carouselInterval);
+        }
+    };
+
+    // Asignación de manejadores a los botones manuales
+    if (btnNext) {
+        btnNext.addEventListener('click', () => {
+            nextSlide();
+            startAutoplay(); // Reinicia el temporizador para que el usuario tenga tiempo de leer
+        });
+    }
+
+    if (btnPrev) {
+        btnPrev.addEventListener('click', () => {
+            prevSlide();
+            startAutoplay(); // Reinicia el temporizador
+        });
+    }
+
+    // Inicializar carrusel
     if (slides.length > 0) {
-        setInterval(nextSlide, 10000);
+        startAutoplay();
     }
 
     // Lógica para el QR (Simulación de animación o datos dinámicos)
