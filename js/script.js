@@ -4,6 +4,19 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Registro del Service Worker para la PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then((reg) => {
+                    console.log('Student HUB PWA: Service Worker registrado con éxito. Scope:', reg.scope);
+                })
+                .catch((err) => {
+                    console.error('Student HUB PWA: Fallo al registrar el Service Worker:', err);
+                });
+        });
+    }
+
     // Referencias a los elementos del DOM
     const navItems = document.querySelectorAll('.nav-item');
     const sections = document.querySelectorAll('.page-section');

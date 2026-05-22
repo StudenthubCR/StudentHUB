@@ -1,0 +1,18 @@
+{
+  "name": "Student HUB",
+  "short_name": "Student HUB",
+  "description": "Tu Portal Educativo y Carnet Digital Premium",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#060b1e",
+  "theme_color": "#0130B2",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/SHlogo.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ]
+}
