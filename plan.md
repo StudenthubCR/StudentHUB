@@ -24,8 +24,8 @@ EduConnect CTP es una aplicación web progresiva (estilo SPA) diseñada para est
 ## 3. Secciones de la App
 1. **Dashboard (Inicio)**: Bienvenida personalizada, banner de noticias y acceso a servicios rápidos.
 2. **Carnet Digital**: Tarjeta de identificación con foto, datos del estudiante y código QR.
-3. **Expediente Académico**: Centro de estadísticas (Asistencia y Promedio) y lista de materias.
-4. **Servicios Rápidos**: Acceso directo a Comedor, Carnet y Asistencia desde el Inicio.
+3. **Horarios de Clases**: Consulta de horarios por grado para estudiantes diurnos y nocturnos.
+4. **Servicios Rápidos**: Acceso directo a Comedor, Carnet y Horarios desde el Inicio.
 
 ---
 

@@ -22,7 +22,7 @@
 
     <!-- Header Principal -->
     <header class="app-header">
-        <div class="logo-container">
+        <div class="logo-container" id="logo-container">
             <img src="assets/SHlarge.svg" alt="Student HUB" class="app-logo">
         </div>
         <div class="header-actions">
@@ -30,9 +30,7 @@
                 <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
                 <svg class="moon-icon hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
             </button>
-            <div class="user-badge">
-                <img src="assets/student.png" alt="Perfil" class="header-avatar">
-            </div>
+            <img src="assets/student.png" alt="Perfil" class="header-avatar">
         </div>
     </header>
 
@@ -80,10 +78,6 @@
                     <div class="service-item" id="shortcut-carnet">
                         <div class="service-icon blue">🪪</div>
                         <span>Carnet Digital</span>
-                    </div>
-                    <div class="service-item" id="shortcut-asistencia">
-                        <div class="service-icon green">📝</div>
-                        <span>Asistencia</span>
                     </div>
                     <div class="service-item" id="shortcut-horarios">
                         <div class="service-icon red">📅</div>
@@ -178,79 +172,7 @@
             </div>
         </section>
 
-        <!-- Sección: Expediente Académico -->
-        <section id="expediente" class="page-section hidden">
-            <div class="section-header">
-                <h2>Expediente Académico</h2>
-            </div>
-
-            <!-- Resumen Académico (Movido desde Dashboard) -->
-            <div class="expediente-summary-grid">
-                <div class="stat-item">
-                    <span class="stat-value">92%</span>
-                    <span class="stat-label">Asistencia</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-value">8.5</span>
-                    <span class="stat-label">Promedio</span>
-                </div>
-            </div>
-
-            <div class="expediente-list">
-                <div class="subject-card">
-                    <div class="subject-info">
-                        <h4>Programación III</h4>
-                        <p>Prof. Luis Solano</p>
-                    </div>
-                    <div class="subject-scores">
-                        <div class="score">
-                            <span class="score-val">95</span>
-                            <span class="score-type">Nota</span>
-                        </div>
-                        <div class="attendance">
-                            <span class="score-val">100%</span>
-                            <span class="score-type">Asist.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="subject-card">
-                    <div class="subject-info">
-                        <h4>Bases de Datos</h4>
-                        <p>Prof. María Castro</p>
-                    </div>
-                    <div class="subject-scores">
-                        <div class="score">
-                            <span class="score-val">88</span>
-                            <span class="score-type">Nota</span>
-                        </div>
-                        <div class="attendance">
-                            <span class="score-val">90%</span>
-                            <span class="score-type">Asist.</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="subject-card">
-                    <div class="subject-info">
-                        <h4>Redes de Computadoras</h4>
-                        <p>Prof. Jorge Ruiz</p>
-                    </div>
-                    <div class="subject-scores">
-                        <div class="score">
-                            <span class="score-val">78</span>
-                            <span class="score-type">Nota</span>
-                        </div>
-                        <div class="attendance">
-                            <span class="score-val">85%</span>
-                            <span class="score-type">Asist.</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
+     </main>
 
     <!-- Navegación Inferior (Bottom Nav Bar) -->
     <nav class="bottom-nav">
@@ -262,9 +184,9 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 21v-4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"/><circle cx="12" cy="11" r="3"/></svg>
             <span>Carnet</span>
         </button>
-        <button class="nav-item" data-section="expediente">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h6"/><path d="M8 11h8"/></svg>
-            <span>Expediente</span>
+        <button class="nav-item" data-section="horarios">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            <span>Horarios</span>
         </button>
     </nav>
 

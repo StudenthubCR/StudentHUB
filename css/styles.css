@@ -71,6 +71,7 @@ body {
     position: relative;
     overflow: hidden;
     margin-left: -12px; /* Jala el logo hacia el borde izquierdo de la pantalla */
+    cursor: pointer;
 }
 
 .app-logo {
@@ -612,68 +613,6 @@ body {
     color: var(--text-muted);
 }
 
-/* =========================================
-   EXPEDIENTE
-   ========================================= */
-.expediente-summary-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin-bottom: 25px;
-}
-
-.expediente-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.subject-card {
-    background: var(--white);
-    padding: 20px;
-    border-radius: var(--radius-md);
-    box-shadow: var(--card-shadow);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.subject-info h4 {
-    font-size: 1rem;
-    margin-bottom: 2px;
-}
-
-.subject-info p {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-.subject-scores {
-    display: flex;
-    gap: 15px;
-}
-
-.score, .attendance {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.score-val {
-    font-weight: 700;
-    color: var(--primary-color);
-    font-size: 1.1rem;
-}
-
-.score-type {
-    font-size: 0.65rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-}
-
-.attendance .score-val {
-    color: #2a9d8f;
-}
 
 /* =========================================
    BOTTOM NAVIGATION

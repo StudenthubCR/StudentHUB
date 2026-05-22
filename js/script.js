@@ -25,7 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
      * Cambia la sección activa basándose en el ID proporcionado.
      * @param {string} sectionId - El ID de la sección a mostrar.
      */
-    const switchSection = (sectionId) => {
+    /**
+     * Cambia la sección activa basándose en el ID proporcionado.
+     * @param {string} sectionId - El ID de la sección a mostrar.
+     * @param {boolean} pushToHistory - Si se debe registrar la navegación en el historial.
+     */
+    const switchSection = (sectionId, pushToHistory = true) => {
         // 1. Ocultar todas las secciones
         sections.forEach(section => {
             section.classList.add('hidden');
@@ -51,7 +56,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Opcional: Feedback hápitco (si el dispositivo lo soporta)
+        // 4. Registrar en el historial para el soporte de retroceso móvil
+        if (pushToHistory) {
+            history.pushState({ sectionId: sectionId, subView: null }, "", `#${sectionId}`);
+        }
+
+        // Opcional: Feedback háptico (si el dispositivo lo soporta)
         if ('vibrate' in navigator) {
             navigator.vibrate(10);
         }
@@ -79,10 +89,49 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
 
+    // Inicializar estado del historial del navegador
+    history.replaceState({ sectionId: 'dashboard', subView: null }, "", "#dashboard");
+
+    // Escuchar el evento de retroceso del navegador (gesto o botón físico en móviles)
+    window.addEventListener('popstate', (event) => {
+        if (event.state) {
+            const { sectionId, subView, grade } = event.state;
+            if (sectionId === 'horarios' && subView === 'schedule') {
+                renderSchedule(grade, document.querySelector(`.grade-card[data-grade="${grade}"]`), false);
+            } else {
+                switchSection(sectionId, false);
+                if (sectionId === 'horarios') {
+                    const gradeSelector = document.getElementById('grade-selector');
+                    const scheduleView = document.getElementById('schedule-view');
+                    if (gradeSelector && scheduleView) {
+                        scheduleView.classList.add('hidden');
+                        scheduleView.classList.remove('active');
+                        gradeSelector.classList.remove('hidden');
+                        document.querySelectorAll('.grade-card').forEach(card => card.classList.remove('active'));
+                    }
+                }
+            }
+        } else {
+            switchSection('dashboard', false);
+        }
+    });
+
     themeToggle.addEventListener('click', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         setTheme(currentTheme === 'dark' ? 'light' : 'dark');
     });
+
+    // Redirección al Inicio al hacer clic en el logo de la barra superior
+    const logoContainer = document.getElementById('logo-container');
+    if (logoContainer) {
+        logoContainer.addEventListener('click', () => {
+            switchSection('dashboard');
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
 
     // Agregar manejadores de eventos a cada botón de la navegación inferior
     navItems.forEach(item => {
@@ -104,15 +153,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Accesos rápidos desde el Dashboard
     const shortcutCarnet = document.getElementById('shortcut-carnet');
-    const shortcutAsistencia = document.getElementById('shortcut-asistencia');
     const shortcutComedor = document.getElementById('shortcut-comedor');
 
     if (shortcutCarnet) {
         shortcutCarnet.addEventListener('click', () => switchSection('carnet'));
-    }
-
-    if (shortcutAsistencia) {
-        shortcutAsistencia.addEventListener('click', () => switchSection('expediente'));
     }
 
     if (shortcutComedor) {
@@ -167,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ]
     };
 
-    const renderSchedule = (grade, selectedCard) => {
+    const renderSchedule = (grade, selectedCard, pushToHistory = true) => {
         const schedule = dummySchedules[grade];
         gradeTitle.textContent = `${grade.toUpperCase()} Año - Grupo ${grade.charAt(0)}-1`;
         scheduleList.innerHTML = '';
@@ -193,6 +237,11 @@ document.addEventListener('DOMContentLoaded', () => {
             scheduleList.appendChild(div);
         });
 
+        // Guardar subvista en el historial
+        if (pushToHistory) {
+            history.pushState({ sectionId: 'horarios', subView: 'schedule', grade: grade }, "", `#horarios-${grade}`);
+        }
+
         // Pequeña pausa para efecto visual antes de ocultar
         setTimeout(() => {
             gradeSelector.classList.add('hidden');
@@ -208,22 +257,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnBackToGrades.addEventListener('click', () => {
-        scheduleView.classList.add('hidden');
-        gradeSelector.classList.remove('hidden');
-        // Quitar estado activo al volver
-        document.querySelectorAll('.grade-card').forEach(card => card.classList.remove('active'));
+        history.back();
     });
 
     btnBackToDashboard.addEventListener('click', () => {
-        // Si estamos viendo un horario, el botón de atrás debe volver al selector de grados
-        if (!scheduleView.classList.contains('hidden')) {
-            scheduleView.classList.add('hidden');
-            gradeSelector.classList.remove('hidden');
-            document.querySelectorAll('.grade-card').forEach(card => card.classList.remove('active'));
-        } else {
-            // Si ya estamos en el selector, volvemos al dashboard
-            switchSection('dashboard');
-        }
+        history.back();
     });
 
     // Lógica del Carrusel de Noticias
