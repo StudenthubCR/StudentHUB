@@ -1,5 +1,5 @@
 /**
- * EduConnect CTP - Lógica de Navegación SPA
+ * Student HUB - Lógica de Navegación SPA
  * Maneja el cambio de secciones sin recargar la página.
  */
 
@@ -239,5 +239,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
-    console.log('EduConnect CTP: Sistema SPA inicializado correctamente.');
+    console.log('Student HUB: Sistema SPA inicializado correctamente.');
 });

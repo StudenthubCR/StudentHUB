@@ -2,13 +2,15 @@
    VARIABLES Y CONFIGURACIÓN GLOBAL
    ========================================= */
 :root {
-    --primary-color: #6c2428;
+    --primary-color: #0130B2;
+    --primary-dark: #0B2B80;
+    --primary-light: #4B73E1;
     --accent-color: #ffffff;
     --bg-white: #f8f9fa;
-    --text-dark: #1a1a1a;
-    --text-muted: #64748b;
+    --text-dark: #0c142c;
+    --text-muted: #5c6b8f;
     --white: #ffffff;
-    --card-shadow: 0 10px 25px rgba(108, 36, 40, 0.08);
+    --card-shadow: 0 10px 25px rgba(11, 43, 128, 0.05);
     --radius-lg: 20px;
     --radius-md: 12px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -16,12 +18,14 @@
 
 /* Modo Oscuro - Variables */
 [data-theme="dark"] {
-    --bg-white: #0a0b10;
-    --white: #161822;
-    --text-dark: #f8fafc;
-    --text-muted: #94a3b8;
-    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-    --primary-color: #ff9da3; /* Mucho más claro para contraste en fondo negro */
+    --bg-white: #060b1e;
+    --white: #0c1538;
+    --text-dark: #f1f5f9;
+    --text-muted: #8ca2de;
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    --primary-color: #4B73E1;
+    --primary-dark: #0130B2;
+    --primary-light: #0B2B80;
 }
 
 * {
@@ -29,6 +33,10 @@
     padding: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    background-color: var(--bg-white);
 }
 
 body {
@@ -45,7 +53,7 @@ body {
    ========================================= */
 .app-header {
     background: var(--white);
-    padding: 20px;
+    padding: 8px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -55,10 +63,35 @@ body {
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
+.logo-container {
+    display: flex;
+    align-items: center;
+    height: 44px;
+    width: 220px;
+    position: relative;
+    overflow: hidden;
+    margin-left: -12px; /* Jala el logo hacia el borde izquierdo de la pantalla */
+}
+
+.app-logo {
+    height: 160px; /* Altura sobredimensionada para compensar el espacio transparente */
+    width: auto;
+    position: absolute;
+    left: -45px; /* Desplazamiento a la izquierda para recortar el margen transparente lateral */
+    top: 50%;
+    transform: translateY(-50%);
+    object-fit: contain;
+    transition: var(--transition);
+}
+
+[data-theme="dark"] .app-logo {
+    filter: brightness(0) invert(1);
+}
+
 .logo-text {
     font-size: 1.4rem;
     font-weight: 700;
-    color: var(--primary-color);
+    color: var(--primary-dark);
 }
 
 [data-theme="dark"] .logo-text {
@@ -66,11 +99,11 @@ body {
 }
 
 .logo-text .accent {
-    color: #4a181b; 
+    color: var(--primary-color); 
 }
 
 [data-theme="dark"] .logo-text .accent {
-    color: var(--primary-color); /* El acento usa el borgoña claro en modo oscuro */
+    color: var(--primary-color); /* El acento usa el celeste claro en modo oscuro */
 }
 
 .header-avatar {
@@ -257,8 +290,8 @@ body {
     font-size: 1.5rem;
 }
 
-.card-icon.blue { background: rgba(108, 36, 40, 0.1); }
-.card-icon.red { background: rgba(163, 59, 65, 0.1); }
+.card-icon.blue { background: rgba(1, 48, 178, 0.1); }
+.card-icon.red { background: rgba(75, 115, 225, 0.15); }
 
 .card-details h4 {
     font-size: 1rem;
@@ -319,9 +352,9 @@ body {
 }
 
 .service-icon.orange { background: rgba(255, 159, 64, 0.15); }
-.service-icon.blue { background: rgba(108, 36, 40, 0.15); }
+.service-icon.blue { background: rgba(1, 48, 178, 0.15); }
 .service-icon.green { background: rgba(42, 157, 143, 0.15); }
-.service-icon.red { background: rgba(108, 36, 40, 0.15); }
+.service-icon.red { background: rgba(11, 43, 128, 0.15); }
 
 /* =========================================
    HORARIOS
@@ -363,17 +396,17 @@ body {
 
 .grade-card:hover {
     transform: translateY(-5px);
-    border-color: rgba(108, 36, 40, 0.3);
+    border-color: rgba(1, 48, 178, 0.3);
 }
 
 .grade-card.active {
     border-color: var(--primary-color);
-    background: rgba(108, 36, 40, 0.05);
+    background: rgba(1, 48, 178, 0.05);
     transform: scale(1.05);
 }
 
 [data-theme="dark"] .grade-card.active {
-    background: rgba(255, 157, 163, 0.1);
+    background: rgba(75, 115, 225, 0.1);
 }
 
 .grade-num {
@@ -467,7 +500,7 @@ body {
 }
 
 .id-card {
-    background: linear-gradient(135deg, #6c2428 0%, #4a181b 100%);
+    background: linear-gradient(135deg, #0130B2 0%, #0B2B80 100%);
     color: #ffffff; /* Texto siempre blanco en la parte superior del carnet */
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -485,7 +518,7 @@ body {
 }
 
 .inst-logo {
-    background: #4a181b;
+    background: #0B2B80;
     color: #ffffff;
     padding: 5px 10px;
     border-radius: 5px;
@@ -539,7 +572,7 @@ body {
 
 .nocturnal-badge {
     display: inline-block;
-    background: #4a181b;
+    background: #0B2B80;
     padding: 4px 12px;
     border-radius: 20px;
     font-size: 0.75rem;
@@ -698,7 +731,7 @@ body {
         margin: 0 auto;
         box-shadow: 0 0 50px rgba(0,0,0,0.1);
         min-height: 100vh;
-        background: #fff;
+        background: var(--white);
     }
     
     .bottom-nav {
