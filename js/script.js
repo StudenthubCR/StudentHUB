@@ -178,80 +178,186 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnBackToGrades = document.getElementById('change-grade');
     const btnBackToDashboard = document.getElementById('back-to-dashboard');
 
-    const dummySchedules = {
-        "7mo": [
-            { time: "07:00", end: "08:20", subject: "Matemáticas", prof: "Lic. Ana Vega" },
-            { time: "08:30", end: "09:50", subject: "Español", prof: "Lic. Mario Solís" },
-            { time: "10:00", end: "11:20", subject: "Ciencias", prof: "Lic. Karla Ruiz" }
-        ],
-        "8vo": [
-            { time: "07:00", end: "08:20", subject: "Estudios Sociales", prof: "Lic. Luis Castro" },
-            { time: "08:30", end: "09:50", subject: "Inglés", prof: "Lic. Elena Mora" },
-            { time: "10:00", end: "11:20", subject: "Edu. Física", prof: "Lic. Jorge Paz" }
-        ],
-        "9no": [
-            { time: "07:00", end: "08:20", subject: "Cívica", prof: "Lic. Pedro Juan" },
-            { time: "08:30", end: "09:50", subject: "Artes Plásticas", prof: "Lic. Sofía Art" },
-            { time: "10:00", end: "11:20", subject: "Música", prof: "Lic. Roberto Do" }
-        ],
-        "10mo": [
-            { time: "17:00", end: "18:20", subject: "Programación I", prof: "Ing. Pablo Tech" },
-            { time: "18:30", end: "19:50", subject: "Redes", prof: "Ing. Carlos Net" },
-            { time: "20:00", end: "21:20", subject: "Ética Prof.", prof: "Lic. Marta Valores" }
-        ],
-        "11vo": [
-            { time: "17:00", end: "18:20", subject: "Bases de Datos", prof: "Ing. Sara Query" },
-            { time: "18:30", end: "19:50", subject: "Diseño Web", prof: "Ing. Erick UI" },
-            { time: "20:00", end: "21:20", subject: "Práctica Supervisada", prof: "Ing. Fabián Guía" }
-        ],
-        "12vo": [
-            { time: "17:00", end: "18:20", subject: "Proyecto Final", prof: "Ing. Daniel Sprint" },
-            { time: "18:30", end: "19:50", subject: "Emprendimiento", prof: "Lic. Julia Start" },
-            { time: "20:00", end: "21:20", subject: "Inglés Técnico", prof: "Lic. Wilson Speak" }
-        ]
+    const ORDEN_DIAS = ['lunes', 'martes', 'miercoles', 'miércoles', 'jueves', 'viernes', 'sabado', 'sábado', 'domingo'];
+
+    const etiquetaGrado = {
+        '7mo': '7° Séptimo',
+        '8vo': '8° Octavo',
+        '9no': '9° Noveno',
+        '10mo': '10° Décimo',
+        '11vo': '11° Undécimo',
+        '12vo': '12° Duodécimo'
     };
 
-    const renderSchedule = (grade, selectedCard, pushToHistory = true) => {
-        const schedule = dummySchedules[grade];
-        gradeTitle.textContent = `${grade.toUpperCase()} Año - Grupo ${grade.charAt(0)}-1`;
-        scheduleList.innerHTML = '';
+    const normalizarDia = (dia) =>
+        (dia || '')
+            .toString()
+            .trim()
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
 
-        // Marcar tarjeta activa
-        document.querySelectorAll('.grade-card').forEach(card => card.classList.remove('active'));
-        if (selectedCard) selectedCard.classList.add('active');
+    const indiceDia = (dia) => {
+        const clave = normalizarDia(dia);
+        const idx = ORDEN_DIAS.indexOf(clave);
+        return idx === -1 ? 99 : idx;
+    };
 
-        schedule.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'schedule-item';
-            div.style.animationDelay = `${index * 0.1}s`;
-            div.innerHTML = `
-                <div class="time-box">
-                    <span class="time-start">${item.time}</span>
-                    <span class="time-end">${item.end}</span>
-                </div>
-                <div class="subject-details">
-                    <h4>${item.subject}</h4>
-                    <p>${item.prof}</p>
-                </div>
-            `;
-            scheduleList.appendChild(div);
-        });
+    const parseHora = (hora) => {
+        const partes = (hora || '').split('-').map((p) => p.trim());
+        return { inicio: partes[0] || '—', fin: partes[1] || '' };
+    };
 
-        // Guardar subvista en el historial
-        if (pushToHistory) {
-            history.pushState({ sectionId: 'horarios', subView: 'schedule', grade: grade }, "", `#horarios-${grade}`);
+    const grupoParaGrado = (grade, card) => {
+        if (card && card.dataset.grupo) return card.dataset.grupo.trim();
+        const mapa = StudentHubConfig.grupoPorGrado || {};
+        return mapa[grade] || StudentHubConfig.estudianteGrupo || '';
+    };
+
+    const gradoTieneHorario = (grade) => {
+        const activo = StudentHubConfig.gradoConHorario;
+        if (activo) return grade === activo;
+        const mapa = StudentHubConfig.grupoPorGrado || {};
+        return Boolean(mapa[grade]);
+    };
+
+    const cacheHorarios = new Map();
+
+    const esGrupoValido = (valor) => {
+        if (!valor) return false;
+        const s = valor.toString();
+        return !/gmt|standard time/i.test(s);
+    };
+
+    const filtrarPorGrupo = (filas, grupo) => {
+        const g = grupo.toLowerCase();
+        const conGrupoValido = filas.some((f) => esGrupoValido(f.grupo));
+        if (!conGrupoValido) return filas;
+        return filas.filter((f) => (f.grupo || '').toString().trim().toLowerCase() === g);
+    };
+
+    const fetchHorarios = async (grupo) => {
+        const clave = grupo || '__todos__';
+        if (cacheHorarios.has(clave)) return cacheHorarios.get(clave);
+
+        const base = StudentHubConfig.horariosApiUrl;
+        const url = grupo ? `${base}?grupo=${encodeURIComponent(grupo)}` : base;
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error('No se pudo conectar con el servidor de horarios');
+
+        const data = await resp.json();
+        if (data && data.error) throw new Error(data.error);
+        if (!Array.isArray(data)) throw new Error('Respuesta inválida del servidor');
+
+        let filas = data;
+        const necesitaRespaldo =
+            (grupo && filas.length === 0) ||
+            (grupo && filas.length > 0 && !filas.some((f) => esGrupoValido(f.grupo)));
+
+        if (necesitaRespaldo) {
+            const respTodos = await fetch(base);
+            const todos = await respTodos.json();
+            if (Array.isArray(todos) && !todos.error && todos.length) {
+                filas = grupo ? filtrarPorGrupo(todos, grupo) : todos;
+            }
         }
 
-        // Pequeña pausa para efecto visual antes de ocultar
-        setTimeout(() => {
-            gradeSelector.classList.add('hidden');
-            scheduleView.classList.remove('hidden');
-        }, 300);
+        cacheHorarios.set(clave, filas);
+        return filas;
     };
 
-    document.querySelectorAll('.grade-card').forEach(card => {
+    const agruparPorDia = (filas) => {
+        const mapa = new Map();
+        filas.forEach((fila) => {
+            const dia = fila.dia || 'Sin día';
+            if (!mapa.has(dia)) mapa.set(dia, []);
+            mapa.get(dia).push(fila);
+        });
+        return [...mapa.entries()].sort((a, b) => indiceDia(a[0]) - indiceDia(b[0]));
+    };
+
+    const mostrarEstadoHorario = (mensaje, esError = false) => {
+        scheduleList.innerHTML = '';
+        const div = document.createElement('div');
+        div.className = esError ? 'schedule-message schedule-error' : 'schedule-message';
+        div.textContent = mensaje;
+        scheduleList.appendChild(div);
+    };
+
+    const renderFilasHorario = (filas) => {
+        scheduleList.innerHTML = '';
+        if (!filas.length) {
+            mostrarEstadoHorario('No hay horario registrado para este grupo.', true);
+            return;
+        }
+
+        let delay = 0;
+        agruparPorDia(filas).forEach(([dia, clases]) => {
+            const header = document.createElement('h4');
+            header.className = 'schedule-day-title';
+            header.textContent = dia;
+            scheduleList.appendChild(header);
+
+            clases.forEach((item) => {
+                const { inicio, fin } = parseHora(item.hora);
+                const esCena = (item.materia || '').toLowerCase() === 'cena';
+                const div = document.createElement('div');
+                div.className = 'schedule-item' + (esCena ? ' schedule-break' : '');
+                div.style.animationDelay = `${delay * 0.08}s`;
+                delay += 1;
+                div.innerHTML = `
+                    <div class="time-box">
+                        <span class="time-start">${inicio}</span>
+                        ${fin ? `<span class="time-end">${fin}</span>` : ''}
+                    </div>
+                    <div class="subject-details">
+                        <h4>${item.materia || '—'}</h4>
+                        <p>${item.hora || ''}</p>
+                    </div>
+                `;
+                scheduleList.appendChild(div);
+            });
+        });
+    };
+
+    const renderSchedule = async (grade, selectedCard, pushToHistory = true) => {
+        if (!gradoTieneHorario(grade)) {
+            mostrarEstadoHorario('Horario no disponible en este prototipo. Usa 11° Undécimo (grupo 11-2).', true);
+            gradeSelector.classList.remove('hidden');
+            scheduleView.classList.add('hidden');
+            return;
+        }
+
+        const grupo = grupoParaGrado(grade, selectedCard);
+        const etiqueta = etiquetaGrado[grade] || grade.toUpperCase();
+        gradeTitle.textContent = `${etiqueta} — Grupo ${grupo}`;
+
+        document.querySelectorAll('.grade-card').forEach((card) => card.classList.remove('active'));
+        if (selectedCard) selectedCard.classList.add('active');
+
+        gradeSelector.classList.add('hidden');
+        scheduleView.classList.remove('hidden');
+        mostrarEstadoHorario('Cargando horario…');
+
+        if (pushToHistory) {
+            history.pushState({ sectionId: 'horarios', subView: 'schedule', grade: grade }, '', `#horarios-${grade}`);
+        }
+
+        try {
+            const filas = await fetchHorarios(grupo);
+            renderFilasHorario(filas);
+        } catch (err) {
+            console.error('Student HUB horarios:', err);
+            mostrarEstadoHorario(err.message || 'Error al cargar el horario.', true);
+        }
+    };
+
+    document.querySelectorAll('.grade-card').forEach((card) => {
         card.addEventListener('click', () => {
             const grade = card.getAttribute('data-grade');
+            if (card.classList.contains('grade-card--disabled') || !gradoTieneHorario(grade)) {
+                return;
+            }
             renderSchedule(grade, card);
         });
     });

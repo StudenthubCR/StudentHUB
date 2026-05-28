@@ -1,8 +1,9 @@
-const CACHE_NAME = 'studenthub-cache-v10';
+const CACHE_NAME = 'studenthub-cache-v12';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './css/styles.css',
+  './js/config.js',
   './js/script.js',
   './manifest.json',
   './assets/SHlogo.svg',

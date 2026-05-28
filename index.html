@@ -154,27 +154,28 @@
             </div>
 
             <div id="grade-selector" class="grades-grid">
-                <div class="grade-card" data-grade="7mo">
+                <div class="grade-card grade-card--disabled" data-grade="7mo" aria-disabled="true">
                     <span class="grade-num">7°</span>
                     <span class="grade-label">Séptimo</span>
                 </div>
-                <div class="grade-card" data-grade="8vo">
+                <div class="grade-card grade-card--disabled" data-grade="8vo" aria-disabled="true">
                     <span class="grade-num">8°</span>
                     <span class="grade-label">Octavo</span>
                 </div>
-                <div class="grade-card" data-grade="9no">
+                <div class="grade-card grade-card--disabled" data-grade="9no" aria-disabled="true">
                     <span class="grade-num">9°</span>
                     <span class="grade-label">Noveno</span>
                 </div>
-                <div class="grade-card" data-grade="10mo">
+                <div class="grade-card grade-card--disabled" data-grade="10mo" aria-disabled="true">
                     <span class="grade-num">10°</span>
                     <span class="grade-label">Décimo</span>
                 </div>
-                <div class="grade-card" data-grade="11vo">
+                <div class="grade-card grade-card--active" data-grade="11vo" data-grupo="11-2">
                     <span class="grade-num">11°</span>
                     <span class="grade-label">Undécimo</span>
+                    <span class="grade-badge">Grupo 11-2</span>
                 </div>
-                <div class="grade-card" data-grade="12vo">
+                <div class="grade-card grade-card--disabled" data-grade="12vo" aria-disabled="true">
                     <span class="grade-num">12°</span>
                     <span class="grade-label">Duodécimo</span>
                 </div>
@@ -182,7 +183,7 @@
 
             <div id="schedule-view" class="schedule-container hidden">
                 <div class="schedule-header">
-                    <h3 id="selected-grade-title">7mo Año - Grupo 7-1</h3>
+                    <h3 id="selected-grade-title">11° Undécimo — Grupo 11-2</h3>
                     <button class="btn-text" id="change-grade">Cambiar grado</button>
                 </div>
                 <div class="schedule-list" id="schedule-list">
@@ -209,7 +210,8 @@
         </button>
     </nav>
 
-    <!-- Script de Lógica SPA -->
+    <!-- Configuración y lógica SPA -->
+    <script src="js/config.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>

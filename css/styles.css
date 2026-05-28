@@ -484,6 +484,32 @@ body {
     color: var(--text-muted);
 }
 
+.grade-badge {
+    margin-top: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    background: rgba(1, 48, 178, 0.1);
+    padding: 3px 8px;
+    border-radius: 999px;
+}
+
+.grade-card--active {
+    border-color: var(--primary-color);
+    box-shadow: 0 6px 20px rgba(1, 48, 178, 0.2);
+}
+
+.grade-card--disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.grade-card--disabled:hover {
+    transform: none;
+    border-color: transparent;
+}
+
 .schedule-header {
     display: flex;
     justify-content: space-between;
@@ -510,6 +536,42 @@ body {
     display: flex;
     flex-direction: column;
     gap: 12px;
+}
+
+.schedule-day-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin: 16px 0 4px;
+    padding-left: 4px;
+}
+
+.schedule-day-title:first-child {
+    margin-top: 0;
+}
+
+.schedule-message {
+    text-align: center;
+    padding: 24px 16px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.schedule-error {
+    color: #c0392b;
+}
+
+[data-theme="dark"] .schedule-error {
+    color: #ff8a80;
+}
+
+.schedule-item.schedule-break {
+    border-left-color: #f39c12;
+    opacity: 0.92;
+}
+
+.schedule-item.schedule-break .subject-details p {
+    font-style: italic;
 }
 
 .schedule-item {
