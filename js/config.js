@@ -1,10 +1,14 @@
 /**
- * Configuración de Student HUB
- * API de horarios (Google Apps Script — implementación actual)
+ * Configuración de Student HUB — USAR ESTE ARCHIVO EN EL REPO DEL EQUIPO
+ * Todas las URLs de bases de datos: ver también BASES_DE_DATOS.md en la raíz.
  */
 const StudentHubConfig = {
+    // --- API Horarios (Google Apps Script) ---
     horariosApiUrl:
-        'https://script.google.com/macros/s/AKfycbwPGx7IqnBLS0NSJScOV90r4yv8sTnoq2B5AzC0kWNOnmyOm1nQeAQXBfBJNBHzLBhn/exec',
+        'https://script.google.com/macros/s/AKfycbxcjXuPs80KsshkCACYPZdOXQmuPY5tg-ThNmcWZ_9_YyOIEkOgb4oMdNlTOYixbfqz/exec',
+
+    // Google Sheet: 1Qm2sW_y5dL7KokhKjCUJ7hPFDnFzgoJP3oeZlCXYMXo — hoja "Horarios"
+    // Código Apps Script en el repo: apps-script/horarios.gs
 
     /** Prototipo: único grupo con horario en la hoja */
     estudianteGrupo: '11-2',

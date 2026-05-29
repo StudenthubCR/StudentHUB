@@ -1,34 +1,51 @@
 /**
  * Student HUB — Backend de horarios (Google Apps Script)
- * Hoja: "Horarios" | Columnas: A=Grupo, B=Día, C=Hora, D=Materia
+ * Hoja: "Horarios" | A=Grupo | B=Día | C=Hora | D=Materia
  *
- * IMPORTANTE: Columna A debe ser texto plano (ej. 11-2), NO formato Fecha.
- * Despliegue: Implementar → Nueva implementación → Aplicación web
+ * CÓMO USAR:
+ * 1. Abre tu Google Sheet → Extensiones → Apps Script
+ * 2. Pega TODO este archivo (reemplaza el código anterior)
+ * 3. Si el script NO está dentro de la hoja, pon el ID correcto en SPREADSHEET_ID
+ *    (está en la URL: .../d/ESTE_ID/edit)
+ * 4. Guardar → Implementar → Nueva implementación → App web → Cualquier persona
+ * 5. Copia la URL nueva en js/config.js (horariosApiUrl)
+ *
+ * Columna A = texto plano "11-2" (no formato Fecha)
  */
 
 var SPREADSHEET_ID = '1Qm2sW_y5dL7KokhKjCUJ7hPFDnFzgoJP3oeZlCXYMXo';
 var HOJA_HORARIOS = 'Horarios';
 
+/** Abre el libro vinculado al script o, si no hay, por ID */
+function obtenerLibro() {
+  try {
+    var activo = SpreadsheetApp.getActiveSpreadsheet();
+    if (activo) return activo;
+  } catch (e) { /* script independiente */ }
+
+  return SpreadsheetApp.openById(SPREADSHEET_ID);
+}
+
 function obtenerDatosDeHoja() {
   try {
-    var libro = SpreadsheetApp.openById(SPREADSHEET_ID);
+    var libro = obtenerLibro();
+    if (!libro) return null;
+
     var hoja = libro.getSheetByName(HOJA_HORARIOS);
-    if (!hoja) return { valores: [], display: [] };
+    if (!hoja) return null;
 
     var rango = hoja.getDataRange();
+    if (rango.getNumRows() < 2) return null;
+
     return {
       valores: rango.getValues(),
       display: rango.getDisplayValues()
     };
   } catch (e) {
-    return { valores: [], display: [] };
+    return null;
   }
 }
 
-/**
- * Lee el texto visible de la celda. Evita que "11-2" convertido a Date
- * salga como "Wed Feb 11 2026..." en el JSON.
- */
 function leerCelda(valores, display, fila, col) {
   var valor = valores[fila][col];
   var texto = display[fila][col];
@@ -36,11 +53,9 @@ function leerCelda(valores, display, fila, col) {
   if (valor === null || valor === undefined || valor === '') {
     return texto ? texto.toString().trim() : '';
   }
-
   if (valor instanceof Date) {
     return texto ? texto.toString().trim() : '';
   }
-
   return valor.toString().trim();
 }
 
@@ -58,14 +73,17 @@ function doGet(e) {
       grupoBuscado = normalizarGrupo(e.parameter.grupo);
     }
 
-    var hoja = obtenerDatosDeHoja();
-    var valores = hoja.valores;
-    var display = hoja.display;
-
-    if (!valores.length) {
-      return respuestaJson({ error: 'No se encontró la hoja Horarios o está vacía' });
+    var datos = obtenerDatosDeHoja();
+    if (!datos) {
+      return respuestaJson({
+        error:
+          'No se encontró la hoja Horarios o está vacía. ' +
+          'Abre el script desde Extensiones en TU hoja, o corrige SPREADSHEET_ID.'
+      });
     }
 
+    var valores = datos.valores;
+    var display = datos.display;
     var resultado = [];
 
     for (var i = 1; i < valores.length; i++) {
@@ -94,4 +112,19 @@ function respuestaJson(objeto) {
   return ContentService.createTextOutput(JSON.stringify(objeto)).setMimeType(
     ContentService.MimeType.JSON
   );
+}
+
+/** Ejecutar una vez en Apps Script (▶) para autorizar permisos */
+function probarLectura() {
+  var datos = obtenerDatosDeHoja();
+  if (!datos) {
+    Logger.log('ERROR: no se leyó Horarios');
+    return;
+  }
+  Logger.log('Filas leídas: ' + datos.valores.length);
+  Logger.log('Primera clase: ' + JSON.stringify({
+    grupo: leerCelda(datos.valores, datos.display, 1, 0),
+    dia: leerCelda(datos.valores, datos.display, 1, 1),
+    materia: leerCelda(datos.valores, datos.display, 1, 3)
+  }));
 }
