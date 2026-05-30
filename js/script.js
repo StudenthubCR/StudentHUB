@@ -24,10 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * Cambia la sección activa basándose en el ID proporcionado.
      * @param {string} sectionId - El ID de la sección a mostrar.
-     */
-    /**
-     * Cambia la sección activa basándose en el ID proporcionado.
-     * @param {string} sectionId - El ID de la sección a mostrar.
      * @param {boolean} pushToHistory - Si se debe registrar la navegación en el historial.
      */
     const switchSection = (sectionId, pushToHistory = true) => {
@@ -45,6 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 targetSection.classList.add('active');
             }, 10);
+
+            // Si entramos a comedor, inicializar el menú
+            if (sectionId === 'comedor') {
+                initComedor();
+            }
         }
 
         // 3. Actualizar estado visual de los botones de navegación
@@ -154,23 +155,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Accesos rápidos desde el Dashboard
     const shortcutCarnet = document.getElementById('shortcut-carnet');
     const shortcutComedor = document.getElementById('shortcut-comedor');
+    const shortcutHorarios = document.getElementById('shortcut-horarios');
 
     if (shortcutCarnet) {
         shortcutCarnet.addEventListener('click', () => switchSection('carnet'));
     }
 
     if (shortcutComedor) {
-        shortcutComedor.addEventListener('click', () => {
-            alert('El servicio de Comedor estará disponible próximamente.');
-        });
+        shortcutComedor.addEventListener('click', () => switchSection('comedor'));
     }
 
-    const shortcutHorarios = document.getElementById('shortcut-horarios');
     if (shortcutHorarios) {
         shortcutHorarios.addEventListener('click', () => switchSection('horarios'));
     }
 
-    // Lógica interna de la sección Horarios
+    // =========================================
+    // LÓGICA DE LA SECCIÓN HORARIOS
+    // =========================================
     const gradeSelector = document.getElementById('grade-selector');
     const scheduleView = document.getElementById('schedule-view');
     const scheduleList = document.getElementById('schedule-list');
@@ -370,7 +371,9 @@ document.addEventListener('DOMContentLoaded', () => {
         history.back();
     });
 
-    // Lógica del Carrusel de Noticias con Controles Manuales y Auto-Rotación
+    // =========================================
+    // LÓGICA DEL CARRUSEL DE NOTICIAS
+    // =========================================
     const slides = document.querySelectorAll('.carousel-slide');
     const btnPrev = document.getElementById('carousel-prev');
     const btnNext = document.getElementById('carousel-next');
@@ -428,6 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (slides.length > 0) {
         startAutoplay();
     }
+
     // Lógica para el QR (Simulación de animación o datos dinámicos)
     const qrPixels = document.querySelectorAll('.qr-pixel');
     if (qrPixels.length > 0) {
@@ -438,7 +442,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     }
 
-    // Botón para Guardar Credencial Offline
+    // =========================================
+    // BOTÓN PARA GUARDAR CREDENCIAL OFFLINE
+    // =========================================
     const downloadOfflineBtn = document.getElementById('download-offline-btn');
     if (downloadOfflineBtn) {
         downloadOfflineBtn.addEventListener('click', () => {
@@ -471,6 +477,194 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1500);
         });
     }
+
+    // =========================================
+    // LÓGICA DEL COMEDOR ESTUDIANTIL
+    // =========================================
+    const MOCK_MENUS = {
+        1: [
+            { dia: 'Lunes', plato: 'Arroz con pollo desmechado', acompanamiento: 'Frijoles molidos, Ensalada de repollo con zanahoria', bebida: 'Té frío de limón', postre: 'Piña en rodajas' },
+            { dia: 'Martes', plato: 'Casado tradicional de carne en salsa', acompanamiento: 'Arroz blanco, Frijoles negros, Plátano maduro frito y ensalada verde', bebida: 'Fresco de cas', postre: 'Papaya' },
+            { dia: 'Miércoles', plato: 'Chuleta de cerdo frita', acompanamiento: 'Puré de papas gratinado, Ensalada de lechuga y tomate', bebida: 'Té dulce caliente', postre: 'Melón dulce' },
+            { dia: 'Jueves', plato: 'Spaghettis a la boloñesa con carne de res', acompanamiento: 'Pan con ajo tostado, Ensalada césar fresca', bebida: 'Agua pura', postre: 'Sandía en triángulos' },
+            { dia: 'Viernes', plato: 'Filet de pescado al ajillo', acompanamiento: 'Arroz blanco, Frijoles frescos y vegetales al vapor', bebida: 'Fresco de frutas de temporada', postre: 'Banano maduro' }
+        ],
+        2: [
+            { dia: 'Lunes', plato: 'Lasaña de carne mixta (res y cerdo)', acompanamiento: 'Ensalada verde con aderezo italiano, Pan con mantequilla', bebida: 'Té frío dulce', postre: 'Manzana roja' },
+            { dia: 'Martes', plato: 'Estofado de pollo con papas y zanahoria', acompanamiento: 'Arroz blanco, Frijoles tiernos con vainicas, Tortilla', bebida: 'Fresco de cas natural', postre: 'Piña picada' },
+            { dia: 'Miércoles', plato: 'Pescado empanizado crujiente', acompanamiento: 'Arroz con maíz dulce, Ensalada caribeña de repollo', bebida: 'Limonada natural', postre: 'Mango maduro' },
+            { dia: 'Jueves', plato: 'Arroz guisado con carne de cerdo', acompanamiento: 'Frijoles molidos, Plátano maduro horneado, Ensalada de pepino', bebida: 'Agua pura', postre: 'Melón picado' },
+            { dia: 'Viernes', plato: 'Sopa de pollo completa con verduras', acompanamiento: 'Arroz blanco, Aguacate y dos tortillas de maíz', bebida: 'Fresco de horchata', postre: 'Mandarina' }
+        ],
+        3: [
+            { dia: 'Lunes', plato: 'Fajitas de pechuga de pollo salteadas con chile y cebolla', acompanamiento: 'Tortillas de trigo para tacos, Frijoles negros enteros, Ensalada criolla', bebida: 'Té frío', postre: 'Piña' },
+            { dia: 'Martes', plato: 'Carne mechada de res en salsa criolla', acompanamiento: 'Arroz blanco, Ensalada de repollo blanco con culantro y limón', bebida: 'Fresco de maracuyá', postre: 'Banano' },
+            { dia: 'Miércoles', plato: 'Pescado fresco frito al limón', acompanamiento: 'Papas fritas crujientes, Ensalada mixta tradicional', bebida: 'Té helado de limón', postre: 'Papaya dulce' },
+            { dia: 'Jueves', plato: 'Arroz con carne de cerdo picada y maíz dulce', acompanamiento: 'Ensalada rusa con remolacha y papa, Chips de plátano', bebida: 'Agua pura', postre: 'Sandía' },
+            { dia: 'Viernes', plato: 'Garbanzos con pollo desmechado y papa', acompanamiento: 'Arroz blanco, Ensalada fresca de lechuga, repollo y remolacha', bebida: 'Fresco de frutas', postre: 'Manzana verde' }
+        ],
+        4: [
+            { dia: 'Lunes', plato: 'Frijoles blancos con pollo desmechado, zanahoria o chayote', acompanamiento: 'Arroz blanco. Aderezo: Vinagreta de vegetales', bebida: 'Agua pura', postre: 'Banano' },
+            { dia: 'Martes', plato: 'Pasta de cerdo en salsa criolla con papas', acompanamiento: 'Arroz blanco, Frijoles negros frescos, Repollo blanco con zanahoria', bebida: 'Agua pura', postre: 'Papaya / Melón' },
+            { dia: 'Miércoles', plato: 'Pescado empanizado (con limón en rodaja)', acompanamiento: 'Arroz blanco, Frijoles negros frescos, Lechuga y tomate. Aderezo: Vinagreta básica', bebida: 'Agua pura', postre: 'Sandía' },
+            { dia: 'Jueves', plato: 'Arroz mixto de pollo, cerdo y huevo con cebollino y zanahoria', acompanamiento: 'Frijoles molidos, Pepino en medias lunas y guacamole', bebida: 'Agua pura', postre: 'Piña' },
+            { dia: 'Viernes', plato: 'Olla de carne con verduras variadas', acompanamiento: 'Verduras de olla (Sopa completa con yuca, elote, plátano y papa)', bebida: 'Agua pura', postre: 'Manzana' }
+        ],
+        5: [
+            { dia: 'Lunes', plato: 'Pollo al horno marinado con hierbas frescas', acompanamiento: 'Puré de papas cremoso con ajo, Vainicas salteadas con mantequilla', bebida: 'Té frío', postre: 'Mandarina dulce' },
+            { dia: 'Martes', plato: 'Carne mechada en salsa con pimientos y cebolla', acompanamiento: 'Arroz con vegetales, Frijoles colorados frescos, Chips de yuca', bebida: 'Fresco de avena fría', postre: 'Mango picado' },
+            { dia: 'Miércoles', plato: 'Tacos de pescado al estilo ensenada', acompanamiento: 'Repollo morado rallado, Salsa de yogur y limón, Tortillas de maíz', bebida: 'Limonada con menta', postre: 'Piña dulce' },
+            { dia: 'Jueves', plato: 'Arroz con atún selecto y maíz dulce horneado', acompanamiento: 'Ensalada de papa fría con mayonesa y cilantro, Plátano frito', bebida: 'Té de durazno', postre: 'Sandía jugosa' },
+            { dia: 'Viernes', plato: 'Estofado de res en salsa de tomate con zanahoria y papa', acompanamiento: 'Arroz blanco, Frijoles negros frescos, Tortilla de maíz palmada', bebida: 'Agua pura', postre: 'Papaya' }
+        ]
+    };
+
+    const initComedor = async () => {
+        const todayMenuTitle = document.getElementById('today-menu-title');
+        const todayMenuDesc = document.getElementById('today-menu-desc');
+        const todayMenuProtein = document.getElementById('today-menu-protein');
+        const todayMenuSide = document.getElementById('today-menu-side');
+        const todayMenuDrink = document.getElementById('today-menu-drink');
+        const todayMenuDessert = document.getElementById('today-menu-dessert');
+        const weeklyMenuList = document.getElementById('weekly-menu-list');
+        const weeklySubtitle = document.querySelector('.weekly-subtitle');
+
+        if (!weeklyMenuList) return;
+
+        // Mostrar cargando
+        weeklyMenuList.innerHTML = '<div class="schedule-message">Cargando menú semanal...</div>';
+
+        // Detectar si hoy es fin de semana (Sábado o Domingo) para previsualizar la siguiente semana
+        const hoyIndex = new Date().getDay();
+        const esFinDeSemana = (hoyIndex === 0 || hoyIndex === 6);
+        
+        const semanaConfigurada = StudentHubConfig.comedorSemanaActiva || 1;
+        let semanaActiva = semanaConfigurada;
+
+        if (esFinDeSemana) {
+            // El fin de semana cargamos la semana siguiente de forma cíclica (de la 1 a la 5)
+            semanaActiva = semanaConfigurada + 1;
+            if (semanaActiva > 5) {
+                semanaActiva = 1;
+            }
+            if (weeklySubtitle) {
+                weeklySubtitle.innerHTML = `<strong>Avance de la Semana ${semanaActiva}</strong> — Visualizando el menú para la próxima semana (Comedor cerrado fines de semana).`;
+            }
+        } else {
+            if (weeklySubtitle) {
+                weeklySubtitle.textContent = `Menú correspondiente a la Semana ${semanaActiva} del ciclo lectivo.`;
+            }
+        }
+
+        let menuData = MOCK_MENUS[semanaActiva] || MOCK_MENUS[4]; // Por defecto usar fallback offline dinámico según la semana
+        const baseUrl = StudentHubConfig.comedorApiUrl;
+
+        // Comprobar si la URL del Apps Script es la por defecto o está configurada
+        if (baseUrl && !baseUrl.includes('AKfycbwUqA9-wz-O7v0F1zW-E06_z7y112345')) {
+            try {
+                // Añadimos el parámetro de la semana activa en el fetch a Apps Script
+                let response = await fetch(`${baseUrl}?semana=${semanaActiva}`);
+                if (response.ok) {
+                    let data = await response.json();
+                    
+                    // Si no devolvió datos y no hay error, intentamos con el formato alternativo "?semana=Semana X"
+                    if ((!Array.isArray(data) || data.length === 0) && !data.error) {
+                        console.log(`Student HUB Comedor: Intento con "?semana=${semanaActiva}" retornó vacío. Probando con "?semana=Semana ${semanaActiva}"...`);
+                        const fallbackResponse = await fetch(`${baseUrl}?semana=Semana ${encodeURIComponent(semanaActiva)}`);
+                        if (fallbackResponse.ok) {
+                            const fallbackData = await fallbackResponse.json();
+                            if (Array.isArray(fallbackData) && fallbackData.length > 0) {
+                                data = fallbackData;
+                            }
+                        }
+                    }
+                    
+                    if (Array.isArray(data) && data.length > 0 && !data.error) {
+                        menuData = data;
+                        console.log(`Student HUB Comedor: Datos de Semana ${semanaActiva} cargados con éxito desde Google Sheets.`);
+                    }
+                }
+            } catch (err) {
+                console.warn('Student HUB Comedor: Error al conectar con Apps Script. Usando menú local offline dinámico.', err);
+            }
+        }
+
+        // Renderizar menú de la semana
+        weeklyMenuList.innerHTML = '';
+        let delay = 0;
+
+        menuData.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'menu-day-card';
+            card.style.animationDelay = `${delay * 0.08}s`;
+            delay += 1;
+
+            card.innerHTML = `
+                <div class="menu-day-header">
+                    <h4>${item.dia || 'Día'}</h4>
+                    <span class="menu-day-icon">🍲</span>
+                </div>
+                <div class="menu-day-body">
+                    <div class="menu-field">
+                        <span class="field-label">Plato Principal</span>
+                        <p class="field-val">${item.plato || 'No programado'}</p>
+                    </div>
+                    <div class="menu-field">
+                        <span class="field-label">Acompañamiento</span>
+                        <p class="field-val">${item.acompanamiento || 'No programado'}</p>
+                    </div>
+                    <div class="menu-field">
+                        <span class="field-label">Bebida</span>
+                        <p class="field-val">${item.bebida || 'No programado'}</p>
+                    </div>
+                    <div class="menu-field">
+                        <span class="field-label">Fruta</span>
+                        <p class="field-val">${item.postre || 'No programada'}</p>
+                    </div>
+                </div>
+            `;
+            weeklyMenuList.appendChild(card);
+        });
+
+        // Determinar menú recomendado para hoy basado en el día real
+        const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        const hoyNombre = diasSemana[hoyIndex];
+
+        if (esFinDeSemana) {
+            // Desactivamos el plato recomendado los fines de semana
+            todayMenuTitle.textContent = "Comedor Cerrado ☀️";
+            todayMenuDesc.textContent = "El servicio de comedor no está activo durante los fines de semana. ¡Que tengas un excelente descanso!";
+            todayMenuProtein.textContent = "—";
+            todayMenuSide.textContent = "—";
+            todayMenuDrink.textContent = "—";
+            todayMenuDessert.textContent = "—";
+        } else {
+            let menuHoy = menuData.find(item => {
+                const d = (item.dia || '').toString().toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                const h = hoyNombre.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                return d === h;
+            });
+
+            if (menuHoy) {
+                todayMenuTitle.textContent = menuHoy.plato || 'No programado';
+                todayMenuDesc.textContent = `Acompañamiento recomendado: ${menuHoy.acompanamiento || 'No programado'}`;
+                
+                // Extraer una simplificación para la tabla nutricional
+                const platoText = (menuHoy.plato || '');
+                let proteina = platoText.split('con')[0] || platoText;
+                if (proteina.length > 25) proteina = proteina.substring(0, 25) + '...';
+
+                const acoText = (menuHoy.acompanamiento || '');
+                let acomp = acoText.split(',')[0] || acoText;
+                if (acomp.length > 25) acomp = acomp.substring(0, 25) + '...';
+
+                todayMenuProtein.textContent = proteina;
+                todayMenuSide.textContent = acomp;
+                todayMenuDrink.textContent = menuHoy.bebida || 'Agua pura';
+                todayMenuDessert.textContent = menuHoy.postre || 'Fruta de temporada';
+            }
+        }
+    };
 
     console.log('Student HUB: Sistema SPA inicializado correctamente.');
 });

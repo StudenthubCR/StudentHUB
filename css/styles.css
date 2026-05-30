@@ -1207,6 +1207,192 @@ body {
         padding: 30px;
     }
 }
+/* =========================================
+   ESTILOS DEL COMEDOR ESTUDIANTIL
+   ========================================= */
+.comedor-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 15px;
+}
+
+.menu-today-card {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: #ffffff;
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-today-badge {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 6px 14px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-block;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.menu-today-card h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #ffffff;
+}
+
+.menu-today-card .menu-details {
+    font-size: 0.95rem;
+    opacity: 0.95;
+    margin-bottom: 25px;
+    max-width: 650px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.menu-nutritional-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    padding-top: 20px;
+}
+
+@media (min-width: 576px) {
+    .menu-nutritional-info {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.nutri-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.nutri-label {
+    font-size: 0.7rem;
+    opacity: 0.75;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.nutri-val {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.weekly-menu-section h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.weekly-subtitle {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+}
+
+.weekly-menu-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+@media (min-width: 768px) {
+    .weekly-menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1200px) {
+    .weekly-menu-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.menu-day-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition);
+    animation: fadeIn 0.4s ease-out both;
+}
+
+[data-theme="dark"] .menu-day-card {
+    border-color: rgba(255, 255, 255, 0.03);
+}
+
+.menu-day-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(11, 43, 128, 0.08);
+    border-color: rgba(1, 48, 178, 0.15);
+}
+
+.menu-day-header {
+    background: rgba(1, 48, 178, 0.04);
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="dark"] .menu-day-header {
+    background: rgba(75, 115, 225, 0.04);
+    border-bottom-color: rgba(255, 255, 255, 0.03);
+}
+
+.menu-day-header h4 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.menu-day-icon {
+    font-size: 1.3rem;
+}
+
+.menu-day-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    flex-grow: 1;
+}
+
+.menu-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.field-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.field-val {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    line-height: 1.4;
+}
 
 /* =========================================
    ESTILOS DE IMPRESIÓN EXCLUSIVOS PARA CARNET
