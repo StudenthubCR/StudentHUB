@@ -788,19 +788,458 @@ body {
     stroke: var(--primary-color);
 }
 
-/* Media Queries */
+/* =========================================
+   ESTILOS DE ANIMACIÓN E INTERACTIVIDAD
+   ========================================= */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* =========================================
+   DETALLES DE CARNET DIGITAL
+   ========================================= */
+.carnet-container {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.carnet-details-panel {
+    background: var(--white);
+    padding: 24px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--card-shadow);
+    width: 100%;
+    max-width: 350px;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    transition: var(--transition);
+}
+
+[data-theme="dark"] .carnet-details-panel {
+    border-color: rgba(255, 255, 255, 0.03);
+}
+
+.carnet-details-panel h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.badge-status-container {
+    margin-bottom: 18px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 12px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+[data-theme="dark"] .status-badge {
+    background: rgba(16, 185, 129, 0.2);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #10b981;
+    display: inline-block;
+}
+
+/* Animación de pulso para indicador activo */
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.status-badge.active .status-dot {
+    animation: pulse 2s infinite;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.detail-item {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding-bottom: 8px;
+}
+
+[data-theme="dark"] .detail-item {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.detail-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.detail-val {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.carnet-action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.carnet-action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid transparent;
+    font-family: inherit;
+}
+
+.carnet-action-btn:active {
+    transform: scale(0.97);
+}
+
+.carnet-action-btn.primary {
+    background: var(--primary-color);
+    color: #ffffff;
+}
+
+.carnet-action-btn.primary:hover {
+    background: var(--primary-dark);
+}
+
+.carnet-action-btn.secondary {
+    background: transparent;
+    border-color: rgba(0, 0, 0, 0.15);
+    color: var(--text-dark);
+}
+
+[data-theme="dark"] .carnet-action-btn.secondary {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.carnet-action-btn.secondary:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="dark"] .carnet-action-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* =========================================
+   MEDIA QUERIES PARA ADAPTACIÓN A LAPTOPS Y ESCRITORIO
+   ========================================= */
 @media (min-width: 768px) {
     body {
-        max-width: 500px;
-        margin: 0 auto;
-        box-shadow: 0 0 50px rgba(0,0,0,0.1);
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        grid-template-rows: 70px 1fr;
+        grid-template-areas:
+            "header header"
+            "sidebar content";
         min-height: 100vh;
+        padding-bottom: 0; /* Remueve espacio inferior de la barra móvil */
+        max-width: none;
+        margin: 0;
+        box-shadow: none;
+        background-color: var(--bg-white);
+    }
+    
+    .app-header {
+        grid-area: header;
+        position: sticky;
+        top: 0;
+        height: 70px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 40px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: none;
         background: var(--white);
+        z-index: 100;
+    }
+    
+    [data-theme="dark"] .app-header {
+        border-bottom-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .logo-container {
+        margin-left: 0;
     }
     
     .bottom-nav {
-        max-width: 500px;
-        left: 50%;
-        transform: translateX(-50%);
+        grid-area: sidebar;
+        position: sticky;
+        top: 70px;
+        height: calc(100vh - 70px);
+        width: 280px;
+        max-width: none;
+        left: 0;
+        transform: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        padding: 30px 20px;
+        gap: 10px;
+        border-right: 1px solid rgba(0, 0, 0, 0.05);
+        background: var(--white);
+        box-shadow: none;
+        z-index: 90;
+    }
+    
+    [data-theme="dark"] .bottom-nav {
+        border-right-color: rgba(255, 255, 255, 0.05);
+    }
+    
+    .nav-item {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 16px;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        width: 100%;
+        color: var(--text-muted);
+        transition: var(--transition);
+        flex: none; /* Override flex: 1 de móvil */
+    }
+    
+    .nav-item span {
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    
+    .nav-item svg {
+        width: 22px;
+        height: 22px;
+    }
+    
+    .nav-item.active {
+        background: rgba(1, 48, 178, 0.08);
+        color: var(--primary-color);
+    }
+    
+    [data-theme="dark"] .nav-item.active {
+        background: rgba(75, 115, 225, 0.12);
+        color: var(--primary-color);
+    }
+    
+    .nav-item.active svg {
+        transform: none;
+    }
+    
+    .nav-item:hover:not(.active) {
+        background: rgba(0, 0, 0, 0.03);
+        color: var(--text-dark);
+    }
+    
+    [data-theme="dark"] .nav-item:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--text-dark);
+    }
+    
+    #app-content {
+        grid-area: content;
+        padding: 40px;
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+        overflow-y: auto;
+    }
+    
+    .page-section {
+        padding: 0; /* Remueve padding excesivo de secciones en desktop */
+    }
+    
+    /* Adaptaciones de la sección Horarios */
+    .grades-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+    
+    .grade-card {
+        padding: 30px 20px;
+    }
+    
+    .schedule-container {
+        background: var(--white);
+        padding: 30px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+    
+    [data-theme="dark"] .schedule-container {
+        border-color: rgba(255, 255, 255, 0.03);
+    }
+}
+
+@media (min-width: 992px) {
+    /* Diseño del Dashboard en 2 columnas */
+    #dashboard {
+        display: grid;
+        grid-template-columns: 1.8fr 1.2fr;
+        grid-template-rows: auto 1fr;
+        gap: 30px;
+        align-items: start;
+    }
+    
+    .welcome-card {
+        grid-column: 1 / -1;
+    }
+    
+    .news-carousel.dashboard-banner {
+        grid-column: 1;
+        margin-bottom: 0;
+        max-width: 450px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+
+    
+    .info-section {
+        grid-column: 2;
+        margin-bottom: 0;
+    }
+    
+    /* Servicios horizontales detallados en desktop */
+    .services-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .service-item {
+        flex-direction: row;
+        padding: 20px;
+        align-items: center;
+        text-align: left;
+        gap: 20px;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+    
+    [data-theme="dark"] .service-item {
+        border-color: rgba(255, 255, 255, 0.03);
+    }
+    
+    .service-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(1, 48, 178, 0.08);
+        border-color: rgba(1, 48, 178, 0.2);
+    }
+    
+    .service-item span {
+        font-size: 0.95rem;
+    }
+    
+    .service-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.6rem;
+    }
+    
+    /* Grid de Grados del Horario en Fila Única (6 Columnas) */
+    .grades-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+    
+    /* Split Layout para el Carnet Digital */
+    .carnet-container {
+        flex-direction: row;
+        justify-content: center;
+        gap: 40px;
+        align-items: stretch;
+        max-width: 850px;
+        margin: 20px auto 0;
+    }
+    
+    .id-card {
+        margin: 0;
+        flex: 1;
+        max-width: 360px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .carnet-details-panel {
+        flex: 1.2;
+        max-width: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 30px;
+    }
+}
+
+/* =========================================
+   ESTILOS DE IMPRESIÓN EXCLUSIVOS PARA CARNET
+   ========================================= */
+@media print {
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    .app-header, 
+    .bottom-nav, 
+    .section-header, 
+    .carnet-details-panel, 
+    script {
+        display: none !important;
+    }
+    
+    .id-card {
+        box-shadow: none !important;
+        border: 1px solid #cccccc !important;
+        margin: 40px auto !important;
+        page-break-inside: avoid;
+        background: linear-gradient(135deg, #0130B2 0%, #0B2B80 100%) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    
+    .id-card-footer {
+        background: #ffffff !important;
+        color: #1a1a1a !important;
     }
 }

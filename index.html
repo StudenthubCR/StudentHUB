@@ -112,33 +112,73 @@
                 <h2>Mi Carnet Digital</h2>
             </div>
             
-            <div class="id-card">
-                <div class="id-card-header">
-                    <div class="inst-logo">CTP</div>
-                    <div class="inst-name">Colegio Técnico Profesional</div>
-                </div>
-                
-                <div class="id-card-body">
-                    <div class="student-photo-container">
-                        <img src="assets/student.png" alt="Foto Estudiante" class="student-photo">
+            <div class="carnet-container">
+                <div class="id-card">
+                    <div class="id-card-header">
+                        <div class="inst-logo">CTP</div>
+                        <div class="inst-name">Colegio Técnico Profesional</div>
                     </div>
-                    <div class="student-info">
-                        <h3>Erick Martínez</h3>
-                        <p class="student-id">ID: 2024-00123</p>
-                        <p class="student-specialty">Informática en Desarrollo de Software</p>
-                        <div class="nocturnal-badge">Sección Nocturna</div>
-                    </div>
-                </div>
-                
-                <div class="id-card-footer">
-                    <div class="qr-container">
-                        <!-- Simulación de Código QR -->
-                        <div class="qr-code">
-                            <div class="qr-pixel"></div>
-                            <div class="qr-pixel"></div>
-                            <!-- ... más píxeles simulados con CSS ... -->
+                    
+                    <div class="id-card-body">
+                        <div class="student-photo-container">
+                            <img src="assets/student.png" alt="Foto Estudiante" class="student-photo">
                         </div>
-                        <p>Escanea para validar</p>
+                        <div class="student-info">
+                            <h3>Erick Martínez</h3>
+                            <p class="student-id">ID: 2024-00123</p>
+                            <p class="student-specialty">Informática en Desarrollo de Software</p>
+                            <div class="nocturnal-badge">Sección Nocturna</div>
+                        </div>
+                    </div>
+                    
+                    <div class="id-card-footer">
+                        <div class="qr-container">
+                            <!-- Simulación de Código QR -->
+                            <div class="qr-code">
+                                <div class="qr-pixel"></div>
+                                <div class="qr-pixel"></div>
+                                <!-- ... más píxeles simulados con CSS ... -->
+                            </div>
+                            <p>Escanea para validar</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de Detalles Académicos para pantallas grandes -->
+                <div class="carnet-details-panel">
+                    <h3>Credencial Digital Oficial</h3>
+                    <div class="badge-status-container">
+                        <span class="status-badge active"><span class="status-dot"></span> Estudiante Activo</span>
+                    </div>
+                    
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Institución</span>
+                            <span class="detail-val">Colegio Técnico Profesional (CTP)</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Especialidad</span>
+                            <span class="detail-val">Informática en Desarrollo de Software</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Sección / Nivel</span>
+                            <span class="detail-val">11-2 (Undécimo Año - Nocturna)</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Vigencia</span>
+                            <span class="detail-val">Ciclo Lectivo 2026</span>
+                        </div>
+                    </div>
+
+                    <div class="carnet-action-buttons">
+                        <button class="carnet-action-btn primary" onclick="window.print()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                            <span>Imprimir Credencial</span>
+                        </button>
+                        <button class="carnet-action-btn secondary" id="download-offline-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                            <span>Guardar Offline</span>
+                        </button>
                     </div>
                 </div>
             </div>

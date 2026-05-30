@@ -428,7 +428,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (slides.length > 0) {
         startAutoplay();
     }
-
     // Lógica para el QR (Simulación de animación o datos dinámicos)
     const qrPixels = document.querySelectorAll('.qr-pixel');
     if (qrPixels.length > 0) {
@@ -437,6 +436,40 @@ document.addEventListener('DOMContentLoaded', () => {
                 pixel.style.opacity = Math.random() > 0.5 ? '1' : '0.3';
             });
         }, 1000);
+    }
+
+    // Botón para Guardar Credencial Offline
+    const downloadOfflineBtn = document.getElementById('download-offline-btn');
+    if (downloadOfflineBtn) {
+        downloadOfflineBtn.addEventListener('click', () => {
+            // Mostrar feedback premium de descarga
+            const originalContent = downloadOfflineBtn.innerHTML;
+            downloadOfflineBtn.disabled = true;
+            downloadOfflineBtn.innerHTML = `
+                <svg class="animate-spin" style="animation: spin 1s linear infinite;" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                <span>Descargando...</span>
+            `;
+            
+            setTimeout(() => {
+                downloadOfflineBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>¡Guardado Offline!</span>
+                `;
+                downloadOfflineBtn.style.backgroundColor = '#10b981';
+                downloadOfflineBtn.style.borderColor = '#10b981';
+                downloadOfflineBtn.style.color = '#ffffff';
+                
+                alert('Credencial guardada en la caché local. Ahora puedes acceder a tu carnet digital incluso sin conexión a internet.');
+                
+                setTimeout(() => {
+                    downloadOfflineBtn.disabled = false;
+                    downloadOfflineBtn.innerHTML = originalContent;
+                    downloadOfflineBtn.style.backgroundColor = '';
+                    downloadOfflineBtn.style.borderColor = '';
+                    downloadOfflineBtn.style.color = '';
+                }, 3000);
+            }, 1500);
+        });
     }
 
     console.log('Student HUB: Sistema SPA inicializado correctamente.');
