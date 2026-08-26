@@ -377,20 +377,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const slides = document.querySelectorAll('.carousel-slide');
     const btnPrev = document.getElementById('carousel-prev');
     const btnNext = document.getElementById('carousel-next');
+    const dotsContainer = document.getElementById('carousel-dots');
     let currentSlide = 0;
     let carouselInterval;
+    let dots = [];
 
     const showSlide = (index) => {
         if (slides.length === 0) return;
-        
+
         // Quitar la clase active del slide actual
         slides[currentSlide].classList.remove('active');
-        
+        if (dots[currentSlide]) {
+            dots[currentSlide].classList.remove('active');
+            dots[currentSlide].setAttribute('aria-selected', 'false');
+        }
+
         // Calcular el índice circular
         currentSlide = (index + slides.length) % slides.length;
-        
+
         // Mostrar el nuevo slide
         slides[currentSlide].classList.add('active');
+        if (dots[currentSlide]) {
+            dots[currentSlide].classList.add('active');
+            dots[currentSlide].setAttribute('aria-selected', 'true');
+        }
     };
 
     const nextSlide = () => {
@@ -424,6 +434,24 @@ document.addEventListener('DOMContentLoaded', () => {
         btnPrev.addEventListener('click', () => {
             prevSlide();
             startAutoplay(); // Reinicia el temporizador
+        });
+    }
+
+    // Generar los indicadores (puntos) a partir de los slides existentes
+    if (dotsContainer && slides.length > 1) {
+        slides.forEach((slide, index) => {
+            const dot = document.createElement('button');
+            dot.className = 'carousel-dot' + (index === 0 ? ' active' : '');
+            dot.type = 'button';
+            dot.setAttribute('role', 'tab');
+            dot.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+            dot.setAttribute('aria-label', `Ir a la noticia ${index + 1} de ${slides.length}`);
+            dot.addEventListener('click', () => {
+                showSlide(index);
+                startAutoplay(); // Reinicia el temporizador tras la interacción manual
+            });
+            dotsContainer.appendChild(dot);
+            dots.push(dot);
         });
     }
 

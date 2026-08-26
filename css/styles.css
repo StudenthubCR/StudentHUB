@@ -1,31 +1,73 @@
 /* =========================================
-   VARIABLES Y CONFIGURACIÓN GLOBAL
+   STUDENT HUB — SISTEMA DE DISEÑO
+   -----------------------------------------
+   Arquitectura de breakpoints:
+     · Móvil      : < 768px   → nav inferior flotante, una columna
+     · Tablet     : 768–1023  → mismo paradigma que móvil, contenido centrado
+     · Escritorio : ≥ 1024px  → sidebar lateral + contenido amplio
    ========================================= */
 :root {
-    --primary-color: #0130B2;
+    /* --- Marca --- */
+    --primary-color: #0130B2;   /* Acento para texto e iconos */
+    --primary-solid: #0130B2;   /* Relleno de botones (contrasta con blanco) */
     --primary-dark: #0B2B80;
     --primary-light: #4B73E1;
     --accent-color: #ffffff;
-    --bg-white: #f8f9fa;
+
+    /* --- Superficies y texto --- */
+    --bg-white: #f3f6fc;
+    --white: #ffffff;
+    --surface-alt: #eaf0fb;
     --text-dark: #0c142c;
     --text-muted: #5c6b8f;
-    --white: #ffffff;
-    --card-shadow: 0 10px 25px rgba(11, 43, 128, 0.05);
+    --border-color: rgba(12, 20, 44, 0.08);
+    --border-strong: rgba(12, 20, 44, 0.14);
+    --nav-glass: rgba(255, 255, 255, 0.82);
+
+    /* --- Tintes de marca reutilizables --- */
+    --primary-tint: rgba(1, 48, 178, 0.08);
+    --primary-tint-strong: rgba(1, 48, 178, 0.16);
+
+    /* --- Elevación --- */
+    --shadow-sm: 0 1px 2px rgba(11, 43, 128, 0.06), 0 2px 8px rgba(11, 43, 128, 0.04);
+    --shadow-md: 0 4px 12px rgba(11, 43, 128, 0.06), 0 14px 30px rgba(11, 43, 128, 0.06);
+    --shadow-lg: 0 20px 44px rgba(11, 43, 128, 0.14);
+    --card-shadow: var(--shadow-md);
+
+    /* --- Formas --- */
+    --radius-sm: 10px;
+    --radius-md: 14px;
     --radius-lg: 20px;
-    --radius-md: 12px;
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --radius-xl: 28px;
+    --radius-pill: 999px;
+
+    /* --- Movimiento --- */
+    --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Modo Oscuro - Variables */
 [data-theme="dark"] {
-    --bg-white: #060b1e;
-    --white: #0c1538;
-    --text-dark: #f1f5f9;
-    --text-muted: #8ca2de;
-    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    --primary-color: #4B73E1;
-    --primary-dark: #0130B2;
-    --primary-light: #0B2B80;
+    --primary-color: #7ba0f5;
+    --primary-solid: #3a63d8;
+    --primary-dark: #0B2B80;
+    --primary-light: #4B73E1;
+
+    --bg-white: #070c20;
+    --white: #101a3d;
+    --surface-alt: #17224b;
+    --text-dark: #eef2fb;
+    --text-muted: #93a7dc;
+    --border-color: rgba(255, 255, 255, 0.09);
+    --border-strong: rgba(255, 255, 255, 0.18);
+    --nav-glass: rgba(16, 26, 61, 0.84);
+
+    --primary-tint: rgba(123, 160, 245, 0.12);
+    --primary-tint-strong: rgba(123, 160, 245, 0.22);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.42);
+    --shadow-lg: 0 24px 50px rgba(0, 0, 0, 0.55);
 }
 
 * {
@@ -37,30 +79,57 @@
 
 html {
     background-color: var(--bg-white);
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
     background-color: var(--bg-white);
     color: var(--text-dark);
     line-height: 1.6;
     overflow-x: hidden;
-    padding-bottom: 80px; /* Espacio para el Bottom Nav */
+    /* Espacio reservado para el nav inferior flotante */
+    padding-bottom: calc(100px + env(safe-area-inset-bottom));
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button {
+    font-family: inherit;
+}
+
+/* Accesibilidad: foco visible y coherente en toda la app */
+:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
+    border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
 
 /* =========================================
    HEADER
    ========================================= */
 .app-header {
-    background: var(--white);
-    padding: 8px 20px;
+    background: var(--nav-glass);
+    -webkit-backdrop-filter: saturate(180%) blur(18px);
+    backdrop-filter: saturate(180%) blur(18px);
+    padding: 8px 18px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .logo-container {
@@ -72,13 +141,14 @@ body {
     overflow: hidden;
     margin-left: -12px; /* Jala el logo hacia el borde izquierdo de la pantalla */
     cursor: pointer;
+    border-radius: var(--radius-sm);
 }
 
 .app-logo {
     height: 160px; /* Altura sobredimensionada para compensar el espacio transparente */
     width: auto;
     position: absolute;
-    left: -45px; /* Desplazamiento a la izquierda para recortar el margen transparente lateral */
+    left: -45px; /* Recorta el margen transparente lateral del SVG */
     top: 50%;
     transform: translateY(-50%);
     object-fit: contain;
@@ -89,6 +159,10 @@ body {
     filter: brightness(0) invert(1);
 }
 
+.logo-container:active .app-logo {
+    transform: translateY(-50%) scale(0.96);
+}
+
 .logo-text {
     font-size: 1.4rem;
     font-weight: 700;
@@ -96,15 +170,11 @@ body {
 }
 
 [data-theme="dark"] .logo-text {
-    color: #ffffff; /* Blanco puro en modo oscuro para el nombre */
+    color: #ffffff;
 }
 
 .logo-text .accent {
-    color: var(--primary-color); 
-}
-
-[data-theme="dark"] .logo-text .accent {
-    color: var(--primary-color); /* El acento usa el celeste claro en modo oscuro */
+    color: var(--primary-color);
 }
 
 .header-avatar {
@@ -113,17 +183,19 @@ body {
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-tint);
+    transition: var(--transition);
 }
 
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
 }
 
 .theme-btn {
-    background: var(--bg-white);
-    border: none;
+    background: var(--surface-alt);
+    border: 1px solid var(--border-color);
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -135,6 +207,12 @@ body {
     transition: var(--transition);
 }
 
+.theme-btn:hover {
+    background: var(--primary-tint);
+    color: var(--primary-color);
+    border-color: var(--primary-tint-strong);
+}
+
 .theme-btn:active {
     transform: scale(0.9);
 }
@@ -143,8 +221,8 @@ body {
    SISTEMA SPA (SECCIONES)
    ========================================= */
 .page-section {
-    padding: 20px;
-    animation: fadeIn 0.4s ease-out;
+    padding: 20px 18px 8px;
+    animation: fadeIn 0.4s var(--ease-out);
 }
 
 .hidden {
@@ -153,31 +231,61 @@ body {
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Cabecera de sección (título + botón de retroceso opcional) */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
 }
 
 /* =========================================
    DASHBOARD
    ========================================= */
 .welcome-card {
-    margin-bottom: 25px;
+    margin-bottom: 22px;
 }
 
 .welcome-card h1 {
-    font-size: 1.8rem;
-    margin-bottom: 5px;
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
 }
 
 .welcome-card p {
     color: var(--text-muted);
-    font-size: 0.95rem;
+    font-size: 0.93rem;
 }
 
 .stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin-bottom: 30px;
+    gap: 14px;
+    margin-bottom: 28px;
 }
 
 .stat-item {
@@ -203,14 +311,17 @@ body {
     letter-spacing: 1px;
 }
 
-/* NEWS CAROUSEL */
+/* =========================================
+   CARRUSEL DE NOTICIAS
+   ========================================= */
 .news-carousel {
-    background: transparent;
-    border-radius: var(--radius-md);
+    background: var(--white);
+    border-radius: var(--radius-lg);
     box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
     overflow: hidden;
     position: relative;
-    margin-bottom: 30px;
+    margin-bottom: 28px;
 }
 
 .news-carousel.dashboard-banner {
@@ -231,7 +342,7 @@ body {
     width: 100%;
     height: 100%;
     opacity: 0;
-    transition: opacity 0.8s ease-in-out;
+    transition: opacity 0.7s ease-in-out;
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -249,25 +360,25 @@ body {
     width: 100%;
     height: auto;
     display: block;
-    object-fit: contain;
+    object-fit: cover;
 }
 
 .slide-overlay {
     position: absolute;
-    bottom: 12px;
+    bottom: 40px; /* Deja aire para los indicadores */
     left: 12px;
     right: 12px;
     padding: 10px 16px;
     background: rgba(12, 21, 56, 0.72);
-    backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
     border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: var(--radius-md);
     color: #ffffff;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     font-weight: 700;
     text-align: center;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     display: flex;
     align-items: center;
@@ -280,19 +391,17 @@ body {
     background: rgba(1, 48, 178, 0.82);
     border-color: rgba(255, 255, 255, 0.25);
     transform: translateY(-2px);
-    box-shadow: 0 12px 30px rgba(1, 48, 178, 0.45);
 }
 
-
-/* Botones de Navegación del Carrusel */
+/* Botones de navegación manual */
 .carousel-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.42);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     color: #ffffff;
     width: 38px;
     height: 38px;
@@ -315,17 +424,47 @@ body {
     transform: translateY(-50%) scale(0.92);
 }
 
-.prev-btn {
-    left: 12px;
+.prev-btn { left: 12px; }
+.next-btn { right: 12px; }
+
+/* Indicadores (puntos) del carrusel */
+.carousel-dots {
+    position: absolute;
+    bottom: 13px;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    z-index: 10;
 }
 
-.next-btn {
-    right: 12px;
+.carousel-dot {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.5);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+    transition: width 0.35s var(--ease-out), background-color 0.25s ease;
 }
 
+.carousel-dot.active {
+    width: 22px;
+    background: #ffffff;
+}
+
+/* =========================================
+   TARJETAS DE INFORMACIÓN
+   ========================================= */
 .info-section h3 {
-    margin-bottom: 15px;
-    font-size: 1.1rem;
+    margin-bottom: 14px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
 .info-card {
@@ -337,6 +476,7 @@ body {
     gap: 15px;
     margin-bottom: 12px;
     box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
     transition: var(--transition);
 }
 
@@ -354,8 +494,8 @@ body {
     font-size: 1.5rem;
 }
 
-.card-icon.blue { background: rgba(1, 48, 178, 0.1); }
-.card-icon.red { background: rgba(75, 115, 225, 0.15); }
+.card-icon.blue { background: var(--primary-tint); }
+.card-icon.red  { background: rgba(75, 115, 225, 0.15); }
 
 .card-details h4 {
     font-size: 1rem;
@@ -367,7 +507,9 @@ body {
     color: var(--text-muted);
 }
 
-/* SERVICES GRID (Dashboard Shortcuts) */
+/* =========================================
+   ACCESOS DIRECTOS (SERVICIOS)
+   ========================================= */
 .services-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -382,52 +524,81 @@ body {
 }
 
 .service-item {
+    position: relative;
     background: var(--white);
-    padding: 15px 10px;
+    padding: 16px 10px;
     border-radius: var(--radius-md);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
     box-shadow: var(--card-shadow);
-    transition: var(--transition);
+    border: 1px solid var(--border-color);
+    transition: transform 0.25s var(--ease-out), box-shadow 0.25s ease, border-color 0.25s ease;
     cursor: pointer;
     text-align: center;
+    overflow: hidden;
+}
+
+.service-item::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--primary-tint);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+}
+
+.service-item:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-tint-strong);
 }
 
 .service-item:active {
-    transform: scale(0.95);
+    transform: scale(0.96);
+}
+
+.service-item:active::after {
+    opacity: 1;
 }
 
 .service-item span {
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     font-weight: 600;
     color: var(--text-dark);
+    line-height: 1.3;
 }
 
 .service-icon {
-    width: 45px;
-    height: 45px;
-    border-radius: 12px;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.4rem;
+    transition: transform 0.25s var(--ease-out);
 }
 
-.service-icon.orange { background: rgba(255, 159, 64, 0.15); }
-.service-icon.blue { background: rgba(1, 48, 178, 0.15); }
-.service-icon.green { background: rgba(42, 157, 143, 0.15); }
-.service-icon.red { background: rgba(11, 43, 128, 0.15); }
+.service-item:hover .service-icon {
+    transform: scale(1.08) rotate(-4deg);
+}
+
+.service-icon.orange { background: rgba(255, 159, 64, 0.16); }
+.service-icon.blue   { background: var(--primary-tint-strong); }
+.service-icon.green  { background: rgba(42, 157, 143, 0.16); }
+.service-icon.red    { background: rgba(75, 115, 225, 0.18); }
 
 /* =========================================
    HORARIOS
    ========================================= */
 .back-btn {
-    background: var(--bg-white);
-    border: none;
-    width: 35px;
-    height: 35px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border-color);
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -435,48 +606,61 @@ body {
     color: var(--text-dark);
     cursor: pointer;
     margin-right: 10px;
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+
+.back-btn:hover {
+    background: var(--primary-tint);
+    color: var(--primary-color);
+}
+
+.back-btn:active {
+    transform: scale(0.9);
 }
 
 .grades-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    gap: 14px;
     margin-top: 10px;
 }
 
 .grade-card {
     background: var(--white);
-    padding: 25px 15px;
-    border-radius: var(--radius-md);
+    padding: 24px 15px;
+    border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     box-shadow: var(--card-shadow);
     cursor: pointer;
-    transition: var(--transition);
-    border: 2px solid transparent;
+    transition: transform 0.25s var(--ease-out), box-shadow 0.25s ease, border-color 0.25s ease;
+    border: 1.5px solid var(--border-color);
 }
 
 .grade-card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(1, 48, 178, 0.3);
+    transform: translateY(-4px);
+    border-color: var(--primary-tint-strong);
+    box-shadow: var(--shadow-lg);
+}
+
+.grade-card:active {
+    transform: scale(0.97);
 }
 
 .grade-card.active {
     border-color: var(--primary-color);
-    background: rgba(1, 48, 178, 0.05);
-    transform: scale(1.05);
-}
-
-[data-theme="dark"] .grade-card.active {
-    background: rgba(75, 115, 225, 0.1);
+    background: var(--primary-tint);
+    transform: scale(1.03);
 }
 
 .grade-num {
-    font-size: 1.8rem;
+    font-size: 1.85rem;
     font-weight: 700;
     color: var(--primary-color);
+    line-height: 1.2;
 }
 
 .grade-label {
@@ -489,60 +673,77 @@ body {
     font-size: 0.7rem;
     font-weight: 600;
     color: var(--primary-color);
-    background: rgba(1, 48, 178, 0.1);
-    padding: 3px 8px;
-    border-radius: 999px;
+    background: var(--primary-tint);
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
 }
 
 .grade-card--active {
     border-color: var(--primary-color);
-    box-shadow: 0 6px 20px rgba(1, 48, 178, 0.2);
+    box-shadow: 0 8px 24px var(--primary-tint-strong);
 }
 
 .grade-card--disabled {
     opacity: 0.45;
     cursor: not-allowed;
     pointer-events: none;
+    box-shadow: var(--shadow-sm);
 }
 
 .grade-card--disabled:hover {
     transform: none;
-    border-color: transparent;
+    border-color: var(--border-color);
 }
 
 .schedule-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
     margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-[data-theme="dark"] .schedule-header {
-    border-bottom-color: rgba(255,255,255,0.1);
+.schedule-header h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
 }
 
 .btn-text {
-    background: none;
+    background: var(--primary-tint);
     border: none;
     color: var(--primary-color);
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
+    padding: 7px 14px;
+    border-radius: var(--radius-pill);
     cursor: pointer;
+    white-space: nowrap;
+    transition: var(--transition);
+}
+
+.btn-text:hover {
+    background: var(--primary-tint-strong);
+}
+
+.btn-text:active {
+    transform: scale(0.95);
 }
 
 .schedule-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .schedule-day-title {
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: var(--primary-color);
-    margin: 16px 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 20px 0 4px;
     padding-left: 4px;
 }
 
@@ -552,48 +753,58 @@ body {
 
 .schedule-message {
     text-align: center;
-    padding: 24px 16px;
+    padding: 28px 16px;
     color: var(--text-muted);
     font-size: 0.9rem;
+    background: var(--white);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius-lg);
 }
 
 .schedule-error {
     color: #c0392b;
+    border-color: rgba(192, 57, 43, 0.35);
 }
 
 [data-theme="dark"] .schedule-error {
     color: #ff8a80;
 }
 
+.schedule-item {
+    background: var(--white);
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary-color);
+    animation: slideInUp 0.4s var(--ease-out) both;
+    transition: var(--transition);
+}
+
+.schedule-item:hover {
+    box-shadow: var(--card-shadow);
+    transform: translateX(3px);
+}
+
 .schedule-item.schedule-break {
     border-left-color: #f39c12;
-    opacity: 0.92;
+    background: var(--surface-alt);
+    box-shadow: none;
 }
 
 .schedule-item.schedule-break .subject-details p {
     font-style: italic;
 }
 
-.schedule-item {
-    background: var(--white);
-    padding: 15px;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    box-shadow: var(--card-shadow);
-    border-left: 5px solid var(--primary-color);
-    animation: slideInUp 0.4s ease-out both;
-}
-
-@keyframes slideInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
 .time-box {
     text-align: center;
-    min-width: 60px;
+    min-width: 58px;
+    flex-shrink: 0;
+    padding-right: 12px;
+    border-right: 1px solid var(--border-color);
 }
 
 .time-start {
@@ -611,6 +822,7 @@ body {
 .subject-details h4 {
     font-size: 0.95rem;
     margin-bottom: 2px;
+    font-weight: 600;
 }
 
 .subject-details p {
@@ -621,56 +833,82 @@ body {
 /* =========================================
    CARNET DIGITAL
    ========================================= */
-.section-header {
-    margin-bottom: 20px;
+.carnet-container {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    align-items: center;
+    margin-top: 10px;
 }
 
 .id-card {
-    background: linear-gradient(135deg, #0130B2 0%, #0B2B80 100%);
+    background: linear-gradient(140deg, #0130B2 0%, #0B2B80 55%, #071c56 100%);
     color: #ffffff; /* Texto siempre blanco en la parte superior del carnet */
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
     overflow: hidden;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 22px 44px rgba(11, 43, 128, 0.32);
     max-width: 350px;
+    width: 100%;
     margin: 0 auto;
+    position: relative;
+}
+
+/* Brillo diagonal sutil sobre el carnet */
+.id-card::before {
+    content: "";
+    position: absolute;
+    top: -60%;
+    right: -30%;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 70%);
+    pointer-events: none;
 }
 
 .id-card-header {
-    padding: 20px;
+    padding: 18px 20px;
     display: flex;
     align-items: center;
     gap: 10px;
     background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    position: relative;
 }
 
 .inst-logo {
-    background: #0B2B80;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.22);
     color: #ffffff;
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
     font-weight: 800;
     font-size: 0.8rem;
+    letter-spacing: 0.06em;
 }
 
 .inst-name {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 300;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.09em;
+    opacity: 0.9;
 }
 
 .id-card-body {
-    padding: 30px 20px;
+    padding: 28px 20px;
     text-align: center;
+    position: relative;
 }
 
 .student-photo-container {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 20px;
+    width: 118px;
+    height: 118px;
+    margin: 0 auto 18px;
     border-radius: 50%;
-    padding: 5px;
-    background: var(--white);
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
 }
 
 .student-photo {
@@ -681,34 +919,39 @@ body {
 }
 
 .student-info h3 {
-    font-size: 1.4rem;
-    margin-bottom: 5px;
+    font-size: 1.35rem;
+    margin-bottom: 4px;
+    letter-spacing: -0.02em;
 }
 
 .student-id {
-    font-size: 0.9rem;
-    opacity: 0.8;
+    font-size: 0.85rem;
+    opacity: 0.75;
+    letter-spacing: 0.04em;
 }
 
 .student-specialty {
     font-size: 0.85rem;
     margin: 10px 0;
     font-weight: 300;
+    opacity: 0.95;
 }
 
 .nocturnal-badge {
     display: inline-block;
-    background: #0B2B80;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    padding: 4px 14px;
+    border-radius: var(--radius-pill);
+    font-size: 0.72rem;
     font-weight: 600;
+    letter-spacing: 0.02em;
 }
 
 .id-card-footer {
     padding: 20px;
-    background: #ffffff; /* Footer siempre blanco para parecer carnet real */
-    color: #1a1a1a; /* Texto del footer siempre oscuro */
+    background: #ffffff; /* Footer siempre blanco para parecer un carnet real */
+    color: #1a1a1a;
 }
 
 .qr-container {
@@ -722,6 +965,7 @@ body {
     height: 80px;
     background: #000;
     margin-bottom: 10px;
+    border-radius: 6px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
@@ -735,82 +979,10 @@ body {
 
 .qr-container p {
     font-size: 0.7rem;
-    color: var(--text-muted);
+    color: #5c6b8f;
 }
 
-
-/* =========================================
-   BOTTOM NAVIGATION
-   ========================================= */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: var(--white);
-    height: 70px;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
-    z-index: 1000;
-    padding-bottom: env(safe-area-inset-bottom);
-}
-
-.nav-item {
-    background: none;
-    border: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: var(--transition);
-    flex: 1;
-}
-
-.nav-item svg {
-    transition: var(--transition);
-}
-
-.nav-item span {
-    font-size: 0.7rem;
-    font-weight: 500;
-}
-
-.nav-item.active {
-    color: var(--primary-color);
-}
-
-.nav-item.active svg {
-    transform: translateY(-2px);
-    stroke: var(--primary-color);
-}
-
-/* =========================================
-   ESTILOS DE ANIMACIÓN E INTERACTIVIDAD
-   ========================================= */
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.animate-spin {
-    animation: spin 1s linear infinite;
-}
-
-/* =========================================
-   DETALLES DE CARNET DIGITAL
-   ========================================= */
-.carnet-container {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    align-items: center;
-    margin-top: 15px;
-}
-
+/* --- Panel de detalles académicos --- */
 .carnet-details-panel {
     background: var(--white);
     padding: 24px;
@@ -818,18 +990,15 @@ body {
     box-shadow: var(--card-shadow);
     width: 100%;
     max-width: 350px;
-    border: 1px solid rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-color);
     transition: var(--transition);
 }
 
-[data-theme="dark"] .carnet-details-panel {
-    border-color: rgba(255, 255, 255, 0.03);
-}
-
 .carnet-details-panel h3 {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-weight: 700;
     margin-bottom: 6px;
+    letter-spacing: -0.01em;
 }
 
 .badge-status-container {
@@ -841,29 +1010,29 @@ body {
     align-items: center;
     gap: 8px;
     padding: 5px 12px;
-    border-radius: 99px;
+    border-radius: var(--radius-pill);
     font-size: 0.75rem;
     font-weight: 600;
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
+    background: rgba(16, 185, 129, 0.12);
+    color: #0f9b74;
 }
 
 [data-theme="dark"] .status-badge {
     background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
 }
 
 .status-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: #10b981;
+    background-color: currentColor;
     display: inline-block;
 }
 
-/* Animación de pulso para indicador activo */
 @keyframes pulse {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    0%   { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70%  { transform: scale(1);    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
@@ -879,12 +1048,8 @@ body {
 }
 
 .detail-item {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 8px;
-}
-
-[data-theme="dark"] .detail-item {
-    border-bottom-color: rgba(255, 255, 255, 0.05);
 }
 
 .detail-item:last-child {
@@ -893,11 +1058,11 @@ body {
 }
 
 .detail-label {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     color: var(--text-muted);
     display: block;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.06em;
     margin-bottom: 2px;
 }
 
@@ -918,7 +1083,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 10px 14px;
+    padding: 12px 14px;
     border-radius: var(--radius-md);
     font-weight: 600;
     font-size: 0.8rem;
@@ -933,341 +1098,188 @@ body {
 }
 
 .carnet-action-btn.primary {
-    background: var(--primary-color);
+    background: var(--primary-solid);
     color: #ffffff;
+    box-shadow: 0 6px 16px var(--primary-tint-strong);
 }
 
 .carnet-action-btn.primary:hover {
     background: var(--primary-dark);
+    box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] .carnet-action-btn.primary:hover {
+    background: var(--primary-light);
 }
 
 .carnet-action-btn.secondary {
     background: transparent;
-    border-color: rgba(0, 0, 0, 0.15);
+    border-color: var(--border-strong);
     color: var(--text-dark);
 }
 
-[data-theme="dark"] .carnet-action-btn.secondary {
-    border-color: rgba(255, 255, 255, 0.15);
-}
-
 .carnet-action-btn.secondary:hover {
-    background: rgba(0, 0, 0, 0.03);
-}
-
-[data-theme="dark"] .carnet-action-btn.secondary:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--surface-alt);
 }
 
 /* =========================================
-   MEDIA QUERIES PARA ADAPTACIÓN A LAPTOPS Y ESCRITORIO
+   NAVEGACIÓN INFERIOR (píldora flotante)
    ========================================= */
-@media (min-width: 768px) {
-    body {
-        display: grid;
-        grid-template-columns: 280px 1fr;
-        grid-template-rows: 70px 1fr;
-        grid-template-areas:
-            "header header"
-            "sidebar content";
-        min-height: 100vh;
-        padding-bottom: 0; /* Remueve espacio inferior de la barra móvil */
-        max-width: none;
-        margin: 0;
-        box-shadow: none;
-        background-color: var(--bg-white);
-    }
-    
-    .app-header {
-        grid-area: header;
-        position: sticky;
-        top: 0;
-        height: 70px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 40px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        box-shadow: none;
-        background: var(--white);
-        z-index: 100;
-    }
-    
-    [data-theme="dark"] .app-header {
-        border-bottom-color: rgba(255, 255, 255, 0.05);
-    }
-    
-    .logo-container {
-        margin-left: 0;
-    }
-    
-    .bottom-nav {
-        grid-area: sidebar;
-        position: sticky;
-        top: 70px;
-        height: calc(100vh - 70px);
-        width: 280px;
-        max-width: none;
-        left: 0;
-        transform: none;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: stretch;
-        padding: 30px 20px;
-        gap: 10px;
-        border-right: 1px solid rgba(0, 0, 0, 0.05);
-        background: var(--white);
-        box-shadow: none;
-        z-index: 90;
-    }
-    
-    [data-theme="dark"] .bottom-nav {
-        border-right-color: rgba(255, 255, 255, 0.05);
-    }
-    
-    .nav-item {
-        flex-direction: row;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 16px;
-        padding: 12px 16px;
-        border-radius: var(--radius-md);
-        width: 100%;
-        color: var(--text-muted);
-        transition: var(--transition);
-        flex: none; /* Override flex: 1 de móvil */
-    }
-    
-    .nav-item span {
-        font-size: 0.9rem;
-        font-weight: 600;
-    }
-    
-    .nav-item svg {
-        width: 22px;
-        height: 22px;
-    }
-    
-    .nav-item.active {
-        background: rgba(1, 48, 178, 0.08);
-        color: var(--primary-color);
-    }
-    
-    [data-theme="dark"] .nav-item.active {
-        background: rgba(75, 115, 225, 0.12);
-        color: var(--primary-color);
-    }
-    
-    .nav-item.active svg {
-        transform: none;
-    }
-    
-    .nav-item:hover:not(.active) {
-        background: rgba(0, 0, 0, 0.03);
-        color: var(--text-dark);
-    }
-    
-    [data-theme="dark"] .nav-item:hover:not(.active) {
-        background: rgba(255, 255, 255, 0.03);
-        color: var(--text-dark);
-    }
-    
-    #app-content {
-        grid-area: content;
-        padding: 40px;
-        max-width: 1200px;
-        width: 100%;
-        margin: 0 auto;
-        overflow-y: auto;
-    }
-    
-    .page-section {
-        padding: 0; /* Remueve padding excesivo de secciones en desktop */
-    }
-    
-    /* Adaptaciones de la sección Horarios */
-    .grades-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-    }
-    
-    .grade-card {
-        padding: 30px 20px;
-    }
-    
-    .schedule-container {
-        background: var(--white);
-        padding: 30px;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--card-shadow);
-        border: 1px solid rgba(0, 0, 0, 0.03);
-    }
-    
-    [data-theme="dark"] .schedule-container {
-        border-color: rgba(255, 255, 255, 0.03);
-    }
+.bottom-nav {
+    position: fixed;
+    bottom: calc(14px + env(safe-area-inset-bottom));
+    left: 14px;
+    right: 14px;
+    width: auto;
+    height: 66px;
+    background: var(--nav-glass);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 6px;
+    box-shadow: 0 10px 30px rgba(11, 43, 128, 0.14), 0 2px 8px rgba(11, 43, 128, 0.08);
+    z-index: 1000;
 }
 
-@media (min-width: 992px) {
-    /* Diseño del Dashboard en 2 columnas */
-    #dashboard {
-        display: grid;
-        grid-template-columns: 1.8fr 1.2fr;
-        grid-template-rows: auto 1fr;
-        gap: 30px;
-        align-items: start;
-    }
-    
-    .welcome-card {
-        grid-column: 1 / -1;
-    }
-    
-    .news-carousel.dashboard-banner {
-        grid-column: 1;
-        margin-bottom: 0;
-        max-width: 450px;
-        width: 100%;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    
-
-    
-    .info-section {
-        grid-column: 2;
-        margin-bottom: 0;
-    }
-    
-    /* Servicios horizontales detallados en desktop */
-    .services-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-    
-    .service-item {
-        flex-direction: row;
-        padding: 20px;
-        align-items: center;
-        text-align: left;
-        gap: 20px;
-        border: 1px solid rgba(0, 0, 0, 0.03);
-    }
-    
-    [data-theme="dark"] .service-item {
-        border-color: rgba(255, 255, 255, 0.03);
-    }
-    
-    .service-item:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 30px rgba(1, 48, 178, 0.08);
-        border-color: rgba(1, 48, 178, 0.2);
-    }
-    
-    .service-item span {
-        font-size: 0.95rem;
-    }
-    
-    .service-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.6rem;
-    }
-    
-    /* Grid de Grados del Horario en Fila Única (6 Columnas) */
-    .grades-grid {
-        grid-template-columns: repeat(6, 1fr);
-    }
-    
-    /* Split Layout para el Carnet Digital */
-    .carnet-container {
-        flex-direction: row;
-        justify-content: center;
-        gap: 40px;
-        align-items: stretch;
-        max-width: 850px;
-        margin: 20px auto 0;
-    }
-    
-    .id-card {
-        margin: 0;
-        flex: 1;
-        max-width: 360px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-    
-    .carnet-details-panel {
-        flex: 1.2;
-        max-width: none;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 30px;
-    }
+[data-theme="dark"] .bottom-nav {
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
 }
+
+.nav-item {
+    position: relative;
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 100%;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.25s ease;
+    flex: 1;
+}
+
+/* Indicador superior del ítem activo */
+.nav-item::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    border-radius: var(--radius-pill);
+    background: var(--primary-color);
+    transition: width 0.3s var(--ease-out);
+}
+
+.nav-item svg {
+    width: 23px;
+    height: 23px;
+    transition: transform 0.3s var(--ease-out);
+}
+
+.nav-item span {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.nav-item:active svg {
+    transform: scale(0.88);
+}
+
+.nav-item.active {
+    color: var(--primary-color);
+}
+
+.nav-item.active::before {
+    width: 20px;
+}
+
+.nav-item.active svg {
+    transform: translateY(1px) scale(1.06);
+    stroke: var(--primary-color);
+}
+
 /* =========================================
-   ESTILOS DEL COMEDOR ESTUDIANTIL
+   COMEDOR ESTUDIANTIL
    ========================================= */
 .comedor-container {
     display: flex;
     flex-direction: column;
-    gap: 30px;
-    margin-top: 15px;
+    gap: 28px;
+    margin-top: 10px;
 }
 
 .menu-today-card {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    /* Colores fijos de marca: el texto blanco mantiene contraste en ambos temas */
+    background: linear-gradient(140deg, #0130B2 0%, #0B2B80 60%, #071c56 100%);
     color: #ffffff;
-    padding: 30px;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--card-shadow);
+    padding: 26px 24px;
+    border-radius: var(--radius-xl);
+    box-shadow: 0 18px 38px rgba(11, 43, 128, 0.26);
     position: relative;
     overflow: hidden;
+}
+
+.menu-today-card::before {
+    content: "";
+    position: absolute;
+    top: -40%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 70%);
+    pointer-events: none;
 }
 
 .menu-today-badge {
     background: rgba(255, 255, 255, 0.15);
     padding: 6px 14px;
-    border-radius: 99px;
-    font-size: 0.75rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.72rem;
     font-weight: 700;
     display: inline-block;
-    margin-bottom: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
+    margin-bottom: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    position: relative;
 }
 
 .menu-today-card h3 {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 8px;
     color: #ffffff;
+    letter-spacing: -0.02em;
+    position: relative;
 }
 
 .menu-today-card .menu-details {
-    font-size: 0.95rem;
-    opacity: 0.95;
-    margin-bottom: 25px;
+    font-size: 0.93rem;
+    margin-bottom: 22px;
     max-width: 650px;
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.88);
+    position: relative;
 }
 
 .menu-nutritional-info {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    gap: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
     padding-top: 20px;
-}
-
-@media (min-width: 576px) {
-    .menu-nutritional-info {
-        grid-template-columns: repeat(4, 1fr);
-    }
+    position: relative;
 }
 
 .nutri-item {
@@ -1276,12 +1288,11 @@ body {
 }
 
 .nutri-label {
-    font-size: 0.7rem;
-    opacity: 0.75;
+    font-size: 0.68rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.06em;
     margin-bottom: 2px;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.72);
 }
 
 .nutri-val {
@@ -1291,86 +1302,66 @@ body {
 }
 
 .weekly-menu-section h3 {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     font-weight: 700;
     margin-bottom: 4px;
+    letter-spacing: -0.01em;
 }
 
 .weekly-subtitle {
     color: var(--text-muted);
     font-size: 0.85rem;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
 .weekly-menu-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 20px;
-}
-
-@media (min-width: 768px) {
-    .weekly-menu-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 1200px) {
-    .weekly-menu-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+    gap: 16px;
 }
 
 .menu-day-card {
     background: var(--white);
     border-radius: var(--radius-lg);
     box-shadow: var(--card-shadow);
-    border: 1px solid rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border-color);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    transition: var(--transition);
-    animation: fadeIn 0.4s ease-out both;
-}
-
-[data-theme="dark"] .menu-day-card {
-    border-color: rgba(255, 255, 255, 0.03);
+    transition: transform 0.25s var(--ease-out), box-shadow 0.25s ease, border-color 0.25s ease;
+    animation: fadeIn 0.4s var(--ease-out) both;
 }
 
 .menu-day-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(11, 43, 128, 0.08);
-    border-color: rgba(1, 48, 178, 0.15);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-tint-strong);
 }
 
 .menu-day-header {
-    background: rgba(1, 48, 178, 0.04);
-    padding: 16px 20px;
+    background: var(--primary-tint);
+    padding: 14px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
-}
-
-[data-theme="dark"] .menu-day-header {
-    background: rgba(75, 115, 225, 0.04);
-    border-bottom-color: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .menu-day-header h4 {
-    font-size: 1.05rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--primary-color);
 }
 
 .menu-day-icon {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
 }
 
 .menu-day-body {
-    padding: 20px;
+    padding: 18px 20px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 14px;
     flex-grow: 1;
 }
 
@@ -1380,10 +1371,10 @@ body {
 }
 
 .field-label {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.06em;
     margin-bottom: 2px;
 }
 
@@ -1395,7 +1386,424 @@ body {
 }
 
 /* =========================================
-   ESTILOS DE IMPRESIÓN EXCLUSIVOS PARA CARNET
+   RESPONSIVE — MÓVIL GRANDE (≥ 576px)
+   ========================================= */
+@media (min-width: 576px) {
+    .menu-nutritional-info {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* =========================================
+   RESPONSIVE — TABLET (768px – 1023px)
+   -----------------------------------------
+   La tablet conserva el mismo paradigma que el móvil:
+   navegación inferior flotante y una sola columna de
+   contenido centrada. Solo escalan el aire y la tipografía.
+   ========================================= */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+    body {
+        padding-bottom: calc(110px + env(safe-area-inset-bottom));
+    }
+
+    /* Cabecera con algo más de aire y objetivos táctiles mayores */
+    .app-header {
+        padding: 10px 24px;
+    }
+
+    .header-avatar,
+    .theme-btn {
+        width: 44px;
+        height: 44px;
+    }
+
+    /* Columna central de lectura cómoda: la app no se estira de borde a borde */
+    #app-content {
+        display: block;
+        max-width: 700px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .page-section {
+        padding: 28px 24px 8px;
+    }
+
+    .welcome-card {
+        margin-bottom: 26px;
+    }
+
+    .welcome-card h1 {
+        font-size: 2rem;
+    }
+
+    .welcome-card p {
+        font-size: 1rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.7rem;
+    }
+
+    /* Accesos directos: mismo grid de 3 columnas del móvil, con más aire */
+    .services-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .service-item {
+        padding: 22px 12px;
+        gap: 12px;
+    }
+
+    .service-item span {
+        font-size: 0.88rem;
+    }
+
+    .service-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 1.7rem;
+        border-radius: 16px;
+    }
+
+    .info-section h3 {
+        font-size: 1.15rem;
+    }
+
+    /* Carrusel: se centra y se acota para que el banner cuadrado
+       no domine la pantalla como pasaría a todo el ancho */
+    .news-carousel.dashboard-banner {
+        max-width: 440px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 32px;
+    }
+
+    .carousel-btn {
+        width: 42px;
+        height: 42px;
+    }
+
+    .slide-overlay {
+        font-size: 1rem;
+        bottom: 44px;
+    }
+
+    /* Horarios: 3 columnas para aprovechar el ancho sin perder el aire móvil */
+    .grades-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .grade-card {
+        padding: 28px 16px;
+    }
+
+    .grade-num {
+        font-size: 2.1rem;
+    }
+
+    .schedule-item {
+        padding: 16px 18px;
+    }
+
+    /* Carnet: sigue apilado como en móvil, solo un poco más grande */
+    .carnet-container {
+        gap: 26px;
+    }
+
+    .id-card,
+    .carnet-details-panel {
+        max-width: 420px;
+    }
+
+    .carnet-details-panel {
+        padding: 28px;
+    }
+
+    /* Comedor */
+    .menu-today-card {
+        padding: 32px 28px;
+    }
+
+    .menu-today-card h3 {
+        font-size: 1.7rem;
+    }
+
+    .weekly-menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+    }
+
+    /* Navegación inferior: misma píldora del móvil, centrada y acotada */
+    .bottom-nav {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: min(520px, calc(100% - 48px));
+        height: 72px;
+        bottom: calc(18px + env(safe-area-inset-bottom));
+    }
+
+    .nav-item svg {
+        width: 25px;
+        height: 25px;
+    }
+
+    .nav-item span {
+        font-size: 0.75rem;
+    }
+}
+
+/* =========================================
+   RESPONSIVE — ESCRITORIO (≥ 1024px)
+   Sidebar lateral + contenido amplio
+   ========================================= */
+@media (min-width: 1024px) {
+    body {
+        display: grid;
+        grid-template-columns: 264px 1fr;
+        grid-template-rows: 70px 1fr;
+        grid-template-areas:
+            "header header"
+            "sidebar content";
+        min-height: 100vh;
+        padding-bottom: 0; /* Se elimina el espacio de la barra móvil */
+        max-width: none;
+        margin: 0;
+        box-shadow: none;
+    }
+
+    .app-header {
+        grid-area: header;
+        position: sticky;
+        top: 0;
+        height: 70px;
+        padding: 0 32px;
+        z-index: 100;
+    }
+
+    .logo-container {
+        margin-left: 0;
+    }
+
+    /* La píldora flotante se convierte en barra lateral */
+    .bottom-nav {
+        grid-area: sidebar;
+        position: sticky;
+        top: 70px;
+        bottom: auto;
+        left: 0;
+        right: auto;
+        transform: none;
+        height: calc(100vh - 70px);
+        width: 264px;
+        max-width: none;
+        border: none;
+        border-right: 1px solid var(--border-color);
+        border-radius: 0;
+        background: var(--white);
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        padding: 24px 16px;
+        gap: 6px;
+        z-index: 90;
+    }
+
+    .nav-item {
+        flex: none;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 14px;
+        height: auto;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        width: 100%;
+        transition: var(--transition);
+    }
+
+    /* El indicador pasa de barra superior a barra lateral izquierda */
+    .nav-item::before {
+        top: 50%;
+        left: 0;
+        width: 3px;
+        height: 0;
+        transform: translateY(-50%);
+        transition: height 0.3s var(--ease-out);
+    }
+
+    .nav-item.active::before {
+        width: 3px;
+        height: 22px;
+    }
+
+    .nav-item span {
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .nav-item svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .nav-item.active {
+        background: var(--primary-tint);
+        color: var(--primary-color);
+    }
+
+    .nav-item.active svg {
+        transform: none;
+    }
+
+    .nav-item:hover:not(.active) {
+        background: var(--surface-alt);
+        color: var(--text-dark);
+    }
+
+    #app-content {
+        grid-area: content;
+        padding: 36px 40px;
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .page-section {
+        padding: 0;
+    }
+
+    .welcome-card h1 {
+        font-size: 2rem;
+    }
+
+    /* El banner cuadrado se acota para no desbordar verticalmente */
+    .news-carousel.dashboard-banner {
+        max-width: 430px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .grades-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+
+    .grade-card {
+        padding: 30px 20px;
+    }
+
+    .schedule-container {
+        background: var(--white);
+        padding: 28px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--border-color);
+    }
+
+    .weekly-menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Carnet lado a lado */
+    .carnet-container {
+        flex-direction: row;
+        justify-content: center;
+        gap: 36px;
+        align-items: stretch;
+        max-width: 860px;
+        margin: 16px auto 0;
+    }
+
+    .id-card {
+        margin: 0;
+        flex: 1;
+        max-width: 360px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .carnet-details-panel {
+        flex: 1.2;
+        max-width: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 30px;
+    }
+}
+
+/* =========================================
+   RESPONSIVE — ESCRITORIO AMPLIO (≥ 1280px)
+   ========================================= */
+@media (min-width: 1280px) {
+    /* Dashboard en dos columnas */
+    #dashboard {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        grid-template-rows: auto 1fr;
+        gap: 30px;
+        align-items: start;
+    }
+
+    .welcome-card {
+        grid-column: 1 / -1;
+    }
+
+    .news-carousel.dashboard-banner {
+        grid-column: 1;
+        margin-bottom: 0;
+    }
+
+    .info-section {
+        grid-column: 2;
+        margin-bottom: 0;
+    }
+
+    /* Servicios en fila horizontal detallada */
+    .services-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .service-item {
+        flex-direction: row;
+        padding: 18px 20px;
+        align-items: center;
+        text-align: left;
+        gap: 18px;
+    }
+
+    .service-item span {
+        font-size: 0.95rem;
+    }
+
+    .service-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.6rem;
+    }
+
+    /* Los seis grados en una sola fila */
+    .grades-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .weekly-menu-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* =========================================
+   IMPRESIÓN — SOLO EL CARNET
    ========================================= */
 @media print {
     body {
@@ -1405,15 +1813,19 @@ body {
         padding: 0 !important;
         margin: 0 !important;
     }
-    
-    .app-header, 
-    .bottom-nav, 
-    .section-header, 
-    .carnet-details-panel, 
+
+    .app-header,
+    .bottom-nav,
+    .section-header,
+    .carnet-details-panel,
     script {
         display: none !important;
     }
-    
+
+    #app-content {
+        padding: 0 !important;
+    }
+
     .id-card {
         box-shadow: none !important;
         border: 1px solid #cccccc !important;
@@ -1423,7 +1835,7 @@ body {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
-    
+
     .id-card-footer {
         background: #ffffff !important;
         color: #1a1a1a !important;
