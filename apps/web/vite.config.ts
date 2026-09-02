@@ -1,5 +1,6 @@
+import { rm, writeFile } from 'node:fs/promises'
 import { fileURLToPath, URL } from 'node:url'
-import { defineConfig } from 'vitest/config'
+import { defineConfig, type Plugin } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -10,6 +11,65 @@ import { VitePWA } from 'vite-plugin-pwa'
  * la raíz del sitio (`/SHlarge.webp`).
  */
 const assetsDir = fileURLToPath(new URL('../../assets', import.meta.url))
+
+/**
+ * Escribe `_redirects` en el build.
+ *
+ * Sin esto, un estudiante que recargue la página estando en `/comedor` recibe
+ * un 404 del servidor: Cloudflare Pages busca un archivo en esa ruta y no
+ * existe, porque las rutas las resuelve React Router en el navegador. La regla
+ * manda todo a index.html con código 200, no con una redirección, para que la
+ * dirección de la barra no cambie.
+ *
+ * Va como plugin y no como archivo en `assets/` para no ensuciar la carpeta
+ * compartida con la app de la raíz.
+ */
+function redireccionesDePages(): Plugin {
+  return {
+    name: 'studenthub-redirects',
+    apply: 'build',
+    async closeBundle() {
+      await writeFile(
+        fileURLToPath(new URL('./dist/_redirects', import.meta.url)),
+        '/*  /index.html  200\n',
+        'utf8',
+      )
+    },
+  }
+}
+
+/**
+ * Saca del build los originales que sólo usa la app de la raíz.
+ *
+ * `publicDir` apunta a la carpeta `assets/` compartida y Vite la copia entera,
+ * así que el despliegue se llevaba también los PNG de 700 KB y los SVG de
+ * 1.1 MB que la app nueva ya no referencia: unos 7 MB de subida por despliegue
+ * que nadie descarga nunca. Se quedan en el repositorio; sólo no viajan aquí.
+ */
+function sinOriginalesDeLaAppVieja(): Plugin {
+  const soloParaLaAppVieja = [
+    'SHOG.svg',
+    'SHlarge.svg',
+    'SHlogo.svg',
+    'Paleta de colores.png',
+    'student.png',
+    'news_dia_estudiante.png',
+    'news_expotecnica.png',
+    'news_feria_cientifica.png',
+    'news_feria_vocacional.png',
+    'news_torneo_futsal.png',
+  ]
+
+  return {
+    name: 'studenthub-sin-originales',
+    apply: 'build',
+    async closeBundle() {
+      for (const archivo of soloParaLaAppVieja) {
+        await rm(fileURLToPath(new URL(`./dist/${archivo}`, import.meta.url)), { force: true })
+      }
+    },
+  }
+}
 
 export default defineConfig({
   plugins: [
@@ -72,6 +132,8 @@ export default defineConfig({
       },
       devOptions: { enabled: false },
     }),
+    redireccionesDePages(),
+    sinOriginalesDeLaAppVieja(),
   ],
   publicDir: assetsDir,
   resolve: {
