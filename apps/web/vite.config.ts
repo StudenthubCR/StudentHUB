@@ -1,4 +1,4 @@
-import { rm, writeFile } from 'node:fs/promises'
+import { rm } from 'node:fs/promises'
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig, type Plugin } from 'vitest/config'
 import react from '@vitejs/plugin-react'
@@ -13,30 +13,15 @@ import { VitePWA } from 'vite-plugin-pwa'
 const assetsDir = fileURLToPath(new URL('../../assets', import.meta.url))
 
 /**
- * Escribe `_redirects` en el build.
+ * Nota sobre el enrutado del SPA: aquí hubo un archivo `_redirects` con la
+ * regla `/* -> /index.html 200`, que es como se resuelve en Cloudflare Pages.
+ * En Workers con assets estáticos esa regla es inválida y el despliegue la
+ * rechaza: Workers ya quita `.html` y `/index` por su cuenta, así que
+ * `/index.html` se reescribe a `/`, vuelve a caer en `/*` y detecta el bucle.
  *
- * Sin esto, un estudiante que recargue la página estando en `/comedor` recibe
- * un 404 del servidor: Cloudflare Pages busca un archivo en esa ruta y no
- * existe, porque las rutas las resuelve React Router en el navegador. La regla
- * manda todo a index.html con código 200, no con una redirección, para que la
- * dirección de la barra no cambie.
- *
- * Va como plugin y no como archivo en `assets/` para no ensuciar la carpeta
- * compartida con la app de la raíz.
+ * Lo que corresponde ahí es `not_found_handling: "single-page-application"`,
+ * que está en wrangler.jsonc y hace exactamente lo mismo de forma nativa.
  */
-function redireccionesDePages(): Plugin {
-  return {
-    name: 'studenthub-redirects',
-    apply: 'build',
-    async closeBundle() {
-      await writeFile(
-        fileURLToPath(new URL('./dist/_redirects', import.meta.url)),
-        '/*  /index.html  200\n',
-        'utf8',
-      )
-    },
-  }
-}
 
 /**
  * Saca del build los originales que sólo usa la app de la raíz.
@@ -132,7 +117,6 @@ export default defineConfig({
       },
       devOptions: { enabled: false },
     }),
-    redireccionesDePages(),
     sinOriginalesDeLaAppVieja(),
   ],
   publicDir: assetsDir,
