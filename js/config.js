@@ -12,7 +12,7 @@ const StudentHubConfig = {
         'https://script.google.com/macros/s/AKfycbz7VyJ4OXewe9lH4npvBrvoMRj8N5P583MmMr7jlYoWB0qMJHeqdpOj5Q1LVGdPxyk/exec',
 
     /** Semana activa actual para desplegar en el comedor escolar */
-    comedorSemanaActiva: 4,
+    comedorSemanaActiva: 1,
 
     // Google Sheet: 1Qm2sW_y5dL7KokhKjCUJ7hPFDnFzgoJP3oeZlCXYMXo — hojas "Horarios" y "Comedor"
     // Códigos Apps Script en el repo: apps-script/horarios.gs y apps-script/comedor.gs
