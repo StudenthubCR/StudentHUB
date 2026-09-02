@@ -3,7 +3,7 @@ import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import { ThemeToggle } from './ThemeToggle'
 
 export function AppHeader() {
-  const estudiante = useEstudiante()
+  const { estudiante } = useEstudiante()
 
   return (
     <header
@@ -34,21 +34,34 @@ export function AppHeader() {
       <div className="flex items-center gap-3">
         <ThemeToggle />
         {/* La foto era decorativa y no llevaba a ningún lado; un avatar en la
-            cabecera es justo lo que la gente toca buscando su ficha. */}
-        <Link
-          to="/carnet"
-          aria-label={`Ver el carnet de ${estudiante.nombre}`}
-          className="rounded-full transition-transform duration-250 ease-ui active:scale-95"
-        >
-          <img
-            src={estudiante.fotoUrl}
-            alt=""
+            cabecera es justo lo que la gente toca buscando su ficha. Sin
+            sesión no se muestra una cara ajena: se ofrece entrar. */}
+        {estudiante ? (
+          <Link
+            to="/carnet"
+            aria-label={`Ver el carnet de ${estudiante.nombre}`}
+            className="rounded-full transition-transform duration-250 ease-ui active:scale-95"
+          >
+            <img
+              src={estudiante.fotoUrl}
+              alt=""
+              className={
+                'size-10 rounded-full border-2 border-primary object-cover ' +
+                'shadow-[0_0_0_3px_var(--color-primary-tint)] md:size-11'
+              }
+            />
+          </Link>
+        ) : (
+          <Link
+            to="/entrar"
             className={
-              'size-10 rounded-full border-2 border-primary object-cover ' +
-              'shadow-[0_0_0_3px_var(--color-primary-tint)] md:size-11'
+              'rounded-full bg-primary-tint px-3.5 py-2 text-nota font-semibold text-primary ' +
+              'transition-all duration-250 ease-ui hover:bg-primary-tint-strong active:scale-95'
             }
-          />
-        </Link>
+          >
+            Entrar
+          </Link>
+        )}
       </div>
     </header>
   )

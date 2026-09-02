@@ -82,7 +82,22 @@ export function AppNav() {
 }
 
 function FichaLateral() {
-  const estudiante = useEstudiante()
+  const { estudiante } = useEstudiante()
+
+  if (!estudiante) {
+    return (
+      <NavLink
+        to="/entrar"
+        className={cn(
+          'mt-auto hidden items-center justify-center rounded-md border border-border',
+          'bg-primary-tint p-2.5 text-menor font-semibold text-primary',
+          'transition-colors duration-250 hover:bg-primary-tint-strong lg:flex',
+        )}
+      >
+        Iniciar sesión
+      </NavLink>
+    )
+  }
 
   return (
     <NavLink

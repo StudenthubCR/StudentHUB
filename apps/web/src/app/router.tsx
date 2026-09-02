@@ -7,6 +7,7 @@ import { CarnetPage } from '@/features/carnet/CarnetPage'
 import { HorariosPage } from '@/features/horarios/HorariosPage'
 import { HorarioGrupoPage } from '@/features/horarios/HorarioGrupoPage'
 import { ComedorPage } from '@/features/comedor/ComedorPage'
+import { LoginPage } from '@/features/auth/LoginPage'
 
 /**
  * `handle.titulo` alimenta el título del documento (ver `useTituloDeRuta`), y
@@ -14,6 +15,9 @@ import { ComedorPage } from '@/features/comedor/ComedorPage'
  * cualquier error de render.
  */
 export const router = createBrowserRouter([
+  // El login va fuera del layout a propósito: sin barra de navegación ni
+  // cabecera, para que no invite a irse a otro lado a mitad del ingreso.
+  { path: '/entrar', element: <LoginPage />, errorElement: <PaginaDeError /> },
   {
     path: '/',
     element: <AppLayout />,

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { aplicarTema, leerTemaGuardado, type Theme } from '@/lib/theme'
 import { ThemeContext } from './theme-context'
+import { SesionProvider } from '@/features/auth/SesionProvider'
 
 /**
  * El cliente se crea fuera del componente: uno solo para toda la vida de la
@@ -34,7 +35,9 @@ export function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeContext value={valor}>{children}</ThemeContext>
+      <SesionProvider>
+        <ThemeContext value={valor}>{children}</ThemeContext>
+      </SesionProvider>
     </QueryClientProvider>
   )
 }

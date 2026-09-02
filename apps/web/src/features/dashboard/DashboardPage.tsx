@@ -21,10 +21,12 @@ import { primerNombre, saludoSegunHora } from './saludo'
  * barra lateral. Repetirlos aquí ocupaba media pantalla sin agregar nada.
  */
 export function DashboardPage() {
-  const estudiante = useEstudiante()
+  const { estudiante } = useEstudiante()
   const ahora = useReloj()
 
-  const grado = buscarGradoPorGrupo(estudiante.grupo)
+  // Sin sesión se muestra el único grupo con horario publicado: los horarios
+  // son datos públicos y el inicio sigue sirviendo para algo antes de entrar.
+  const grado = buscarGradoPorGrupo(estudiante?.grupo ?? '11-2')
   const horario = useHorario(grado?.grupo ?? null, ahora)
   const comedor = useMenuSemanal(ahora)
 
@@ -34,7 +36,8 @@ export function DashboardPage() {
     <section className="animate-fade-in">
       <header className="mb-5.5 md:mb-6.5">
         <h1 className="text-hero leading-tight font-bold tracking-[-0.03em] md:text-[2rem]">
-          {saludoSegunHora(ahora)}, {primerNombre(estudiante.nombre)}
+          {saludoSegunHora(ahora)}
+          {estudiante ? `, ${primerNombre(estudiante.nombre)}` : ''}
         </h1>
         <p className="mt-1 text-dato text-text-muted first-letter:uppercase md:text-base">
           {nombreLargoDeFecha(ahora)}
