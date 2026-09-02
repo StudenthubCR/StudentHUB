@@ -93,8 +93,8 @@ export function CarruselNoticias({ noticias }: { noticias: Noticia[] }) {
             <img
               src={noticia.imagen}
               alt={noticia.descripcion}
-              width={1024}
-              height={1024}
+              width={900}
+              height={900}
               draggable={false}
               loading={indice === 0 ? 'eager' : 'lazy'}
               decoding="async"

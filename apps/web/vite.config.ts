@@ -7,7 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 /**
  * Las imágenes siguen viviendo en el `assets/` de la raíz del repositorio: se
  * sirven tal cual, sin duplicarlas ni tocar la app actual. Quedan expuestas en
- * la raíz del sitio (`/SHlarge.svg`).
+ * la raíz del sitio (`/SHlarge.webp`).
  */
 const assetsDir = fileURLToPath(new URL('../../assets', import.meta.url))
 
@@ -17,7 +17,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['SHlogo.svg'],
+      includeAssets: ['SHlogo.png'],
       manifest: {
         name: 'Student HUB',
         short_name: 'Student HUB',
@@ -30,16 +30,16 @@ export default defineConfig({
         theme_color: '#0130B2',
         icons: [
           {
-            src: '/SHlogo.svg',
-            type: 'image/svg+xml',
-            sizes: 'any',
+            src: '/SHlogo.png',
+            type: 'image/png',
+            sizes: '512x302',
             purpose: 'any maskable',
           },
         ],
       },
       workbox: {
-        // Precaché sólo del shell y las fuentes. Las imágenes de `assets/`
-        // pesan ~7 MB sin optimizar; entran al caché bajo demanda, no de golpe.
+        // Precaché del shell y las fuentes. Los afiches de noticias entran al
+        // caché bajo demanda: son 90 KB cada uno y sólo se ve uno a la vez.
         globPatterns: ['**/*.{js,css,html,woff2}'],
         navigateFallback: '/index.html',
         cleanupOutdatedCaches: true,

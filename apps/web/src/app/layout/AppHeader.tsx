@@ -19,10 +19,10 @@ export function AppHeader() {
         aria-label="Ir al inicio"
         className="relative -ml-3 flex h-11 w-[220px] items-center overflow-hidden rounded-sm lg:ml-0"
       >
-        {/* Alto sobredimensionado y desplazamiento lateral: el SVG del logo
+        {/* Alto sobredimensionado y desplazamiento lateral: el logo
             trae mucho margen transparente y así se recorta, igual que hoy. */}
         <img
-          src="/SHlarge.svg"
+          src="/SHlarge.webp"
           alt="Student HUB"
           className={
             'absolute top-1/2 left-[-45px] h-40 w-auto -translate-y-1/2 object-contain ' +
