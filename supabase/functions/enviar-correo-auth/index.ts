@@ -16,6 +16,9 @@
  *
  * Sin dominio propio verificado, Resend sólo entrega a la dirección de la
  * cuenta. Alcanza para probar; para los estudiantes hace falta el dominio.
+ *
+ * verify_jwt va desactivado a propósito: quien llama es el hook de Auth, que
+ * no manda un JWT sino una firma de webhook, y esa sí se verifica abajo.
  */
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
