@@ -6,6 +6,13 @@
       "runtimeExecutable": "py",
       "runtimeArgs": ["-3", "-m", "http.server", "5510"],
       "port": 5510
+    },
+    {
+      "name": "studenthub-web",
+      "cwd": "apps/web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "5173"],
+      "port": 5173
     }
   ]
 }

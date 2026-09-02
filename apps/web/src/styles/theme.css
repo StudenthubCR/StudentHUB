@@ -1,0 +1,116 @@
+/* =========================================
+   STUDENT HUB — SISTEMA DE DISEÑO (portado)
+   -----------------------------------------
+   Origen: css/styles.css de la app actual. Los valores son los mismos:
+   lo único que cambia es que ahora viven en @theme y Tailwind genera las
+   utilidades (bg-surface, rounded-xl, shadow-md…) a partir de ellos.
+
+   El modo oscuro NO usa el variante `dark:` en cada clase: se redefinen las
+   mismas variables bajo html[data-theme="dark"], igual que hoy. Como Tailwind
+   v4 emite `background-color: var(--color-surface)`, todas las utilidades
+   voltean solas al cambiar el atributo.
+   ========================================= */
+/* `static` mantiene todos los tokens emitidos aunque una utilidad no los use:
+   las utilidades `elev-*` de app.css los leen por `var()`, y así el modo oscuro
+   los puede redefinir. */
+@theme static {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Breakpoint propio de la app actual (móvil grande). md/lg/xl ya coinciden
+     con 768/1024/1280 en Tailwind. */
+  --breakpoint-xs: 576px;
+
+  /* --- Escala tipográfica ---
+     Antes había 28 tamaños sueltos escritos a mano por toda la app: las
+     etiquetas en mayúsculas estaban en 0.62, 0.66 y 0.68rem según el archivo,
+     y los valores en 0.88, 0.9, 0.92 y 0.93. Diferencias invisibles una por
+     una, pero juntas hacen que la app se vea armada a pedazos. Estos son los
+     únicos tamaños permitidos. */
+  --text-micro: 0.62rem;      /* insignias: AHORA, SIGUE, HOY */
+  --text-etiqueta: 0.68rem;   /* etiquetas en mayúsculas sobre un dato */
+  --text-menuda: 0.75rem;     /* pies de tarjeta, notas al margen */
+  --text-nota: 0.8rem;        /* texto secundario corto, enlaces de acción */
+  --text-menor: 0.85rem;      /* texto secundario */
+  --text-dato: 0.9rem;        /* el valor de un dato */
+  --text-cuerpo: 0.95rem;     /* cuerpo */
+  --text-subtitulo: 1.15rem;
+  --text-titulo: 1.35rem;
+  --text-hero: 1.75rem;
+
+  /* --- Marca --- */
+  --color-primary: #0130B2;        /* Acento para texto e iconos */
+  --color-primary-solid: #0130B2;  /* Relleno de botones */
+  --color-primary-dark: #0B2B80;
+  --color-primary-light: #4B73E1;
+
+  /* --- Superficies y texto --- */
+  --color-bg: #f3f6fc;
+  --color-surface: #ffffff;
+  --color-surface-alt: #eaf0fb;
+  --color-text: #0c142c;
+  --color-text-muted: #5c6b8f;
+  --color-border: rgba(12, 20, 44, 0.08);
+  --color-border-strong: rgba(12, 20, 44, 0.14);
+  --color-nav-glass: rgba(255, 255, 255, 0.82);
+
+  /* --- Tintes de marca reutilizables --- */
+  --color-primary-tint: rgba(1, 48, 178, 0.08);
+  --color-primary-tint-strong: rgba(1, 48, 178, 0.16);
+
+  /* --- Elevación --- */
+  --shadow-sm: 0 1px 2px rgba(11, 43, 128, 0.06), 0 2px 8px rgba(11, 43, 128, 0.04);
+  --shadow-md: 0 4px 12px rgba(11, 43, 128, 0.06), 0 14px 30px rgba(11, 43, 128, 0.06);
+  --shadow-lg: 0 20px 44px rgba(11, 43, 128, 0.14);
+  --shadow-nav: 0 10px 30px rgba(11, 43, 128, 0.14), 0 2px 8px rgba(11, 43, 128, 0.08);
+  --shadow-hero: 0 18px 38px rgba(11, 43, 128, 0.26);
+
+  /* --- Formas --- */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  /* --- Movimiento --- */
+  --ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-ui: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --animate-fade-in: fade-in 0.4s var(--ease-soft) both;
+  --animate-slide-up: slide-up 0.4s var(--ease-soft) both;
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Modo oscuro — mismos valores que [data-theme="dark"] en styles.css.
+   Se usa html[…] y no [data-theme="dark"] a secas para ganarle en
+   especificidad al :root que emite Tailwind, sin depender del orden. */
+html[data-theme="dark"] {
+  --color-primary: #7ba0f5;
+  --color-primary-solid: #3a63d8;
+  --color-primary-dark: #0B2B80;
+  --color-primary-light: #4B73E1;
+
+  --color-bg: #070c20;
+  --color-surface: #101a3d;
+  --color-surface-alt: #17224b;
+  --color-text: #eef2fb;
+  --color-text-muted: #93a7dc;
+  --color-border: rgba(255, 255, 255, 0.09);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
+  --color-nav-glass: rgba(16, 26, 61, 0.84);
+
+  --color-primary-tint: rgba(123, 160, 245, 0.12);
+  --color-primary-tint-strong: rgba(123, 160, 245, 0.22);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.42);
+  --shadow-lg: 0 24px 50px rgba(0, 0, 0, 0.55);
+  --shadow-nav: 0 14px 34px rgba(0, 0, 0, 0.55);
+}

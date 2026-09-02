@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Student HUB</title>
+    <link rel="icon" type="image/svg+xml" href="/SHlogo.svg" />
+    <link rel="apple-touch-icon" href="/SHlogo.svg" />
+    <meta name="theme-color" content="#0130B2" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="description" content="Tu Portal Educativo y Carnet Digital Premium" />
+    <!-- Aplica el tema guardado antes del primer pintado: sin esto la app
+         parpadea en blanco al abrirse en oscuro. Misma clave 'theme'. -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
+        } catch (e) {
+          /* modo privado sin localStorage: se queda en claro */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

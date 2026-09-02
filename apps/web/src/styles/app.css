@@ -1,0 +1,137 @@
+@import "tailwindcss";
+@import "./theme.css";
+
+/* El modo oscuro se conserva tal cual está hoy: atributo data-theme en <html>
+   y la misma clave 'theme' de localStorage. Queda disponible para los pocos
+   casos que necesitan una regla distinta y no sólo otro valor de token. */
+@custom-variant dark (&:where([data-theme="dark"] *));
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    background-color: var(--color-bg);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Accesibilidad: foco visible y coherente en toda la app */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+    border-radius: 8px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Vidrio esmerilado del header y de la píldora de navegación. Se declara como
+   utilidad porque `backdrop-filter` necesita además el prefijo -webkit- para
+   Safari de iOS, que es donde más se instala la PWA. */
+@utility glass {
+  background-color: var(--color-nav-glass);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  backdrop-filter: saturate(180%) blur(18px);
+}
+
+/* Franja luminosa del banner del comedor (el ::before del .menu-today-card) */
+@utility hero-glow {
+  &::before {
+    content: "";
+    position: absolute;
+    top: -40%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 70%);
+    pointer-events: none;
+  }
+}
+
+/* Elevación. No se usan las utilidades `shadow-*` de Tailwind porque éstas
+   inlinean el valor del token en la clase: la sombra quedaría congelada en su
+   versión clara y no voltearía con data-theme. Éstas leen la variable en
+   tiempo de cálculo, que es lo que hace hoy `var(--card-shadow)`. */
+@utility elev-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+@utility elev-md {
+  box-shadow: var(--shadow-md);
+}
+
+@utility elev-lg {
+  box-shadow: var(--shadow-lg);
+}
+
+@utility elev-nav {
+  box-shadow: var(--shadow-nav);
+}
+
+@utility elev-hero {
+  box-shadow: var(--shadow-hero);
+}
+
+/* Filas deslizables (las pestañas de día del horario): se desplazan con el
+   dedo, pero la barra de scroll sobra y ensucia la fila. */
+@utility sin-barra {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* =========================================
+   IMPRESIÓN — SOLO EL CARNET
+   -----------------------------------------
+   Se marca con data-print qué se oculta y qué se imprime, en vez de listar
+   selectores de componentes que van a cambiar de nombre.
+   ========================================= */
+@media print {
+  [data-print="ocultar"] {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  main {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  [data-print="carnet"] {
+    margin: 40px auto !important;
+    border: 1px solid #cccccc !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+    /* El carnet es un degradado de marca: sin esto sale en blanco. */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
