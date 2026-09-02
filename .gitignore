@@ -1,0 +1,4 @@
+# Enlaces simbólicos con rutas absolutas de la máquina que instaló las skills.
+# El contenido real vive en .agents/skills y ese sí se versiona; estos enlaces
+# se recrean con `npx skills add` usando skills-lock.json.
+.claude/skills/
