@@ -1,0 +1,27 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+
+  // OJO: este nombre tiene que coincidir con el del Worker que ya existe en
+  // Cloudflare. Si no coincide, `wrangler deploy` crea un Worker nuevo en vez
+  // de actualizar el que está conectado al repositorio.
+  "name": "studenthub",
+
+  "compatibility_date": "2026-09-02",
+
+  /**
+   * Worker de sólo assets: no hay código de servidor, sólo el sitio estático
+   * que produce `npm run build`. Por eso no hay campo `main`.
+   *
+   * `single-page-application` hace que cualquier ruta que no corresponda a un
+   * archivo devuelva index.html con código 200. Es lo que necesita React
+   * Router: sin eso, recargar estando en /comedor da 404.
+   */
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}
