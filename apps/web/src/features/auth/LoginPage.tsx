@@ -3,7 +3,13 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/cn'
 import { IconoFlechaDerecha } from '@/components/icons'
-import { codigoCompleto, correoValido, normalizarCorreo, soloDigitos } from './auth.service'
+import {
+  LARGO_MAXIMO,
+  codigoCompleto,
+  correoValido,
+  normalizarCorreo,
+  soloDigitos,
+} from './auth.service'
 import { useSesion } from './useSesion'
 
 const CAMPO =
@@ -95,7 +101,7 @@ export function LoginPage() {
         <form onSubmit={pedirCodigo} noValidate>
           <h1 className="text-hero leading-tight font-bold tracking-[-0.03em]">Entrar</h1>
           <p className="mt-2 mb-6 text-menor text-text-muted">
-            Te enviamos un código de 6 dígitos a tu correo institucional.
+            Te enviamos un código de un solo uso a tu correo institucional.
           </p>
 
           <label htmlFor="correo" className="mb-1.5 block text-etiqueta font-bold tracking-[0.08em] text-text-muted uppercase">
@@ -124,7 +130,7 @@ export function LoginPage() {
         <form onSubmit={verificar} noValidate>
           <h1 className="text-hero leading-tight font-bold tracking-[-0.03em]">Revisá tu correo</h1>
           <p className="mt-2 mb-6 text-menor text-text-muted">
-            Mandamos un código de 6 dígitos a <strong className="text-text">{paso.correo}</strong>.
+            Mandamos un código a <strong className="text-text">{paso.correo}</strong>.
             Si no aparece, revisá la carpeta de no deseados.
           </p>
 
@@ -140,7 +146,8 @@ export function LoginPage() {
             value={codigo}
             onChange={(e) => setCodigo(soloDigitos(e.target.value))}
             placeholder="000000"
-            className={cn(CAMPO, 'text-center text-titulo font-bold tracking-[0.4em]')}
+            maxLength={LARGO_MAXIMO}
+            className={cn(CAMPO, 'text-center text-titulo font-bold tracking-[0.3em]')}
           />
 
           {error && <p className="mt-3 text-menor text-[#c0392b] dark:text-[#ff8a80]">{error}</p>}

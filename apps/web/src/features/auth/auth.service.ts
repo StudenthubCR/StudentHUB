@@ -26,11 +26,22 @@ export function dominioPermitido(correo: string, dominio: string | null): boolea
   return dominioDe(correo) === dominio.trim().toLowerCase()
 }
 
-/** El código que envía Supabase son 6 dígitos. */
+/**
+ * Largo del código.
+ *
+ * Supabase lo genera según su propia configuración, y no siempre son 6: este
+ * proyecto salió mandando 8. Si la app truncara a 6, el código llegaría por
+ * correo y no se podría escribir — que fue justo lo que pasó en la primera
+ * prueba real. Se acepta el rango que Supabase permite y se deja que sea el
+ * servidor quien diga si el código es correcto.
+ */
+export const LARGO_MINIMO = 6
+export const LARGO_MAXIMO = 10
+
 export function soloDigitos(codigo: string): string {
-  return codigo.replace(/\D/g, '').slice(0, 6)
+  return codigo.replace(/\D/g, '').slice(0, LARGO_MAXIMO)
 }
 
 export function codigoCompleto(codigo: string): boolean {
-  return soloDigitos(codigo).length === 6
+  return soloDigitos(codigo).length >= LARGO_MINIMO
 }
