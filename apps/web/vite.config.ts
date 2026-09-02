@@ -36,6 +36,7 @@ function sinOriginalesDeLaAppVieja(): Plugin {
     'SHOG.svg',
     'SHlarge.svg',
     'SHlogo.svg',
+    'SHlogo.png',
     'Paleta de colores.png',
     'student.png',
     'news_dia_estudiante.png',
@@ -62,23 +63,37 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['SHlogo.png'],
+      includeAssets: ['icon-192.png', 'icon-512.png', 'icon-maskable-512.png'],
       manifest: {
+        id: '/',
         name: 'Student HUB',
         short_name: 'Student HUB',
         description: 'Tu Portal Educativo y Carnet Digital Premium',
+        lang: 'es',
         start_url: '/',
         scope: '/',
         display: 'standalone',
         orientation: 'portrait-primary',
         background_color: '#060b1e',
         theme_color: '#0130B2',
+        /**
+         * Chrome sólo ofrece "Instalar aplicación" con al menos un ícono de
+         * 192x192 y uno de 512x512, cuadrados y con el tamaño declarado igual
+         * al real. Si no, ofrece "Agregar acceso directo", que es un marcador
+         * y no la app instalada.
+         *
+         * El `maskable` va aparte y no combinado en un mismo `purpose`: el
+         * lanzador de Android recorta ese ícono con su propia forma, así que
+         * necesita más margen que el que se ve entero.
+         */
         icons: [
+          { src: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+          { src: '/icon-512.png', type: 'image/png', sizes: '512x512' },
           {
-            src: '/SHlogo.png',
+            src: '/icon-maskable-512.png',
             type: 'image/png',
-            sizes: '512x302',
-            purpose: 'any maskable',
+            sizes: '512x512',
+            purpose: 'maskable',
           },
         ],
       },
