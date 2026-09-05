@@ -90,6 +90,12 @@ export function CarruselNoticias({ noticias }: { noticias: Noticia[] }) {
               indice === actual ? 'opacity-100' : 'pointer-events-none opacity-0',
             )}
           >
+            {noticia.periodo && (
+              <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 rounded-full border border-white/25 bg-black/60 px-3 py-1 text-etiqueta font-semibold text-white backdrop-blur-md shadow-md">
+                <span className="text-xs" aria-hidden>📅</span>
+                <span>{noticia.periodo}</span>
+              </div>
+            )}
             <img
               src={noticia.imagen}
               alt={noticia.descripcion}

@@ -1,48 +1,57 @@
 /**
- * Noticias del carrusel — por ahora fijas, como en la app actual.
+ * Noticias y boletines del carrusel informativo escolar.
  *
- * Las imágenes se sirven desde el `assets/` de la raíz del repositorio. Según
- * el plan (Fase 2) estas noticias pasan a una tabla con las imágenes en un
- * bucket público de Storage; entonces este archivo se cambia por una consulta
- * y `CarruselNoticias` no se entera.
+ * Programación cronológica desde septiembre hasta diciembre:
+ * - Septiembre: Fiestas Patrias y Semana Cívica
+ * - Octubre: Festival Estudiantil de las Artes
+ * - Noviembre: Práctica Profesional Supervisada y Pasantías
+ * - Noviembre / Diciembre: Proceso de Matrícula y Admisión 2027
+ * - Diciembre: Acto Solemne de Graduación y Clausura
  */
 export type Noticia = {
   id: string
   titulo: string
-  /** Texto alternativo real, no una repetición del título con emojis. */
+  /** Texto alternativo descriptivo */
   descripcion: string
   imagen: string
+  periodo?: string
 }
 
 export const NOTICIAS: Noticia[] = [
   {
-    id: 'dia-estudiante',
-    titulo: 'Día del Estudiante 2026',
-    descripcion: 'Afiche del Día del Estudiante 2026',
-    imagen: '/news_dia_estudiante.webp',
+    id: 'fiestas-patrias',
+    titulo: 'Fiestas Patrias 2026',
+    descripcion: 'Afiche de la Semana Cívica y Celebración de Fiestas Patrias del CTP 2026 (Septiembre)',
+    imagen: '/news_fiestas_patrias.webp',
+    periodo: 'Septiembre',
   },
   {
-    id: 'expotecnica',
-    titulo: 'ExpoTécnica CTP 2026',
-    descripcion: 'Afiche de la ExpoTécnica del CTP 2026',
-    imagen: '/news_expotecnica.webp',
+    id: 'festival-artes',
+    titulo: 'Festival de las Artes 2026',
+    descripcion: 'Afiche del Festival Estudiantil de las Artes FEA del CTP 2026 (Octubre)',
+    imagen: '/news_festival_artes.webp',
+    periodo: 'Octubre',
   },
   {
-    id: 'feria-cientifica',
-    titulo: 'Feria Científica CTP 2026',
-    descripcion: 'Afiche de la Feria Científica del CTP 2026',
-    imagen: '/news_feria_cientifica.webp',
+    id: 'practica-profesional',
+    titulo: 'Práctica Profesional 2026',
+    descripcion: 'Afiche de la Práctica Profesional Supervisada y Pasantías en Empresas CTP 2026 (Noviembre)',
+    imagen: '/news_practica_profesional.webp',
+    periodo: 'Noviembre',
   },
   {
-    id: 'feria-vocacional',
-    titulo: 'Feria Vocacional CTP 2026',
-    descripcion: 'Afiche de la Feria Vocacional del CTP 2026',
-    imagen: '/news_feria_vocacional.webp',
+    id: 'matricula-2027',
+    titulo: 'Matrícula y Admisión 2027',
+    descripcion: 'Afiche de la convocatoria oficial de matrícula y admisión para el curso 2027 (Noviembre - Diciembre)',
+    imagen: '/news_matricula_2027.webp',
+    periodo: 'Noviembre - Diciembre',
   },
   {
-    id: 'torneo-futsal',
-    titulo: 'Torneo de Futsal CTP 2026',
-    descripcion: 'Afiche del Torneo de Futsal del CTP 2026',
-    imagen: '/news_torneo_futsal.webp',
+    id: 'graduacion-2026',
+    titulo: 'Graduación CTP 2026',
+    descripcion: 'Afiche del Acto Solemne de Graduación de Técnicos Medios y Bachilleres CTP 2026 (Diciembre)',
+    imagen: '/news_graduacion_2026.webp',
+    periodo: 'Diciembre',
   },
 ]
+

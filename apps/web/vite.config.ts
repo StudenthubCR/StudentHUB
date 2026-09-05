@@ -44,6 +44,11 @@ function sinOriginalesDeLaAppVieja(): Plugin {
     'news_feria_cientifica.png',
     'news_feria_vocacional.png',
     'news_torneo_futsal.png',
+    'news_fiestas_patrias.png',
+    'news_festival_artes.png',
+    'news_practica_profesional.png',
+    'news_matricula_2027.png',
+    'news_graduacion_2026.png',
   ]
 
   return {
