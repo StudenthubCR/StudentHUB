@@ -1,7 +1,6 @@
 import { estadoDelDia, nombreLargoDeFecha } from '@/features/comedor/menu.service'
 import { useMenuSemanal } from '@/features/comedor/useMenuSemanal'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
-import { buscarGradoPorGrupo } from '@/features/horarios/grados'
 import { useHorario } from '@/features/horarios/useHorario'
 import { useReloj } from '@/lib/useReloj'
 import { AlmuerzoDeHoy } from './components/AlmuerzoDeHoy'
@@ -25,7 +24,6 @@ export function DashboardPage() {
   const ahora = useReloj()
 
   const grupoActivo = estudiante?.grupo ?? '11-1'
-  const grado = buscarGradoPorGrupo(grupoActivo)
   const horario = useHorario(grupoActivo, ahora)
   const comedor = useMenuSemanal(ahora)
 
@@ -59,7 +57,7 @@ export function DashboardPage() {
             ahora={ahora}
             cargando={horario.cargando}
             hayError={Boolean(horario.error)}
-            aHorario={grado ? `/horarios/${grado.id}` : '/horarios'}
+            aHorario="/horarios"
           />
           <RestoDelDia dia={diaDeHoy} ahora={ahora} />
           <AlmuerzoDeHoy

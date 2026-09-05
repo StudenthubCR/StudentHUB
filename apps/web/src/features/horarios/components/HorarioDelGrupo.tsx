@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { cn } from '@/lib/cn'
 import { diaPorDefecto } from '../horario.service'
 import type { DiaDeClases } from '../horario.types'
@@ -118,16 +117,6 @@ export function HorarioDelGrupo({
               Semana
             </button>
           )}
-          <Link
-            to="/horarios"
-            className={cn(
-              'rounded-full bg-primary-tint px-3.5 py-[7px] text-nota font-semibold',
-              'whitespace-nowrap text-primary transition-all duration-250 ease-ui',
-              'hover:bg-primary-tint-strong active:scale-95',
-            )}
-          >
-            Cambiar grado
-          </Link>
         </div>
       </div>
 
