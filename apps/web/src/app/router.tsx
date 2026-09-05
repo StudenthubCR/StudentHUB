@@ -7,6 +7,7 @@ import { CarnetPage } from '@/features/carnet/CarnetPage'
 import { HorariosPage } from '@/features/horarios/HorariosPage'
 import { ComedorPage } from '@/features/comedor/ComedorPage'
 import { LoginPage } from '@/features/auth/LoginPage'
+import { RutaProtegida } from '@/features/auth/RutaProtegida'
 
 /**
  * `handle.titulo` alimenta el título del documento (ver `useTituloDeRuta`), y
@@ -19,7 +20,11 @@ export const router = createBrowserRouter([
   { path: '/entrar', element: <LoginPage />, errorElement: <PaginaDeError /> },
   {
     path: '/',
-    element: <AppLayout />,
+    element: (
+      <RutaProtegida>
+        <AppLayout />
+      </RutaProtegida>
+    ),
     errorElement: <PaginaDeError />,
     children: [
       { index: true, element: <DashboardPage />, handle: { titulo: 'Inicio' } },

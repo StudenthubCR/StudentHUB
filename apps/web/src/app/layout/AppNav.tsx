@@ -1,6 +1,8 @@
 import { NavLink } from 'react-router-dom'
-import { cn } from '@/lib/cn'
+import { IconoSalir } from '@/components/icons'
+import { useSesion } from '@/features/auth/useSesion'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
+import { cn } from '@/lib/cn'
 import { NAV_ITEMS } from './nav-items'
 
 /**
@@ -83,6 +85,7 @@ export function AppNav() {
 
 function FichaLateral() {
   const { estudiante } = useEstudiante()
+  const { cerrarSesion } = useSesion()
 
   if (!estudiante) {
     return (
@@ -100,27 +103,42 @@ function FichaLateral() {
   }
 
   return (
-    <NavLink
-      to="/carnet"
-      className={({ isActive }) =>
-        cn(
-          'mt-auto hidden items-center gap-3 rounded-md border border-border p-2.5',
-          'transition-colors duration-250 lg:flex',
-          isActive ? 'bg-primary-tint' : 'hover:bg-surface-alt',
-        )
-      }
-    >
-      <img
-        src={estudiante.fotoUrl}
-        alt=""
-        className="size-9 shrink-0 rounded-full border border-border object-cover"
-      />
-      <span className="min-w-0">
-        <span className="block truncate text-menor font-semibold text-text">
-          {estudiante.nombre}
+    <div className="mt-auto hidden flex-col gap-2 border-t border-border pt-3 lg:flex">
+      <NavLink
+        to="/carnet"
+        className={({ isActive }) =>
+          cn(
+            'flex items-center gap-3 rounded-md border border-border p-2.5',
+            'transition-colors duration-250',
+            isActive ? 'bg-primary-tint' : 'hover:bg-surface-alt',
+          )
+        }
+      >
+        <img
+          src={estudiante.fotoUrl}
+          alt=""
+          className="size-9 shrink-0 rounded-full border border-border object-cover"
+        />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-menor font-semibold text-text">
+            {estudiante.nombre}
+          </span>
+          <span className="block text-menuda text-text-muted">Grupo {estudiante.grupo}</span>
         </span>
-        <span className="block text-menuda text-text-muted">Grupo {estudiante.grupo}</span>
-      </span>
-    </NavLink>
+      </NavLink>
+
+      <button
+        type="button"
+        onClick={() => void cerrarSesion()}
+        className={cn(
+          'flex cursor-pointer items-center justify-center gap-2 rounded-md border border-border',
+          'bg-surface px-3 py-2 text-menuda font-semibold text-text-muted transition-all duration-200',
+          'hover:border-border-strong hover:bg-surface-alt hover:text-text active:scale-98',
+        )}
+      >
+        <IconoSalir className="size-3.5" />
+        <span>Cerrar sesión</span>
+      </button>
+    </div>
   )
 }

@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom'
+import { IconoSalir } from '@/components/icons'
+import { useSesion } from '@/features/auth/useSesion'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import { ThemeToggle } from './ThemeToggle'
 
 export function AppHeader() {
   const { estudiante } = useEstudiante()
+  const { sesion, cerrarSesion } = useSesion()
 
   return (
     <header
@@ -31,8 +34,25 @@ export function AppHeader() {
         />
       </Link>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5 sm:gap-3">
         <ThemeToggle />
+
+        {sesion && (
+          <button
+            type="button"
+            onClick={() => void cerrarSesion()}
+            aria-label="Cerrar sesión"
+            title="Cerrar sesión"
+            className={
+              'flex size-10 cursor-pointer items-center justify-center rounded-full ' +
+              'border border-border bg-surface text-text-muted transition-all duration-200 ' +
+              'hover:border-border-strong hover:bg-surface-alt hover:text-text active:scale-95'
+            }
+          >
+            <IconoSalir className="size-4" />
+          </button>
+        )}
+
         {/* La foto era decorativa y no llevaba a ningún lado; un avatar en la
             cabecera es justo lo que la gente toca buscando su ficha. Sin
             sesión no se muestra una cara ajena: se ofrece entrar. */}
