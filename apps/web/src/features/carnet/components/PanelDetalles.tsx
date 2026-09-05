@@ -84,12 +84,9 @@ export function PanelDetalles({ estudiante, onImprimir }: Props) {
         Imprimir credencial
       </button>
 
-      {/* El botón "Guardar Offline" de la app actual no se portó: mostraba un
-          alert y no guardaba nada. Además el plan §3.5 dice lo contrario —
-          los datos del estudiante nunca van al caché del service worker. */}
       <p className="mt-4 text-menuda leading-relaxed text-text-muted">
-        Los datos que ves son de demostración. El carnet real, con la ficha del
-        estudiante y el código verificable, llega junto con el inicio de sesión.
+        Credencial oficial del estudiante. El código QR codifica tu nombre y tu
+        sección para validaciones y trámites dentro de la institución.
       </p>
     </div>
   )

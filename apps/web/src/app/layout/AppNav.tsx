@@ -3,6 +3,7 @@ import { IconoSalir } from '@/components/icons'
 import { useSesion } from '@/features/auth/useSesion'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import { cn } from '@/lib/cn'
+import { obtenerIniciales } from '@/lib/texto'
 import { NAV_ITEMS } from './nav-items'
 
 /**
@@ -114,11 +115,19 @@ function FichaLateral() {
           )
         }
       >
-        <img
-          src={estudiante.fotoUrl}
-          alt=""
-          className="size-9 shrink-0 rounded-full border border-border object-cover"
-        />
+        {estudiante.fotoUrl &&
+        !estudiante.fotoUrl.includes('student.webp') &&
+        !estudiante.fotoUrl.includes('placeholder') ? (
+          <img
+            src={estudiante.fotoUrl}
+            alt=""
+            className="size-9 shrink-0 rounded-full border border-border object-cover"
+          />
+        ) : (
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-primary-solid text-micro font-bold text-white">
+            {obtenerIniciales(estudiante.nombre)}
+          </span>
+        )}
         <span className="min-w-0 flex-1">
           <span className="block truncate text-menor font-semibold text-text">
             {estudiante.nombre}

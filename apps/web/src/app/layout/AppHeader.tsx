@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { IconoSalir } from '@/components/icons'
 import { useSesion } from '@/features/auth/useSesion'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
+import { obtenerIniciales } from '@/lib/texto'
 import { ThemeToggle } from './ThemeToggle'
 
 export function AppHeader() {
@@ -62,14 +63,27 @@ export function AppHeader() {
             aria-label={`Ver el carnet de ${estudiante.nombre}`}
             className="rounded-full transition-transform duration-250 ease-ui active:scale-95"
           >
-            <img
-              src={estudiante.fotoUrl}
-              alt=""
-              className={
-                'size-10 rounded-full border-2 border-primary object-cover ' +
-                'shadow-[0_0_0_3px_var(--color-primary-tint)] md:size-11'
-              }
-            />
+            {estudiante.fotoUrl &&
+            !estudiante.fotoUrl.includes('student.webp') &&
+            !estudiante.fotoUrl.includes('placeholder') ? (
+              <img
+                src={estudiante.fotoUrl}
+                alt=""
+                className={
+                  'size-10 rounded-full border-2 border-primary object-cover ' +
+                  'shadow-[0_0_0_3px_var(--color-primary-tint)] md:size-11'
+                }
+              />
+            ) : (
+              <span
+                className={
+                  'flex size-10 items-center justify-center rounded-full border-2 border-primary ' +
+                  'bg-primary-solid text-nota font-bold text-white shadow-[0_0_0_3px_var(--color-primary-tint)] md:size-11'
+                }
+              >
+                {obtenerIniciales(estudiante.nombre)}
+              </span>
+            )}
           </Link>
         ) : (
           <Link
