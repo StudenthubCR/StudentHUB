@@ -1,16 +1,36 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { ThemeToggle } from '@/app/layout/ThemeToggle'
 import { IconoCerrar, IconoEngranaje, IconoSalir, IconoEscudo } from '@/components/icons'
+import { cn } from '@/lib/cn'
 import type { Estudiante } from '@/features/estudiante/estudiante.fixture'
+import type { PersonalizacionCarnet, PatronFondo } from '../carnet.estilos'
+import { SelectorPersonalizacionCarnet } from './SelectorPersonalizacionCarnet'
 
 type Props = {
   abierto: boolean
   alCerrar: () => void
   estudiante: Estudiante
   onCerrarSesion: () => void
+  personalizacion: PersonalizacionCarnet
+  onCambiarTema: (temaId: string) => void
+  onCambiarPatron: (patron: PatronFondo) => void
+  onToggleBrillo: () => void
+  onRestablecer: () => void
 }
 
-export function ModalOpcionesCarnet({ abierto, alCerrar, estudiante, onCerrarSesion }: Props) {
+export function ModalOpcionesCarnet({
+  abierto,
+  alCerrar,
+  estudiante,
+  onCerrarSesion,
+  personalizacion,
+  onCambiarTema,
+  onCambiarPatron,
+  onToggleBrillo,
+  onRestablecer,
+}: Props) {
+  const [pestana, setPestana] = useState<'estilo' | 'cuenta'>('estilo')
+
   // Cerrar modal al presionar Escape
   useEffect(() => {
     if (!abierto) return
@@ -32,23 +52,23 @@ export function ModalOpcionesCarnet({ abierto, alCerrar, estudiante, onCerrarSes
     >
       {/* Fondo difuminado con clic para cerrar */}
       <div
-        className="absolute inset-0 bg-black/55 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
         onClick={alCerrar}
       />
 
       {/* Contenedor de la ventana modal */}
-      <div className="relative w-full max-w-md animate-slide-up rounded-2xl border border-border bg-surface p-6 shadow-2xl elev-lg sm:p-7">
+      <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto animate-slide-up rounded-2xl border border-border bg-surface p-6 shadow-2xl elev-lg sm:p-7">
         {/* Cabecera */}
         <div className="flex items-center justify-between border-b border-border pb-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-primary-tint text-primary">
+            <div className="flex size-9.5 items-center justify-center rounded-xl bg-primary-tint text-primary">
               <IconoEngranaje className="size-5" />
             </div>
             <div>
               <h3 id="titulo-modal-opciones" className="text-subtitulo font-bold text-text">
-                Opciones y Configuración
+                Opciones y Personalización
               </h3>
-              <p className="text-menuda text-text-muted">Ajustes de tu carnet y cuenta</p>
+              <p className="text-menuda text-text-muted">Ajustes visuales y cuenta de estudiante</p>
             </div>
           </div>
 
@@ -62,66 +82,106 @@ export function ModalOpcionesCarnet({ abierto, alCerrar, estudiante, onCerrarSes
           </button>
         </div>
 
-        {/* Cuerpo con secciones */}
-        <div className="my-5 flex flex-col gap-4.5">
-          {/* Apariencia */}
-          <div className="flex items-center justify-between rounded-xl border border-border bg-surface-alt/50 p-3.5">
-            <div>
-              <span className="block text-dato font-semibold text-text">Tema visual</span>
-              <span className="block text-menuda text-text-muted">Cambia entre modo claro y oscuro</span>
-            </div>
-            <ThemeToggle />
-          </div>
-
-          {/* Información de la cuenta */}
-          <div className="rounded-xl border border-border bg-surface-alt/50 p-4">
-            <h4 className="mb-2.5 text-etiqueta font-bold tracking-[0.08em] text-text-muted uppercase">
-              Datos del estudiante
-            </h4>
-            <div className="flex flex-col gap-2 text-menor">
-              <div className="flex justify-between border-b border-border/60 pb-1.5">
-                <span className="text-text-muted">Nombre:</span>
-                <span className="font-semibold text-text text-right">{estudiante.nombre}</span>
-              </div>
-              <div className="flex justify-between border-b border-border/60 pb-1.5">
-                <span className="text-text-muted">Sección activa:</span>
-                <span className="font-semibold text-primary">{estudiante.grupo}</span>
-              </div>
-              <div className="flex justify-between border-b border-border/60 pb-1.5">
-                <span className="text-text-muted">ID Estudiantil:</span>
-                <span className="font-semibold text-text">{estudiante.codigo}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-text-muted">Especialidad:</span>
-                <span className="font-semibold text-text text-right">{estudiante.especialidad}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Validación QR */}
-          <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-primary-tint/30 p-3 text-menuda text-text">
-            <IconoEscudo className="mt-0.5 size-4 shrink-0 text-primary" />
-            <p>
-              El código QR en tu carnet codifica tu nombre completo y tu sección para validación en
-              el colegio.
-            </p>
-          </div>
-        </div>
-
-        {/* Botón de cerrar sesión */}
-        <div className="border-t border-border pt-4">
+        {/* Pestañas de Navegación */}
+        <div className="mt-4 mb-5 flex rounded-xl border border-border bg-surface-alt/60 p-1">
           <button
             type="button"
-            onClick={() => {
-              alCerrar()
-              onCerrarSesion()
-            }}
-            className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#c0392b]/30 bg-[#c0392b]/10 py-3 text-menor font-bold text-[#c0392b] transition-all duration-200 hover:bg-[#c0392b]/20 active:scale-[0.98] dark:border-[#ff8a80]/30 dark:bg-[#ff8a80]/10 dark:text-[#ff8a80]"
+            onClick={() => setPestana('estilo')}
+            className={cn(
+              'flex-1 cursor-pointer rounded-lg py-2 text-menor font-bold transition-all',
+              pestana === 'estilo'
+                ? 'bg-surface text-primary shadow-sm'
+                : 'text-text-muted hover:text-text',
+            )}
           >
-            <IconoSalir className="size-4" />
-            <span>Cerrar sesión en este dispositivo</span>
+            🎨 Personalizar Carnet
+          </button>
+          <button
+            type="button"
+            onClick={() => setPestana('cuenta')}
+            className={cn(
+              'flex-1 cursor-pointer rounded-lg py-2 text-menor font-bold transition-all',
+              pestana === 'cuenta'
+                ? 'bg-surface text-primary shadow-sm'
+                : 'text-text-muted hover:text-text',
+            )}
+          >
+            ⚙️ Cuenta y Ajustes
           </button>
         </div>
+
+        {/* Contenido según pestaña activa */}
+        {pestana === 'estilo' ? (
+          <div className="animate-fade-in">
+            <SelectorPersonalizacionCarnet
+              personalizacion={personalizacion}
+              onCambiarTema={onCambiarTema}
+              onCambiarPatron={onCambiarPatron}
+              onToggleBrillo={onToggleBrillo}
+              onRestablecer={onRestablecer}
+            />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4.5 animate-fade-in">
+            {/* Apariencia */}
+            <div className="flex items-center justify-between rounded-xl border border-border bg-surface-alt/50 p-3.5">
+              <div>
+                <span className="block text-dato font-semibold text-text">Tema de la app</span>
+                <span className="block text-menuda text-text-muted">Alterna entre modo claro y oscuro</span>
+              </div>
+              <ThemeToggle />
+            </div>
+
+            {/* Información de la cuenta */}
+            <div className="rounded-xl border border-border bg-surface-alt/50 p-4">
+              <h4 className="mb-2.5 text-etiqueta font-bold tracking-[0.08em] text-text-muted uppercase">
+                Ficha del estudiante
+              </h4>
+              <div className="flex flex-col gap-2 text-menor">
+                <div className="flex justify-between border-b border-border/60 pb-1.5">
+                  <span className="text-text-muted">Nombre:</span>
+                  <span className="font-semibold text-text text-right">{estudiante.nombre}</span>
+                </div>
+                <div className="flex justify-between border-b border-border/60 pb-1.5">
+                  <span className="text-text-muted">Sección asignada:</span>
+                  <span className="font-bold text-primary">{estudiante.grupo}</span>
+                </div>
+                <div className="flex justify-between border-b border-border/60 pb-1.5">
+                  <span className="text-text-muted">ID Estudiantil:</span>
+                  <span className="font-semibold text-text">{estudiante.codigo}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-text-muted">Especialidad:</span>
+                  <span className="font-semibold text-text text-right">{estudiante.especialidad}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Validación QR */}
+            <div className="flex items-start gap-2.5 rounded-xl border border-border/80 bg-primary-tint/30 p-3 text-menuda text-text">
+              <IconoEscudo className="mt-0.5 size-4 shrink-0 text-primary" />
+              <p>
+                El código QR de tu carnet codifica tu nombre completo y sección oficial para
+                validación dentro del colegio.
+              </p>
+            </div>
+
+            {/* Botón de cerrar sesión */}
+            <div className="border-t border-border pt-3">
+              <button
+                type="button"
+                onClick={() => {
+                  alCerrar()
+                  onCerrarSesion()
+                }}
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#c0392b]/30 bg-[#c0392b]/10 py-3 text-menor font-bold text-[#c0392b] transition-all duration-200 hover:bg-[#c0392b]/20 active:scale-[0.98] dark:border-[#ff8a80]/30 dark:bg-[#ff8a80]/10 dark:text-[#ff8a80]"
+              >
+                <IconoSalir className="size-4" />
+                <span>Cerrar sesión en este dispositivo</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

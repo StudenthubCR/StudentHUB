@@ -4,6 +4,7 @@ import { PantallaDeAviso } from '@/components/PantallaDeAviso'
 import { IconoEngranaje } from '@/components/icons'
 import { useSesion } from '@/features/auth/useSesion'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
+import { usePersonalizacionCarnet } from './carnet.estilos'
 import { TarjetaCarnet } from './components/TarjetaCarnet'
 import { PanelDetalles } from './components/PanelDetalles'
 import { ModalOpcionesCarnet } from './components/ModalOpcionesCarnet'
@@ -13,6 +14,14 @@ export function CarnetPage() {
   const { estudiante, cargando, fueraDelPadron } = useEstudiante()
   const [modalAbierta, setModalAbierta] = useState(false)
   const imprimir = useCallback(() => window.print(), [])
+
+  const {
+    personalizacion,
+    cambiarTema,
+    cambiarPatron,
+    toggleBrillo,
+    restablecer,
+  } = usePersonalizacionCarnet()
 
   if (cargandoSesion || cargando) return null
 
@@ -48,8 +57,8 @@ export function CarnetPage() {
         <button
           type="button"
           onClick={() => setModalAbierta(true)}
-          aria-label="Opciones y configuración del carnet"
-          title="Opciones y configuración"
+          aria-label="Opciones y personalización del carnet"
+          title="Opciones y personalización"
           className="flex size-10 cursor-pointer items-center justify-center rounded-full border border-border bg-surface text-text-muted shadow-sm transition-all duration-200 hover:border-primary hover:bg-primary-tint hover:text-primary active:scale-95"
         >
           <IconoEngranaje className="size-5" />
@@ -63,11 +72,15 @@ export function CarnetPage() {
         }
       >
         <div className="flex w-full justify-center lg:max-w-[360px] lg:flex-1">
-          <TarjetaCarnet estudiante={estudiante} />
+          <TarjetaCarnet
+            estudiante={estudiante}
+            personalizacion={personalizacion}
+          />
         </div>
         <PanelDetalles
           estudiante={estudiante}
           onImprimir={imprimir}
+          onPersonalizar={() => setModalAbierta(true)}
           onCerrarSesion={() => void cerrarSesion()}
         />
       </div>
@@ -77,6 +90,11 @@ export function CarnetPage() {
         alCerrar={() => setModalAbierta(false)}
         estudiante={estudiante}
         onCerrarSesion={() => void cerrarSesion()}
+        personalizacion={personalizacion}
+        onCambiarTema={cambiarTema}
+        onCambiarPatron={cambiarPatron}
+        onToggleBrillo={toggleBrillo}
+        onRestablecer={restablecer}
       />
     </PageSection>
   )

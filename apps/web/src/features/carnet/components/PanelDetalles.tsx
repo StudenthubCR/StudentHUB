@@ -1,4 +1,4 @@
-import { IconoImprimir, IconoSalir } from '@/components/icons'
+import { IconoImprimir, IconoSalir, IconoEngranaje } from '@/components/icons'
 import { cn } from '@/lib/cn'
 import type { Estudiante } from '@/features/estudiante/estudiante.fixture'
 
@@ -41,10 +41,16 @@ function InsigniaEstado({ activo }: { activo: boolean }) {
 type Props = {
   estudiante: Estudiante
   onImprimir: () => void
+  onPersonalizar?: () => void
   onCerrarSesion?: () => void
 }
 
-export function PanelDetalles({ estudiante, onImprimir, onCerrarSesion }: Props) {
+export function PanelDetalles({
+  estudiante,
+  onImprimir,
+  onPersonalizar,
+  onCerrarSesion,
+}: Props) {
   return (
     <div
       data-print="ocultar"
@@ -85,6 +91,21 @@ export function PanelDetalles({ estudiante, onImprimir, onCerrarSesion }: Props)
           <IconoImprimir className="size-[18px]" />
           Imprimir credencial
         </button>
+
+        {onPersonalizar && (
+          <button
+            type="button"
+            onClick={onPersonalizar}
+            className={cn(
+              'flex w-full cursor-pointer items-center justify-center gap-2 rounded-md',
+              'border border-primary/30 bg-primary-tint px-4 py-2.5 text-nota font-semibold text-primary',
+              'transition-all duration-200 hover:bg-primary-tint-strong active:scale-98',
+            )}
+          >
+            <IconoEngranaje className="size-4" />
+            Personalizar diseño y colores
+          </button>
+        )}
 
         {onCerrarSesion && (
           <button
