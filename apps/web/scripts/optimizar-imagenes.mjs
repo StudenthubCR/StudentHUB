@@ -19,7 +19,7 @@ const ASSETS = fileURLToPath(new URL('../../../assets', import.meta.url))
  * Ancho de destino. Se sirven a 430px como mucho, así que el doble cubre las
  * pantallas de densidad 2×.
  */
-const FOTOS = { news_: 900, student: 320 }
+const FOTOS = { news_: 900 }
 
 /**
  * Los logos son SVG de más de 1 MB: un trazado automático con una cantidad

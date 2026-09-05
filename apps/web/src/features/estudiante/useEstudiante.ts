@@ -24,9 +24,8 @@ function aEstudiante(fila: FilaEstudiante): Estudiante {
     nivel: fila.grupos?.nivel ?? '',
     jornada: fila.grupos?.jornada ?? '',
     vigencia: `Ciclo Lectivo ${new Date().getFullYear()}`,
-    // La foto vive en un bucket privado y se sirve con URL firmada. Hasta que
-    // eso exista, se usa el avatar genérico.
-    fotoUrl: '/student.webp',
+    // La foto vive en un bucket de Supabase Storage. Sin foto cargada, se usan iniciales.
+    fotoUrl: '',
     activo: fila.estado === 'activo',
   }
 }

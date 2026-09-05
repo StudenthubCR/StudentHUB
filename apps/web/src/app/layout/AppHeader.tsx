@@ -63,9 +63,7 @@ export function AppHeader() {
             aria-label={`Ver el carnet de ${estudiante.nombre}`}
             className="rounded-full transition-transform duration-250 ease-ui active:scale-95"
           >
-            {estudiante.fotoUrl &&
-            !estudiante.fotoUrl.includes('student.webp') &&
-            !estudiante.fotoUrl.includes('placeholder') ? (
+            {estudiante.fotoUrl && !estudiante.fotoUrl.includes('placeholder') ? (
               <img
                 src={estudiante.fotoUrl}
                 alt=""

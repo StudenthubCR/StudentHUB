@@ -36,6 +36,6 @@ export const ESTUDIANTE_DEMO: Estudiante = {
   nivel: 'Undécimo Año',
   jornada: 'Diurna',
   vigencia: 'Ciclo Lectivo 2026',
-  fotoUrl: '/student.webp',
+  fotoUrl: '',
   activo: true,
 }

@@ -115,9 +115,7 @@ function FichaLateral() {
           )
         }
       >
-        {estudiante.fotoUrl &&
-        !estudiante.fotoUrl.includes('student.webp') &&
-        !estudiante.fotoUrl.includes('placeholder') ? (
+        {estudiante.fotoUrl && !estudiante.fotoUrl.includes('placeholder') ? (
           <img
             src={estudiante.fotoUrl}
             alt=""

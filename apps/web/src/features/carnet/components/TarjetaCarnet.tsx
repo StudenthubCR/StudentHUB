@@ -80,9 +80,7 @@ export function TarjetaCarnet({
   const valorQR = `Nombre: ${estudiante.nombre}\nSección: ${estudiante.grupo}`
 
   const tieneFotoReal = Boolean(
-    estudiante.fotoUrl &&
-      !estudiante.fotoUrl.includes('student.webp') &&
-      !estudiante.fotoUrl.includes('placeholder'),
+    estudiante.fotoUrl && !estudiante.fotoUrl.includes('placeholder'),
   )
 
   // Capa común de textura o patrón de fondo
