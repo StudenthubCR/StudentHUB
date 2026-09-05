@@ -4,6 +4,7 @@ export type FilaHorario = {
   dia: string
   hora: string
   materia: string
+  docente?: string
 }
 
 /** Una lección ya interpretada. */
@@ -15,6 +16,7 @@ export type Clase = {
   inicio: string
   fin: string
   materia: string
+  docente?: string
   /** Cena, receso, almuerzo: se pinta distinto porque no es lección. */
   esReceso: boolean
 }
@@ -31,6 +33,7 @@ export type Bloque = {
   /** Cuántas lecciones de la hoja se unieron aquí. */
   lecciones: number
   esReceso: boolean
+  docente?: string
 }
 
 export type DiaDeClases = {

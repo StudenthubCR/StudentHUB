@@ -20,7 +20,22 @@ export function indiceDia(dia: string): number {
 /** '5:50pm-6:35pm' → { inicio: '5:50pm', fin: '6:35pm' } */
 export function partirHora(hora: string): { inicio: string; fin: string } {
   const partes = hora.split('-').map((parte) => parte.trim())
-  return { inicio: partes[0] || '—', fin: partes[1] ?? '' }
+  let inicio = partes[0] || '—'
+  const fin = partes[1] ?? ''
+
+  // Si el fin especifica am/pm (ej: "6:35 PM" o "6:35pm") y el inicio no (ej: "5:50"),
+  // propagar am/pm al inicio para que ambos tengan contexto horario completo.
+  const coincidenciaFin = /\s*(am|pm)$/i.exec(fin)
+  const tieneInicio = /(am|pm)$/i.test(inicio)
+  if (coincidenciaFin && !tieneInicio && inicio !== '—') {
+    const separador = fin.includes(' ') ? ' ' : ''
+    const sufijo = coincidenciaFin[1]
+    const sufijoFormateado =
+      fin.slice(-2) === fin.slice(-2).toUpperCase() ? sufijo.toUpperCase() : sufijo.toLowerCase()
+    inicio = `${inicio}${separador}${sufijoFormateado}`
+  }
+
+  return { inicio, fin }
 }
 
 const RECESOS = ['cena', 'receso', 'almuerzo', 'descanso', 'refrigerio']
@@ -57,11 +72,13 @@ export function aClases(filas: FilaHorario[]): Clase[] {
   return filas.map((fila) => {
     const hora = textoDe(fila.hora, '')
     const materia = textoDe(fila.materia, '—')
+    const docente = textoDe(fila.docente, '')
     return {
       dia: textoDe(fila.dia, 'Sin día'),
       hora,
       ...partirHora(hora),
       materia,
+      docente: docente || undefined,
       esReceso: esReceso(materia),
     }
   })
@@ -147,6 +164,7 @@ export function unirConsecutivas(clases: Clase[]): Bloque[] {
     const continua =
       anterior !== undefined &&
       anterior.materia === clase.materia &&
+      (anterior.docente || '') === (clase.docente || '') &&
       Boolean(anterior.fin) &&
       Boolean(clase.inicio) &&
       seEncadenan(anterior.fin, clase.inicio)
@@ -163,6 +181,7 @@ export function unirConsecutivas(clases: Clase[]): Bloque[] {
       fin: clase.fin,
       lecciones: 1,
       esReceso: clase.esReceso,
+      docente: clase.docente,
     })
   }
 

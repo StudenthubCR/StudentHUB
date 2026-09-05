@@ -58,6 +58,11 @@ export function BloqueClase({ bloque, indice, marca, pasado }: Props) {
           </h4>
           {marca && <Etiqueta marca={marca} />}
         </div>
+        {bloque.docente && !bloque.esReceso && (
+          <p className="text-menuda text-text-muted">
+            <span className="font-medium text-text-subtle">Prof.</span> {bloque.docente}
+          </p>
+        )}
         {bloque.lecciones > 1 && (
           <p className="text-menuda text-text-muted">{bloque.lecciones} lecciones seguidas</p>
         )}

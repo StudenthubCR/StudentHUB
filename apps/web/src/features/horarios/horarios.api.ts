@@ -38,12 +38,18 @@ async function pedir(consulta: string, signal?: AbortSignal): Promise<FilaHorari
     throw new ErrorHorarios('El servicio de horarios devolvió un formato inesperado.')
   }
 
-  return datos.filter(esFila).map((fila) => ({
-    grupo: typeof fila.grupo === 'string' ? fila.grupo : '',
-    dia: fila.dia,
-    hora: typeof fila.hora === 'string' ? fila.hora : '',
-    materia: fila.materia,
-  }))
+  return datos.filter(esFila).map((fila) => {
+    const item: FilaHorario = {
+      grupo: typeof fila.grupo === 'string' ? fila.grupo : '',
+      dia: fila.dia,
+      hora: typeof fila.hora === 'string' ? fila.hora : '',
+      materia: fila.materia,
+    }
+    if (typeof fila.docente === 'string' && fila.docente.trim()) {
+      item.docente = fila.docente.trim()
+    }
+    return item
+  })
 }
 
 /**

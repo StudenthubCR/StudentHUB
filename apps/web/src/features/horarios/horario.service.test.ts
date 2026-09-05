@@ -58,6 +58,10 @@ describe('partirHora', () => {
     expect(partirHora('5:50pm')).toEqual({ inicio: '5:50pm', fin: '' })
   })
 
+  it('propaga el meridiano al inicio cuando viene como 5:50 - 6:35 PM', () => {
+    expect(partirHora('5:50 - 6:35 PM')).toEqual({ inicio: '5:50 PM', fin: '6:35 PM' })
+  })
+
   it('no revienta con la celda vacía', () => {
     expect(partirHora('')).toEqual({ inicio: '—', fin: '' })
   })
