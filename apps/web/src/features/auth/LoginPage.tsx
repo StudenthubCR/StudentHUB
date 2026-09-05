@@ -101,7 +101,7 @@ export function LoginPage() {
         <form onSubmit={pedirCodigo} noValidate>
           <h1 className="text-hero leading-tight font-bold tracking-[-0.03em]">Entrar</h1>
           <p className="mt-2 mb-6 text-menor text-text-muted">
-            Te enviamos un código de un solo uso a tu correo institucional.
+            Te enviamos un código de un solo uso a tu correo registrado.
           </p>
 
           <label htmlFor="correo" className="mb-1.5 block text-etiqueta font-bold tracking-[0.08em] text-text-muted uppercase">
@@ -115,7 +115,7 @@ export function LoginPage() {
             autoFocus
             value={correo}
             onChange={(e) => setCorreo(e.target.value)}
-            placeholder="nombre.apellido@mep.go.cr"
+            placeholder="tu.correo@gmail.com"
             className={CAMPO}
           />
 

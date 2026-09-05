@@ -33,8 +33,29 @@ export function etiquetaDeGrado(grado: Grado): string {
   return `${grado.numero} ${grado.nombre}`
 }
 
-/** El grado al que pertenece un grupo ('11-2' → 11vo), para enlazar al horario. */
+/** El grado al que pertenece un grupo ('11-1' o '11-2' → 11vo), para enlazar al horario. */
 export function buscarGradoPorGrupo(grupo: string | null): Grado | null {
   if (!grupo) return null
-  return GRADOS.find((grado) => grado.grupo === grupo) ?? null
+  const directo = GRADOS.find((grado) => grado.grupo === grupo)
+  if (directo) return directo
+
+  if (grupo.startsWith('10-') || grupo === '10mo') {
+    return GRADOS.find((g) => g.id === '10mo') ?? null
+  }
+  if (grupo.startsWith('11-') || grupo === '11vo') {
+    return GRADOS.find((g) => g.id === '11vo') ?? null
+  }
+  if (grupo.startsWith('12-') || grupo === '12vo') {
+    return GRADOS.find((g) => g.id === '12vo') ?? null
+  }
+  if (grupo.startsWith('7-') || grupo === '7mo') {
+    return GRADOS.find((g) => g.id === '7mo') ?? null
+  }
+  if (grupo.startsWith('8-') || grupo === '8vo') {
+    return GRADOS.find((g) => g.id === '8vo') ?? null
+  }
+  if (grupo.startsWith('9-') || grupo === '9no') {
+    return GRADOS.find((g) => g.id === '9no') ?? null
+  }
+  return null
 }

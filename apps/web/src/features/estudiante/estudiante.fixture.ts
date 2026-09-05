@@ -27,14 +27,14 @@ export type Estudiante = {
 }
 
 export const ESTUDIANTE_DEMO: Estudiante = {
-  nombre: 'Erick Martínez',
-  codigo: '2024-00123',
-  especialidad: 'Informática en Desarrollo de Software',
+  nombre: 'Erick García Burgos',
+  codigo: '208520530',
+  especialidad: 'Desarrollo Web',
   institucion: 'Colegio Técnico Profesional',
   siglaInstitucion: 'CTP',
-  grupo: '11-2',
+  grupo: '11-1',
   nivel: 'Undécimo Año',
-  jornada: 'Nocturna',
+  jornada: 'Diurna',
   vigencia: 'Ciclo Lectivo 2026',
   fotoUrl: '/student.webp',
   activo: true,
