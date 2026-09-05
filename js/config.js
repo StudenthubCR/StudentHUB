@@ -17,13 +17,15 @@ const StudentHubConfig = {
     // Google Sheet: 1Qm2sW_y5dL7KokhKjCUJ7hPFDnFzgoJP3oeZlCXYMXo — hojas "Horarios" y "Comedor"
     // Códigos Apps Script en el repo: apps-script/horarios.gs y apps-script/comedor.gs
 
-    /** Prototipo: único grupo con horario en la hoja */
-    estudianteGrupo: '11-2',
+    /** Prototipo: grupo por defecto */
+    estudianteGrupo: '11-1',
 
     /** Grado del botón que abre ese horario (data-grade en index.html) */
     gradoConHorario: '11vo',
 
     grupoPorGrado: {
-        '11vo': '11-2'
+        '10mo': '10-1',
+        '11vo': '11-1',
+        '12vo': '12-1'
     }
 };

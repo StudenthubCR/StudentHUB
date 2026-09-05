@@ -216,10 +216,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const gradoTieneHorario = (grade) => {
-        const activo = StudentHubConfig.gradoConHorario;
-        if (activo) return grade === activo;
         const mapa = StudentHubConfig.grupoPorGrado || {};
-        return Boolean(mapa[grade]);
+        if (mapa[grade]) return true;
+        const activo = StudentHubConfig.gradoConHorario;
+        return Boolean(activo && grade === activo);
     };
 
     const cacheHorarios = new Map();

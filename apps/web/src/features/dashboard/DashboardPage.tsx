@@ -24,10 +24,9 @@ export function DashboardPage() {
   const { estudiante } = useEstudiante()
   const ahora = useReloj()
 
-  // Sin sesión se muestra el único grupo con horario publicado: los horarios
-  // son datos públicos y el inicio sigue sirviendo para algo antes de entrar.
-  const grado = buscarGradoPorGrupo(estudiante?.grupo ?? '11-2')
-  const horario = useHorario(grado?.grupo ?? null, ahora)
+  const grupoActivo = estudiante?.grupo ?? '11-1'
+  const grado = buscarGradoPorGrupo(grupoActivo)
+  const horario = useHorario(grupoActivo, ahora)
   const comedor = useMenuSemanal(ahora)
 
   const diaDeHoy = horario.dias.find((dia) => dia.esHoy) ?? null

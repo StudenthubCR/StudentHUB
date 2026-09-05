@@ -1,6 +1,8 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { PageSection } from '@/components/PageSection'
+import { useEstudiante } from '@/features/estudiante/useEstudiante'
+import { cn } from '@/lib/cn'
 import { useReloj } from '@/lib/useReloj'
 import { HorarioDelGrupo } from './components/HorarioDelGrupo'
 import { buscarGrado, etiquetaDeGrado } from './grados'
@@ -15,11 +17,29 @@ function mensajeDeError(error: unknown): string {
 export function HorarioGrupoPage() {
   const { grado: idGrado } = useParams()
   const grado = buscarGrado(idGrado)
-  // Se actualiza cada minuto: el marcador de "ahora" tiene que seguir siendo
-  // cierto si la app queda abierta durante la lección.
+  const { estudiante } = useEstudiante()
   const ahora = useReloj()
 
-  const { dias, lecciones, cargando, error, reintentar } = useHorario(grado?.grupo ?? null, ahora)
+  // Si el estudiante logueado pertenece a este grado, sugerir su grupo automáticamente
+  const grupoPorDefecto =
+    (grado && estudiante && grado.grupos.includes(estudiante.grupo) ? estudiante.grupo : null) ??
+    grado?.grupo ??
+    null
+
+  const [grupoSeleccionado, setGrupoSeleccionado] = useState<string | null>(grupoPorDefecto)
+
+  useEffect(() => {
+    if (grado) {
+      const g =
+        (estudiante && grado.grupos.includes(estudiante.grupo) ? estudiante.grupo : null) ??
+        grado.grupo ??
+        null
+      setGrupoSeleccionado(g)
+    }
+  }, [grado, estudiante?.grupo])
+
+  const grupoActivo = grupoSeleccionado ?? grado?.grupo ?? null
+  const { dias, lecciones, cargando, error, reintentar } = useHorario(grupoActivo, ahora)
 
   const onReintentar = useCallback(() => {
     void reintentar()
@@ -37,7 +57,7 @@ export function HorarioGrupoPage() {
               : 'Ese grado no existe.'}
           </p>
           <p className="mt-2 text-menor text-text-muted">
-            Por ahora la hoja sólo tiene cargado el grupo 11-2.
+            Por ahora no hay horarios cargados para este grado.
           </p>
           <Link
             to="/horarios"
@@ -55,8 +75,32 @@ export function HorarioGrupoPage() {
 
   return (
     <PageSection titulo="Horarios de Clases" volverA="/horarios">
+      {grado.grupos.length > 1 && (
+        <div className="mb-5 flex flex-wrap items-center gap-2">
+          <span className="text-menor font-medium text-text-muted">Grupos:</span>
+          {grado.grupos.map((g) => {
+            const esActivo = grupoActivo === g
+            return (
+              <button
+                key={g}
+                type="button"
+                onClick={() => setGrupoSeleccionado(g)}
+                className={cn(
+                  'cursor-pointer rounded-full px-3.5 py-1 text-menor font-semibold transition-all duration-200',
+                  esActivo
+                    ? 'bg-primary-solid text-white shadow-sm'
+                    : 'border border-border bg-surface text-text-muted hover:border-primary hover:text-text',
+                )}
+              >
+                Grupo {g}
+              </button>
+            )
+          })}
+        </div>
+      )}
+
       <HorarioDelGrupo
-        titulo={`${etiquetaDeGrado(grado)} — Grupo ${grado.grupo}`}
+        titulo={`${etiquetaDeGrado(grado)} — Grupo ${grupoActivo}`}
         lecciones={lecciones}
         dias={dias}
         ahora={ahora}

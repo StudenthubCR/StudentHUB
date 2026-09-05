@@ -29,7 +29,7 @@ export function SelectorDeGrado() {
             </span>
             <span className="text-menor text-text-muted">{grado.nombre}</span>
             <span className="mt-1.5 rounded-full bg-primary-tint px-2.5 py-[3px] text-etiqueta font-semibold text-primary">
-              Grupo {grado.grupo}
+              {grado.grupos.length > 1 ? `${grado.grupos.length} grupos` : `Grupo ${grado.grupo}`}
             </span>
           </Link>
         ) : (

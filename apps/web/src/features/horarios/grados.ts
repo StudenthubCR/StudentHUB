@@ -11,17 +11,37 @@ export type Grado = {
   id: string
   numero: string
   nombre: string
-  /** Grupo con horario publicado, o null si todavía no hay. */
+  /** Grupo por defecto o principal para enlace */
   grupo: string | null
+  /** Todos los grupos disponibles de este grado */
+  grupos: string[]
 }
 
 export const GRADOS: Grado[] = [
-  { id: '7mo', numero: '7°', nombre: 'Séptimo', grupo: null },
-  { id: '8vo', numero: '8°', nombre: 'Octavo', grupo: null },
-  { id: '9no', numero: '9°', nombre: 'Noveno', grupo: null },
-  { id: '10mo', numero: '10°', nombre: 'Décimo', grupo: null },
-  { id: '11vo', numero: '11°', nombre: 'Undécimo', grupo: '11-2' },
-  { id: '12vo', numero: '12°', nombre: 'Duodécimo', grupo: null },
+  { id: '7mo', numero: '7°', nombre: 'Séptimo', grupo: null, grupos: [] },
+  { id: '8vo', numero: '8°', nombre: 'Octavo', grupo: null, grupos: [] },
+  { id: '9no', numero: '9°', nombre: 'Noveno', grupo: null, grupos: [] },
+  {
+    id: '10mo',
+    numero: '10°',
+    nombre: 'Décimo',
+    grupo: '10-1',
+    grupos: ['10-1', '10-2', '10-3'],
+  },
+  {
+    id: '11vo',
+    numero: '11°',
+    nombre: 'Undécimo',
+    grupo: '11-1',
+    grupos: ['11-1', '11-2', '11-3'],
+  },
+  {
+    id: '12vo',
+    numero: '12°',
+    nombre: 'Duodécimo',
+    grupo: '12-1',
+    grupos: ['12-1', '12-2', '12-3'],
+  },
 ]
 
 export function buscarGrado(id: string | undefined): Grado | null {
