@@ -13,6 +13,7 @@ export function CarnetPage() {
   const { sesion, cargando: cargandoSesion, cerrarSesion } = useSesion()
   const { estudiante, cargando, fueraDelPadron } = useEstudiante()
   const [modalAbierta, setModalAbierta] = useState(false)
+  const [carnetVolteado, setCarnetVolteado] = useState(false)
   const imprimir = useCallback(() => window.print(), [])
 
   const {
@@ -20,6 +21,11 @@ export function CarnetPage() {
     cambiarTema,
     cambiarPatron,
     toggleBrillo,
+    toggleEfecto3d,
+    cambiarInsignia,
+    cambiarLema,
+    cambiarTipoSangre,
+    cambiarContactoEmergencia,
     restablecer,
   } = usePersonalizacionCarnet()
 
@@ -75,6 +81,8 @@ export function CarnetPage() {
           <TarjetaCarnet
             estudiante={estudiante}
             personalizacion={personalizacion}
+            volteada={carnetVolteado}
+            onToggleVoltear={() => setCarnetVolteado((prev) => !prev)}
           />
         </div>
         <PanelDetalles
@@ -82,6 +90,8 @@ export function CarnetPage() {
           onImprimir={imprimir}
           onPersonalizar={() => setModalAbierta(true)}
           onCerrarSesion={() => void cerrarSesion()}
+          estaVolteada={carnetVolteado}
+          onToggleVoltear={() => setCarnetVolteado((prev) => !prev)}
         />
       </div>
 
@@ -94,6 +104,11 @@ export function CarnetPage() {
         onCambiarTema={cambiarTema}
         onCambiarPatron={cambiarPatron}
         onToggleBrillo={toggleBrillo}
+        onToggleEfecto3d={toggleEfecto3d}
+        onCambiarInsignia={cambiarInsignia}
+        onCambiarLema={cambiarLema}
+        onCambiarTipoSangre={cambiarTipoSangre}
+        onCambiarContactoEmergencia={cambiarContactoEmergencia}
         onRestablecer={restablecer}
       />
     </PageSection>

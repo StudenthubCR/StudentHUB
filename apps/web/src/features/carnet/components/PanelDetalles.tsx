@@ -43,6 +43,8 @@ type Props = {
   onImprimir: () => void
   onPersonalizar?: () => void
   onCerrarSesion?: () => void
+  estaVolteada?: boolean
+  onToggleVoltear?: () => void
 }
 
 export function PanelDetalles({
@@ -50,6 +52,8 @@ export function PanelDetalles({
   onImprimir,
   onPersonalizar,
   onCerrarSesion,
+  estaVolteada = false,
+  onToggleVoltear,
 }: Props) {
   return (
     <div
@@ -92,6 +96,21 @@ export function PanelDetalles({
           Imprimir credencial
         </button>
 
+        {onToggleVoltear && (
+          <button
+            type="button"
+            onClick={onToggleVoltear}
+            className={cn(
+              'flex w-full cursor-pointer items-center justify-center gap-2 rounded-md',
+              'border border-border bg-surface-alt/70 px-4 py-2.5 text-nota font-semibold text-text',
+              'transition-all duration-200 hover:border-primary/40 hover:bg-surface-alt active:scale-98',
+            )}
+          >
+            <span>🔄</span>
+            <span>{estaVolteada ? 'Ver frente del carnet' : 'Girar carnet (Ver reverso oficial)'}</span>
+          </button>
+        )}
+
         {onPersonalizar && (
           <button
             type="button"
@@ -103,7 +122,7 @@ export function PanelDetalles({
             )}
           >
             <IconoEngranaje className="size-4" />
-            Personalizar diseño y colores
+            Personalizar diseño y opciones
           </button>
         )}
 

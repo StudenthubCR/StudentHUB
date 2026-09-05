@@ -3,7 +3,7 @@ import { ThemeToggle } from '@/app/layout/ThemeToggle'
 import { IconoCerrar, IconoEngranaje, IconoSalir, IconoEscudo } from '@/components/icons'
 import { cn } from '@/lib/cn'
 import type { Estudiante } from '@/features/estudiante/estudiante.fixture'
-import type { PersonalizacionCarnet, PatronFondo } from '../carnet.estilos'
+import type { PersonalizacionCarnet, PatronFondo, TipoSangre } from '../carnet.estilos'
 import { SelectorPersonalizacionCarnet } from './SelectorPersonalizacionCarnet'
 
 type Props = {
@@ -15,6 +15,11 @@ type Props = {
   onCambiarTema: (temaId: string) => void
   onCambiarPatron: (patron: PatronFondo) => void
   onToggleBrillo: () => void
+  onToggleEfecto3d: () => void
+  onCambiarInsignia: (insigniaId: string) => void
+  onCambiarLema: (lema: string) => void
+  onCambiarTipoSangre: (tipoSangre: TipoSangre) => void
+  onCambiarContactoEmergencia: (nombre: string, telefono: string) => void
   onRestablecer: () => void
 }
 
@@ -27,6 +32,11 @@ export function ModalOpcionesCarnet({
   onCambiarTema,
   onCambiarPatron,
   onToggleBrillo,
+  onToggleEfecto3d,
+  onCambiarInsignia,
+  onCambiarLema,
+  onCambiarTipoSangre,
+  onCambiarContactoEmergencia,
   onRestablecer,
 }: Props) {
   const [pestana, setPestana] = useState<'estilo' | 'cuenta'>('estilo')
@@ -118,6 +128,11 @@ export function ModalOpcionesCarnet({
               onCambiarTema={onCambiarTema}
               onCambiarPatron={onCambiarPatron}
               onToggleBrillo={onToggleBrillo}
+              onToggleEfecto3d={onToggleEfecto3d}
+              onCambiarInsignia={onCambiarInsignia}
+              onCambiarLema={onCambiarLema}
+              onCambiarTipoSangre={onCambiarTipoSangre}
+              onCambiarContactoEmergencia={onCambiarContactoEmergencia}
               onRestablecer={onRestablecer}
             />
           </div>
