@@ -6,28 +6,33 @@ type Props = {
   titulo: string
   /** Si se pasa, el título lleva a la izquierda un botón de retroceso. */
   volverA?: string
+  /** Acciones adicionales en la cabecera de sección (ej. botón de engranaje). */
+  acciones?: ReactNode
   children: ReactNode
 }
 
 /** Envoltura de sección: mismo título y misma entrada en cascada de hoy. */
-export function PageSection({ titulo, volverA, children }: Props) {
+export function PageSection({ titulo, volverA, acciones, children }: Props) {
   return (
     <section className="animate-fade-in">
-      <div data-print="ocultar" className="mb-5 flex items-center gap-1">
-        {volverA && (
-          <Link
-            to={volverA}
-            aria-label="Volver"
-            className={
-              'mr-2.5 flex size-9 shrink-0 items-center justify-center rounded-full ' +
-              'border border-border bg-surface-alt text-text transition-all duration-250 ease-ui ' +
-              'hover:bg-primary-tint hover:text-primary active:scale-90'
-            }
-          >
-            <IconoChevron hacia="izquierda" className="size-5" />
-          </Link>
-        )}
-        <h2 className="text-[1.45rem] font-bold tracking-[-0.02em] md:text-[1.7rem]">{titulo}</h2>
+      <div data-print="ocultar" className="mb-5 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-1">
+          {volverA && (
+            <Link
+              to={volverA}
+              aria-label="Volver"
+              className={
+                'mr-2.5 flex size-9 shrink-0 items-center justify-center rounded-full ' +
+                'border border-border bg-surface-alt text-text transition-all duration-250 ease-ui ' +
+                'hover:bg-primary-tint hover:text-primary active:scale-90'
+              }
+            >
+              <IconoChevron hacia="izquierda" className="size-5" />
+            </Link>
+          )}
+          <h2 className="text-[1.45rem] font-bold tracking-[-0.02em] md:text-[1.7rem]">{titulo}</h2>
+        </div>
+        {acciones && <div className="flex items-center gap-2">{acciones}</div>}
       </div>
       {children}
     </section>

@@ -1,20 +1,22 @@
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { PageSection } from '@/components/PageSection'
 import { PantallaDeAviso } from '@/components/PantallaDeAviso'
+import { IconoEngranaje } from '@/components/icons'
 import { useSesion } from '@/features/auth/useSesion'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import { TarjetaCarnet } from './components/TarjetaCarnet'
 import { PanelDetalles } from './components/PanelDetalles'
+import { ModalOpcionesCarnet } from './components/ModalOpcionesCarnet'
 
 export function CarnetPage() {
-  const { sesion, cargando: cargandoSesion } = useSesion()
+  const { sesion, cargando: cargandoSesion, cerrarSesion } = useSesion()
   const { estudiante, cargando, fueraDelPadron } = useEstudiante()
+  const [modalAbierta, setModalAbierta] = useState(false)
   const imprimir = useCallback(() => window.print(), [])
 
   if (cargandoSesion || cargando) return null
 
-  // El carnet es la única sección que muestra datos personales: sin sesión no
-  // hay nada que mostrar, y no se inventa una ficha de relleno.
+  // Sin sesión no hay carnet para mostrar
   if (!sesion) {
     return (
       <PageSection titulo="Mi Carnet Digital">
@@ -40,7 +42,20 @@ export function CarnetPage() {
   }
 
   return (
-    <PageSection titulo="Mi Carnet Digital">
+    <PageSection
+      titulo="Mi Carnet Digital"
+      acciones={
+        <button
+          type="button"
+          onClick={() => setModalAbierta(true)}
+          aria-label="Opciones y configuración del carnet"
+          title="Opciones y configuración"
+          className="flex size-10 cursor-pointer items-center justify-center rounded-full border border-border bg-surface text-text-muted shadow-sm transition-all duration-200 hover:border-primary hover:bg-primary-tint hover:text-primary active:scale-95"
+        >
+          <IconoEngranaje className="size-5" />
+        </button>
+      }
+    >
       <div
         className={
           'mt-2.5 flex flex-col items-center gap-5.5 ' +
@@ -50,8 +65,19 @@ export function CarnetPage() {
         <div className="flex w-full justify-center lg:max-w-[360px] lg:flex-1">
           <TarjetaCarnet estudiante={estudiante} />
         </div>
-        <PanelDetalles estudiante={estudiante} onImprimir={imprimir} />
+        <PanelDetalles
+          estudiante={estudiante}
+          onImprimir={imprimir}
+          onCerrarSesion={() => void cerrarSesion()}
+        />
       </div>
+
+      <ModalOpcionesCarnet
+        abierto={modalAbierta}
+        alCerrar={() => setModalAbierta(false)}
+        estudiante={estudiante}
+        onCerrarSesion={() => void cerrarSesion()}
+      />
     </PageSection>
   )
 }

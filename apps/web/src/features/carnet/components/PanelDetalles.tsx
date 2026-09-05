@@ -1,4 +1,4 @@
-import { IconoImprimir } from '@/components/icons'
+import { IconoImprimir, IconoSalir } from '@/components/icons'
 import { cn } from '@/lib/cn'
 import type { Estudiante } from '@/features/estudiante/estudiante.fixture'
 
@@ -41,9 +41,10 @@ function InsigniaEstado({ activo }: { activo: boolean }) {
 type Props = {
   estudiante: Estudiante
   onImprimir: () => void
+  onCerrarSesion?: () => void
 }
 
-export function PanelDetalles({ estudiante, onImprimir }: Props) {
+export function PanelDetalles({ estudiante, onImprimir, onCerrarSesion }: Props) {
   return (
     <div
       data-print="ocultar"
@@ -70,19 +71,36 @@ export function PanelDetalles({ estudiante, onImprimir }: Props) {
         <Dato etiqueta="Vigencia" valor={estudiante.vigencia} />
       </div>
 
-      <button
-        type="button"
-        onClick={onImprimir}
-        className={cn(
-          'flex w-full cursor-pointer items-center justify-center gap-2 rounded-md',
-          'bg-primary-solid px-4 py-3 text-nota font-semibold text-white',
-          'shadow-[0_6px_16px_var(--color-primary-tint-strong)]',
-          'transition-all duration-250 ease-ui hover:bg-primary-dark active:scale-97',
+      <div className="flex flex-col gap-2.5">
+        <button
+          type="button"
+          onClick={onImprimir}
+          className={cn(
+            'flex w-full cursor-pointer items-center justify-center gap-2 rounded-md',
+            'bg-primary-solid px-4 py-3 text-nota font-semibold text-white',
+            'shadow-[0_6px_16px_var(--color-primary-tint-strong)]',
+            'transition-all duration-250 ease-ui hover:bg-primary-dark active:scale-97',
+          )}
+        >
+          <IconoImprimir className="size-[18px]" />
+          Imprimir credencial
+        </button>
+
+        {onCerrarSesion && (
+          <button
+            type="button"
+            onClick={onCerrarSesion}
+            className={cn(
+              'flex w-full cursor-pointer items-center justify-center gap-2 rounded-md',
+              'border border-border bg-surface px-4 py-2.5 text-nota font-semibold text-text-muted',
+              'transition-all duration-200 hover:border-[#c0392b]/30 hover:bg-[#c0392b]/5 hover:text-[#c0392b] active:scale-98',
+            )}
+          >
+            <IconoSalir className="size-4" />
+            Cerrar sesión
+          </button>
         )}
-      >
-        <IconoImprimir className="size-[18px]" />
-        Imprimir credencial
-      </button>
+      </div>
 
       <p className="mt-4 text-menuda leading-relaxed text-text-muted">
         Credencial oficial del estudiante. El código QR codifica tu nombre y tu
