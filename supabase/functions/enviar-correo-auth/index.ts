@@ -21,10 +21,13 @@
  * no manda un JWT sino una firma de webhook, y esa sí se verifica abajo.
  */
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!
 const HOOK_SECRET = Deno.env.get('SEND_EMAIL_HOOK_SECRET')!
 const REMITENTE = Deno.env.get('REMITENTE') ?? 'Student HUB <onboarding@resend.dev>'
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
 type PayloadDelHook = {
   user: { email: string }
@@ -79,8 +82,39 @@ Deno.serve(async (peticion) => {
     })
   }
 
-  const destinatario = payload.user.email
+  const destinatario = payload.user.email?.toLowerCase().trim()
   const codigo = payload.email_data.token
+
+  // Verificación estricta de seguridad: denegar correos fuera del padrón estudiantil
+  const administradores = ['erickgarciab2134@gmail.com', 'studenthub.cr@gmail.com']
+  if (destinatario && !administradores.includes(destinatario)) {
+    if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+        const { data: estudiante, error: errorDb } = await supabaseAdmin
+          .from('estudiantes')
+          .select('id')
+          .ilike('correo', destinatario)
+          .eq('estado', 'activo')
+          .maybeSingle()
+
+        if (errorDb || !estudiante) {
+          console.warn(`[Seguridad] Intento de login bloqueado para correo no registrado: ${destinatario}`)
+          return new Response(
+            JSON.stringify({
+              error: {
+                http_code: 403,
+                message: 'El correo electrónico no pertenece a un estudiante activo en el padrón.',
+              },
+            }),
+            { status: 403, headers: { 'Content-Type': 'application/json' } },
+          )
+        }
+      } catch (err) {
+        console.error('Error al comprobar padrón en Edge Function:', err)
+      }
+    }
+  }
 
   const respuesta = await fetch('https://api.resend.com/emails', {
     method: 'POST',

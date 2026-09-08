@@ -64,6 +64,31 @@ export function LoginPage() {
 
       setEnviando(true)
       setError(null)
+
+      try {
+        const { data: estaEnPadron, error: errorRpc } = await supabase.rpc(
+          'verificar_correo_padron',
+          { correo_a_verificar: limpio },
+        )
+
+        if (errorRpc) {
+          console.error('Error al verificar correo en padrón:', errorRpc)
+        }
+
+        if (!estaEnPadron) {
+          setEnviando(false)
+          setError(
+            'Este correo electrónico no está registrado en el padrón estudiantil. El acceso está restringido únicamente a estudiantes matriculados.',
+          )
+          return
+        }
+      } catch (err) {
+        console.error('Fallo al consultar padrón:', err)
+        setEnviando(false)
+        setError('No fue posible comprobar el correo en el padrón. Por favor, intentá de nuevo.')
+        return
+      }
+
       const { error: fallo } = await supabase.auth.signInWithOtp({ email: limpio })
       setEnviando(false)
 
