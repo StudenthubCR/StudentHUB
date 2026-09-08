@@ -1,31 +1,44 @@
-import { cn } from '@/lib/cn'
 import { ahoraEnMinutos, jornadaDelDia, progresoDelDia } from '../horario.service'
 import type { DiaDeClases } from '../horario.types'
 import { BloqueClase, type Marca } from './BloqueClase'
 
 /**
- * Una línea que responde la pregunta con la que uno abre la app: qué sigue,
- * o si ya se acabó. Sólo tiene sentido en el día de hoy.
+ * Indicador de progreso dinámico para el día de hoy.
  */
 function EstadoDeHoy({ dia, ahora }: { dia: DiaDeClases; ahora: number }) {
   const { actual, siguiente } = progresoDelDia(dia.bloques, ahora)
   const jornada = jornadaDelDia(dia.bloques)
   if (!jornada) return null
 
-  let texto: string
   if (actual !== null) {
-    texto = `En curso: ${dia.bloques[actual]!.materia}`
-  } else if (siguiente !== null) {
-    const proximo = dia.bloques[siguiente]!
-    texto =
-      siguiente === 0
-        ? `Las clases empiezan a las ${jornada.inicio}`
-        : `Sigue ${proximo.materia} a las ${proximo.inicio}`
-  } else {
-    texto = 'Las clases de hoy ya terminaron'
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-tint px-2.5 py-0.5 text-micro font-bold text-primary">
+        <span className="size-1.5 rounded-full bg-primary animate-ping" />
+        En curso: {dia.bloques[actual]!.materia}
+      </span>
+    )
   }
 
-  return <span className="font-semibold text-primary">{texto}</span>
+  if (siguiente !== null) {
+    const proximo = dia.bloques[siguiente]!
+    return (
+      <span className="inline-flex items-center gap-1 text-micro font-semibold text-text-muted">
+        <span>🕒</span>
+        <span>
+          {siguiente === 0
+            ? `Inicio a las ${jornada.inicio}`
+            : `Sigue ${proximo.materia} (${proximo.inicio})`}
+        </span>
+      </span>
+    )
+  }
+
+  return (
+    <span className="inline-flex items-center gap-1 text-micro font-semibold text-emerald-600 dark:text-emerald-400">
+      <span>✓</span>
+      <span>Jornada finalizada</span>
+    </span>
+  )
 }
 
 type Props = {
@@ -42,28 +55,39 @@ export function DiaDeClasesLista({ dia, ahora, conTitulo }: Props) {
   const progreso = ahora === null ? { actual: null, siguiente: null } : progresoDelDia(dia.bloques, ahora)
 
   return (
-    <section>
+    <section className="animate-fade-in">
       {conTitulo && (
-        <h4 className="mb-1.5 flex items-center gap-2 pl-1 text-nota font-bold tracking-[0.08em] text-primary uppercase">
-          {dia.dia}
-          {dia.esHoy && (
-            <span className="rounded-full bg-primary-solid px-2 py-[2px] text-micro tracking-[0.06em] text-white">
-              Hoy
-            </span>
-          )}
-        </h4>
+        <div className="mb-3 flex items-center justify-between border-b border-border/80 pb-2">
+          <h4 className="flex items-center gap-2 text-cuerpo font-bold tracking-tight text-text">
+            <span>{dia.dia}</span>
+            {dia.esHoy && (
+              <span className="rounded-full bg-primary-solid px-2 py-0.5 text-micro font-bold tracking-wider text-white uppercase">
+                Hoy
+              </span>
+            )}
+          </h4>
+          <span className="text-menuda text-text-muted">
+            {lecciones} {lecciones === 1 ? 'lección' : 'lecciones'}
+          </span>
+        </div>
       )}
 
-      <p className={cn('mb-3.5 pl-1 text-nota text-text-muted', conTitulo && 'mb-2.5')}>
-        {lecciones} {lecciones === 1 ? 'lección' : 'lecciones'}
-        {jornada && ` · ${jornada.inicio} a ${jornada.fin}`}
-        {ahora !== null && (
-          <>
-            {' · '}
-            <EstadoDeHoy dia={dia} ahora={ahora} />
-          </>
-        )}
-      </p>
+      {/* Franja de resumen del día */}
+      {!conTitulo && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-border/70 bg-surface-alt/60 px-4 py-2.5 shadow-2xs">
+          <div className="flex items-center gap-2 text-menuda">
+            <span className="font-bold text-text">
+              {lecciones} {lecciones === 1 ? 'lección' : 'lecciones'}
+            </span>
+            {jornada && (
+              <span className="text-text-muted">
+                • {jornada.inicio} a {jornada.fin}
+              </span>
+            )}
+          </div>
+          {ahora !== null && <EstadoDeHoy dia={dia} ahora={ahora} />}
+        </div>
+      )}
 
       <ul className="flex flex-col gap-2.5">
         {dia.bloques.map((bloque, indice) => {

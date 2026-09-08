@@ -39,42 +39,6 @@ export function TarjetaCarnet({
     }
   }
 
-  // Estado para el efecto 3D Tilt y Glare
-  const [tilt, setTilt] = useState({
-    rotateX: 0,
-    rotateY: 0,
-    glareX: 50,
-    glareY: 50,
-    activo: false,
-  })
-
-  const manejarMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!personalizacion.efecto3d) return
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-    const px = (x / rect.width) * 2 - 1 // -1 a 1
-    const py = (y / rect.height) * 2 - 1 // -1 a 1
-
-    // Reducimos la inclinación para mantener legibilidad y suavidad
-    setTilt({
-      rotateX: -py * 9,
-      rotateY: px * 9,
-      glareX: (x / rect.width) * 100,
-      glareY: (y / rect.height) * 100,
-      activo: true,
-    })
-  }
-
-  const manejarMouseLeave = () => {
-    setTilt((prev) => ({
-      ...prev,
-      rotateX: 0,
-      rotateY: 0,
-      activo: false,
-    }))
-  }
-
   const tema = buscarTema(personalizacion.temaId)
   const insignia = resolverInsignia(personalizacion.insigniaId, estudiante.especialidad)
   const valorQR = `Nombre: ${estudiante.nombre}\nSección: ${estudiante.grupo}`
@@ -126,9 +90,7 @@ export function TarjetaCarnet({
   return (
     <div
       className="relative w-full max-w-[350px] select-none"
-      style={{ perspective: '1100px' }}
-      onMouseMove={manejarMouseMove}
-      onMouseLeave={manejarMouseLeave}
+      style={{ perspective: '1200px' }}
     >
       {/* Botón flotante para voltear la tarjeta en dispositivos móviles o escritorio */}
       <button
@@ -143,14 +105,12 @@ export function TarjetaCarnet({
         <span>{estaVolteada ? 'Ver Frente' : 'Ver Reverso'}</span>
       </button>
 
-      {/* Contenedor con rotación 3D Tilt y Flip */}
+      {/* Contenedor con rotación 3D Flip estable */}
       <div
-        className="relative w-full transition-transform duration-500"
+        className="relative w-full transition-transform duration-500 ease-ui"
         style={{
           transformStyle: 'preserve-3d',
-          transform: `rotateX(${personalizacion.efecto3d ? tilt.rotateX : 0}deg) rotateY(${
-            (personalizacion.efecto3d ? tilt.rotateY : 0) + (estaVolteada ? 180 : 0)
-          }deg)`,
+          transform: `rotateY(${estaVolteada ? 180 : 0}deg)`,
         }}
       >
         {/* ========================================================= */}
@@ -173,16 +133,6 @@ export function TarjetaCarnet({
           }
         >
           {renderizarPatron()}
-
-          {/* Reflejo / Glare Holográfico dinámico según posición del mouse */}
-          {personalizacion.efecto3d && tilt.activo && (
-            <div
-              className="pointer-events-none absolute inset-0 z-20 mix-blend-overlay transition-opacity duration-150"
-              style={{
-                background: `radial-gradient(circle at ${tilt.glareX}% ${tilt.glareY}%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 65%)`,
-              }}
-            />
-          )}
 
           {/* Cabecera institucional + Insignia técnica */}
           <header className="relative z-10 flex items-center justify-between border-b border-white/15 bg-white/10 px-4.5 py-3.5 backdrop-blur-sm">
@@ -254,35 +204,33 @@ export function TarjetaCarnet({
             )}
           </div>
 
-          {/* Pie blanco con Código QR real */}
-          <footer className="relative z-10 flex items-center justify-between gap-3 bg-white px-5 py-3.5 text-[#1a1a1a]">
-            <div className="flex shrink-0 items-center justify-center rounded-lg border border-[#e2e8f0] bg-white p-1 shadow-sm">
+          {/* Pie blanco con Código QR real institucional y diseño premium */}
+          <footer className="relative z-10 flex items-center gap-3.5 bg-white/95 px-4.5 py-3 text-slate-900 shadow-inner backdrop-blur-md">
+            <div className="flex shrink-0 items-center justify-center rounded-xl border border-slate-200/90 bg-white p-1.5 shadow-sm">
               <QRCodeSVG
                 value={valorQR}
-                size={54}
+                size={58}
                 level="M"
                 aria-label={`Código QR para ${estudiante.nombre}`}
               />
             </div>
             <div className="min-w-0 flex-1 text-left">
-              <p className="text-nota font-bold text-[#0c142c]">Validación de Sección</p>
-              <p className="text-etiqueta leading-snug text-[#5c6b8f]">
-                QR oficial con el nombre del estudiante y su grupo ({estudiante.grupo}).
+              <div className="flex items-center gap-1.5">
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+                </span>
+                <span className="text-etiqueta font-extrabold tracking-wider text-emerald-700 uppercase">
+                  Credencial Oficial
+                </span>
+              </div>
+              <p className="mt-0.5 text-dato font-bold leading-tight text-slate-900">
+                Validación de Identidad
+              </p>
+              <p className="mt-0.5 text-micro leading-snug text-slate-500">
+                Sección {estudiante.grupo} • Escaneo para asistencia y comedor
               </p>
             </div>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                alternarVoltear()
-              }}
-              data-print="ocultar"
-              className="relative z-20 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900"
-              title="Girar carnet"
-              aria-label="Girar carnet"
-            >
-              ↺
-            </button>
           </footer>
         </article>
 

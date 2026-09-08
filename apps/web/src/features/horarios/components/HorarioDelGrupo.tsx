@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/cn'
+import { IconoCalendario } from '@/components/icons'
 import { diaPorDefecto } from '../horario.service'
 import type { DiaDeClases } from '../horario.types'
 import { DiaDeClasesLista, minutosSiEsHoy } from './DiaDeClasesLista'
@@ -9,9 +10,9 @@ function Mensaje({ children, esError }: { children: string; esError?: boolean })
   return (
     <p
       className={cn(
-        'rounded-lg border border-dashed px-4 py-7 text-center text-dato',
+        'rounded-2xl border border-dashed px-4 py-8 text-center text-dato',
         esError
-          ? 'border-[#c0392b]/35 text-[#c0392b] dark:text-[#ff8a80]'
+          ? 'border-[#c0392b]/35 bg-[#c0392b]/5 text-[#c0392b] dark:text-[#ff8a80]'
           : 'border-border-strong text-text-muted',
       )}
     >
@@ -25,20 +26,21 @@ function Esqueleto() {
     <div className="animate-pulse" aria-hidden>
       <div className="mb-5 flex gap-2">
         {[0, 1, 2, 3, 4].map((pildora) => (
-          <div key={pildora} className="h-8 w-14 rounded-full bg-surface-alt" />
+          <div key={pildora} className="h-10 flex-1 rounded-2xl bg-surface-alt" />
         ))}
       </div>
-      <div className="mb-3.5 h-3 w-52 rounded-full bg-surface-alt" />
-      <div className="flex flex-col gap-2.5">
+      <div className="mb-4 h-9 w-full rounded-2xl bg-surface-alt/70" />
+      <div className="flex flex-col gap-3">
         {[0, 1, 2, 3].map((fila) => (
           <div
             key={fila}
-            className="flex items-center gap-4 rounded-md border border-border border-l-4 border-l-surface-alt bg-surface px-4 py-3.5 elev-sm"
+            className="flex items-center gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm"
           >
-            <div className="min-w-[58px] shrink-0 border-r border-border pr-3">
-              <div className="mx-auto h-3 w-12 rounded-full bg-surface-alt" />
+            <div className="h-12 w-16 rounded-xl bg-surface-alt" />
+            <div className="flex-1 space-y-2">
+              <div className="h-4 w-40 rounded-full bg-surface-alt" />
+              <div className="h-3 w-28 rounded-full bg-surface-alt/60" />
             </div>
-            <div className="h-3.5 w-32 rounded-full bg-surface-alt" />
           </div>
         ))}
       </div>
@@ -76,46 +78,53 @@ export function HorarioDelGrupo({
   const diaVisible = dias.find((dia) => dia.dia === seleccion) ?? null
 
   return (
-    <div
-      className={cn(
-        'mt-2.5',
-        // En escritorio el horario vive dentro de una tarjeta, como hoy.
-        'lg:rounded-lg lg:border lg:border-border lg:bg-surface lg:p-7 lg:elev-md',
-      )}
-      aria-busy={cargando}
-    >
-      {/* En móvil se apila: si el título comparte fila con el botón, "11°
-          Undécimo — Grupo 11-2" no cabe y se corta justo en el dato útil. */}
-      <div
-        className={cn(
-          'mb-5 flex flex-col items-start gap-3 border-b border-border pb-3',
-          'xs:flex-row xs:items-center xs:justify-between',
-        )}
-      >
-        <div className="min-w-0">
-          <h3 className="text-subtitulo font-bold">{titulo}</h3>
-          {!cargando && !error && lecciones > 0 && (
-            <p className="text-nota text-text-muted">
-              {lecciones} lecciones por semana
-            </p>
-          )}
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          {!cargando && !error && dias.length > 0 && (
-            <button
-              type="button"
-              aria-pressed={verSemana}
-              onClick={() => setSeleccion(verSemana ? diaPorDefecto(dias) : TODA_LA_SEMANA)}
-              className={cn(
-                'cursor-pointer rounded-full px-3.5 py-[7px] text-nota font-semibold',
-                'whitespace-nowrap transition-all duration-250 ease-ui active:scale-95',
-                verSemana
-                  ? 'bg-primary-solid text-white'
-                  : 'bg-primary-tint text-primary hover:bg-primary-tint-strong',
+    <div className="mt-1" aria-busy={cargando}>
+      {/* Tarjeta resumen superior de la sección y selector de vista */}
+      <div className="mb-5 overflow-hidden rounded-3xl border border-border bg-surface p-4.5 shadow-sm sm:p-5">
+        <div className="flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary-tint text-primary shadow-2xs">
+              <IconoCalendario className="size-5.5" />
+            </div>
+            <div>
+              <h3 className="text-subtitulo font-bold tracking-tight text-text">
+                {titulo}
+              </h3>
+              {!cargando && !error && lecciones > 0 && (
+                <p className="mt-0.5 text-menuda text-text-muted">
+                  <span className="font-bold text-primary">{lecciones}</span> lecciones por semana
+                </p>
               )}
-            >
-              Semana
-            </button>
+            </div>
+          </div>
+
+          {!cargando && !error && dias.length > 0 && (
+            <div className="flex items-center rounded-2xl border border-border/80 bg-surface-alt/70 p-1 self-start sm:self-auto shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setSeleccion(diaPorDefecto(dias))}
+                className={cn(
+                  'cursor-pointer rounded-xl px-3 py-1.5 text-micro font-bold transition-all',
+                  !verSemana
+                    ? 'bg-surface text-primary shadow-xs'
+                    : 'text-text-muted hover:text-text',
+                )}
+              >
+                📅 Por Día
+              </button>
+              <button
+                type="button"
+                onClick={() => setSeleccion(TODA_LA_SEMANA)}
+                className={cn(
+                  'cursor-pointer rounded-xl px-3 py-1.5 text-micro font-bold transition-all',
+                  verSemana
+                    ? 'bg-surface text-primary shadow-xs'
+                    : 'text-text-muted hover:text-text',
+                )}
+              >
+                🗓️ Semana
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -123,17 +132,17 @@ export function HorarioDelGrupo({
       {cargando && <Esqueleto />}
 
       {!cargando && error && (
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-4 py-4">
           <Mensaje esError>{error}</Mensaje>
           <button
             type="button"
             onClick={onReintentar}
             className={cn(
-              'cursor-pointer rounded-full bg-primary-solid px-5 py-2.5 text-menor',
-              'font-semibold text-white transition-transform duration-250 active:scale-95',
+              'cursor-pointer rounded-xl bg-primary-solid px-5 py-2.5 text-menor',
+              'font-semibold text-white transition-all hover:bg-primary-dark active:scale-95 shadow-sm',
             )}
           >
-            Reintentar
+            Reintentar carga
           </button>
         </div>
       )}
@@ -144,11 +153,13 @@ export function HorarioDelGrupo({
 
       {!cargando && !error && dias.length > 0 && (
         <>
-          <SelectorDeDia
-            dias={dias}
-            seleccion={seleccion ?? ''}
-            onSeleccionar={setSeleccion}
-          />
+          {!verSemana && (
+            <SelectorDeDia
+              dias={dias}
+              seleccion={seleccion ?? ''}
+              onSeleccionar={setSeleccion}
+            />
+          )}
 
           {verSemana ? (
             <div className="flex flex-col gap-6">
