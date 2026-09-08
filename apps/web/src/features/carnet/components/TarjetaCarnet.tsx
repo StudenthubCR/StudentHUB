@@ -163,6 +163,9 @@ export function TarjetaCarnet({
             boxShadow: `0 22px 44px ${tema.sombra}`,
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
+            transform: 'rotateY(0deg) translateZ(1px)',
+            zIndex: estaVolteada ? 0 : 10,
+            pointerEvents: estaVolteada ? 'none' : 'auto',
           }}
           className={
             'hero-glow relative flex min-h-[535px] w-full flex-col justify-between overflow-hidden rounded-2xl text-white ' +
@@ -269,9 +272,12 @@ export function TarjetaCarnet({
             </div>
             <button
               type="button"
-              onClick={alternarVoltear}
+              onClick={(e) => {
+                e.stopPropagation()
+                alternarVoltear()
+              }}
               data-print="ocultar"
-              className="flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900"
+              className="relative z-20 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900"
               title="Girar carnet"
               aria-label="Girar carnet"
             >
@@ -290,7 +296,9 @@ export function TarjetaCarnet({
             boxShadow: `0 22px 44px ${tema.sombra}`,
             backfaceVisibility: 'hidden',
             WebkitBackfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
+            transform: 'rotateY(180deg) translateZ(1px)',
+            zIndex: estaVolteada ? 10 : 0,
+            pointerEvents: estaVolteada ? 'auto' : 'none',
           }}
           className={
             'hero-glow absolute inset-0 flex min-h-[535px] w-full flex-col justify-between overflow-hidden rounded-2xl text-white ' +
@@ -387,9 +395,12 @@ export function TarjetaCarnet({
             </span>
             <button
               type="button"
-              onClick={alternarVoltear}
+              onClick={(e) => {
+                e.stopPropagation()
+                alternarVoltear()
+              }}
               data-print="ocultar"
-              className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/30 bg-white/20 px-2.5 py-1 text-etiqueta font-bold text-white transition-all hover:bg-white/30 active:scale-95"
+              className="relative z-20 flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/30 bg-white/20 px-2.5 py-1 text-etiqueta font-bold text-white transition-all hover:bg-white/30 active:scale-95"
             >
               <span>↺</span>
               <span>Volver al frente</span>
