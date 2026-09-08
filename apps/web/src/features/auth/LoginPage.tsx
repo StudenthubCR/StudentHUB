@@ -21,6 +21,7 @@ import {
   correoValido,
   normalizarCorreo,
   soloDigitos,
+  traducirErrorAuth,
 } from './auth.service'
 import { useSesion } from './useSesion'
 
@@ -96,7 +97,7 @@ export function LoginPage() {
       setEnviando(false)
 
       if (fallo) {
-        setError(fallo.message)
+        setError(traducirErrorAuth(fallo.message))
         return
       }
       setPaso({ nombre: 'codigo', correo: limpio })
@@ -120,7 +121,7 @@ export function LoginPage() {
       setEnviando(false)
 
       if (fallo) {
-        setError('El código ingresado no es correcto o ya venció. Solicitá uno nuevo.')
+        setError(traducirErrorAuth(fallo.message))
         return
       }
 
@@ -316,6 +317,9 @@ export function LoginPage() {
                   <p className="mt-1.5 text-menor text-text-muted">
                     Ingresá el código de 6 dígitos que enviamos a{' '}
                     <strong className="font-semibold text-text">{paso.correo}</strong>.
+                  </p>
+                  <p className="mt-1 text-micro text-amber-700 dark:text-amber-300">
+                    💡 Si no aparece en tu bandeja principal, revisá también la carpeta de Spam o Correo no deseado.
                   </p>
                 </div>
 

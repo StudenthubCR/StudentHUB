@@ -45,3 +45,23 @@ export function soloDigitos(codigo: string): string {
 export function codigoCompleto(codigo: string): boolean {
   return soloDigitos(codigo).length >= LARGO_MINIMO
 }
+
+/**
+ * Traduce errores comunes del servicio de autenticación de Supabase a español claro.
+ */
+export function traducirErrorAuth(mensaje: string): string {
+  const m = mensaje.toLowerCase()
+  if (m.includes('rate limit') || m.includes('rate_limit') || m.includes('over_email_send_rate_limit')) {
+    return 'Se ha alcanzado el límite temporal de envío de correos de Supabase. Por favor, esperá unos minutos antes de solicitar un nuevo código (o revisá tu carpeta de Spam si ya habías pedido uno).'
+  }
+  if (m.includes('invalid') || m.includes('expired') || m.includes('token') || m.includes('otp')) {
+    return 'El código ingresado no es correcto o ya venció. Por favor, solicitá uno nuevo.'
+  }
+  if (m.includes('signups not allowed')) {
+    return 'El registro de nuevos usuarios no está habilitado en el proyecto.'
+  }
+  if (m.includes('network') || m.includes('fetch') || m.includes('failed to fetch')) {
+    return 'Problema de conexión con el servidor. Revisá tu internet e intentá de nuevo.'
+  }
+  return mensaje
+}
