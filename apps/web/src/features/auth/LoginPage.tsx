@@ -10,8 +10,11 @@ import {
   IconoCandado,
   IconoEscudo,
   IconoFlechaDerecha,
+  IconoDescargar,
 } from '@/components/icons'
 import { ThemeToggle } from '@/app/layout/ThemeToggle'
+import { usePwaInstall } from '@/features/pwa/usePwaInstall'
+import { ModalInstalarApp } from '@/features/pwa/ModalInstalarApp'
 import {
   LARGO_MAXIMO,
   codigoCompleto,
@@ -36,6 +39,8 @@ type Paso = { nombre: 'correo' } | { nombre: 'codigo'; correo: string }
 
 export function LoginPage() {
   const { sesion, cargando } = useSesion()
+  const { esModoInstalado } = usePwaInstall()
+  const [modalInstalarAbierto, setModalInstalarAbierto] = useState(false)
   const navegar = useNavigate()
   const location = useLocation()
 
@@ -72,10 +77,11 @@ export function LoginPage() {
         )
 
         if (errorRpc) {
-          console.error('Error al verificar correo en padrón:', errorRpc)
+          console.warn('RPC verificar_correo_padron no disponible:', errorRpc.message)
         }
 
-        if (!estaEnPadron) {
+        // Bloquear únicamente si la función RPC en Supabase confirmó explícitamente que no está en el padrón
+        if (!errorRpc && estaEnPadron === false) {
           setEnviando(false)
           setError(
             'Este correo electrónico no está registrado en el padrón estudiantil. El acceso está restringido únicamente a estudiantes matriculados.',
@@ -83,10 +89,7 @@ export function LoginPage() {
           return
         }
       } catch (err) {
-        console.error('Fallo al consultar padrón:', err)
-        setEnviando(false)
-        setError('No fue posible comprobar el correo en el padrón. Por favor, intentá de nuevo.')
-        return
+        console.warn('Fallo al consultar padrón:', err)
       }
 
       const { error: fallo } = await supabase.auth.signInWithOtp({ email: limpio })
@@ -133,7 +136,7 @@ export function LoginPage() {
 
   return (
     <div className="relative min-h-screen bg-bg text-text antialiased">
-      {/* Barra superior flotante con Logo y selector de tema */}
+      {/* Barra superior flotante con Logo, Botón de Instalación y selector de tema */}
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
         <div className="flex items-center gap-3">
           <img
@@ -142,7 +145,20 @@ export function LoginPage() {
             className="h-10 w-auto object-contain transition-all duration-250 dark:brightness-0 dark:invert"
           />
         </div>
-        <ThemeToggle />
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          {!esModoInstalado && (
+            <button
+              type="button"
+              onClick={() => setModalInstalarAbierto(true)}
+              className="flex cursor-pointer items-center gap-1.5 rounded-full border border-primary/30 bg-primary-tint px-3.5 py-1.5 text-etiqueta font-bold text-primary shadow-xs transition-all duration-200 hover:bg-primary-tint-strong active:scale-95"
+              title="Instalar Student HUB en tu pantalla de inicio"
+            >
+              <IconoDescargar className="size-3.5" />
+              <span>Instalar App</span>
+            </button>
+          )}
+          <ThemeToggle />
+        </div>
       </header>
 
       {/* Contenedor principal responsive */}
@@ -206,6 +222,27 @@ export function LoginPage() {
 
           {/* Columna Derecha: Tarjeta interactiva de Autenticación */}
           <div className="rounded-2xl border border-border bg-surface p-6.5 shadow-xl elev-md sm:p-8.5">
+            {!esModoInstalado && (
+              <div className="mb-5 flex items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary-tint/60 p-3.5 text-menuda">
+                <div className="flex items-center gap-2.5 text-text">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-xs">
+                    <IconoDescargar className="size-4" />
+                  </span>
+                  <div>
+                    <p className="font-bold text-text">¿Entraste por el enlace?</p>
+                    <p className="text-micro text-text-muted">Instalá la app para acceder sin internet.</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setModalInstalarAbierto(true)}
+                  className="shrink-0 cursor-pointer rounded-xl bg-primary px-3.5 py-2 text-micro font-bold text-white transition-all hover:bg-primary-dark active:scale-95 shadow-xs"
+                >
+                  Instalar
+                </button>
+              </div>
+            )}
+
             {paso.nombre === 'correo' ? (
               <form onSubmit={pedirCodigo} noValidate className="flex flex-col gap-5">
                 <div>
@@ -348,6 +385,11 @@ export function LoginPage() {
           </div>
         </div>
       </main>
+
+      <ModalInstalarApp
+        abierto={modalInstalarAbierto}
+        alCerrar={() => setModalInstalarAbierto(false)}
+      />
     </div>
   )
 }

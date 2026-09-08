@@ -1,11 +1,16 @@
 import { Link } from 'react-router-dom'
-import { IconoSalir } from '@/components/icons'
+import { IconoSalir, IconoDescargar } from '@/components/icons'
 import { useSesion } from '@/features/auth/useSesion'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import { obtenerIniciales } from '@/lib/texto'
 import { ThemeToggle } from './ThemeToggle'
 
-export function AppHeader() {
+type Props = {
+  onAbrirInstalar?: () => void
+  esModoInstalado?: boolean
+}
+
+export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
   const { estudiante } = useEstudiante()
   const { sesion, cerrarSesion } = useSesion()
 
@@ -35,7 +40,20 @@ export function AppHeader() {
         />
       </Link>
 
-      <div className="flex items-center gap-2.5 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
+        {!esModoInstalado && onAbrirInstalar && (
+          <button
+            type="button"
+            onClick={onAbrirInstalar}
+            className="flex cursor-pointer items-center gap-1.5 rounded-full border border-primary/30 bg-primary-tint px-3 py-1.5 text-etiqueta font-bold text-primary shadow-xs transition-all duration-200 hover:bg-primary-tint-strong active:scale-95"
+            title="Instalar Student HUB en tu dispositivo"
+          >
+            <IconoDescargar className="size-3.5" />
+            <span className="hidden sm:inline">Instalar App</span>
+            <span className="sm:hidden">Instalar</span>
+          </button>
+        )}
+
         <ThemeToggle />
 
         {sesion && (
