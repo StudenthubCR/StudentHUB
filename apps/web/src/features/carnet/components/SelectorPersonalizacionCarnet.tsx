@@ -46,7 +46,7 @@ export function SelectorPersonalizacionCarnet({
           type="button"
           onClick={() => setSeccionActiva('visual')}
           className={cn(
-            'flex-1 cursor-pointer rounded-md py-1.5 text-menuda font-semibold transition-all',
+            'flex-1 cursor-pointer rounded-md py-2 px-1 text-center text-[11.5px] sm:text-menuda font-semibold transition-all',
             seccionActiva === 'visual'
               ? 'bg-surface text-primary shadow-xs font-bold'
               : 'text-text-muted hover:text-text',
@@ -58,7 +58,7 @@ export function SelectorPersonalizacionCarnet({
           type="button"
           onClick={() => setSeccionActiva('identidad')}
           className={cn(
-            'flex-1 cursor-pointer rounded-md py-1.5 text-menuda font-semibold transition-all',
+            'flex-1 cursor-pointer rounded-md py-2 px-1 text-center text-[11.5px] sm:text-menuda font-semibold transition-all',
             seccionActiva === 'identidad'
               ? 'bg-surface text-primary shadow-xs font-bold'
               : 'text-text-muted hover:text-text',
@@ -70,7 +70,7 @@ export function SelectorPersonalizacionCarnet({
           type="button"
           onClick={() => setSeccionActiva('reverso')}
           className={cn(
-            'flex-1 cursor-pointer rounded-md py-1.5 text-menuda font-semibold transition-all',
+            'flex-1 cursor-pointer rounded-md py-2 px-1 text-center text-[11.5px] sm:text-menuda font-semibold transition-all',
             seccionActiva === 'reverso'
               ? 'bg-surface text-primary shadow-xs font-bold'
               : 'text-text-muted hover:text-text',

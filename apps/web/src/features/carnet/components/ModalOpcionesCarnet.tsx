@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { ThemeToggle } from '@/app/layout/ThemeToggle'
 import { IconoCerrar, IconoEngranaje, IconoSalir, IconoEscudo } from '@/components/icons'
 import { cn } from '@/lib/cn'
@@ -41,33 +42,42 @@ export function ModalOpcionesCarnet({
 }: Props) {
   const [pestana, setPestana] = useState<'estilo' | 'cuenta'>('estilo')
 
-  // Cerrar modal al presionar Escape
+  // Bloquear scroll de fondo y manejar Escape
   useEffect(() => {
     if (!abierto) return
+    const scrollOriginal = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
     const manejarTecla = (e: KeyboardEvent) => {
       if (e.key === 'Escape') alCerrar()
     }
     window.addEventListener('keydown', manejarTecla)
-    return () => window.removeEventListener('keydown', manejarTecla)
+    return () => {
+      document.body.style.overflow = scrollOriginal
+      window.removeEventListener('keydown', manejarTecla)
+    }
   }, [abierto, alCerrar])
 
   if (!abierto) return null
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="titulo-modal-opciones"
-      className="fixed inset-0 z-[2000] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[10000] flex items-end justify-center p-0 sm:items-center sm:p-4 animate-fade-in"
     >
-      {/* Fondo difuminado con clic para cerrar */}
+      {/* Fondo difuminado completo que cubre toda la pantalla incluyendo la barra inferior */}
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/75 backdrop-blur-md transition-opacity"
         onClick={alCerrar}
       />
 
-      {/* Contenedor de la ventana modal */}
-      <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto animate-slide-up rounded-2xl border border-border bg-surface p-6 shadow-2xl elev-lg sm:p-7">
+      {/* Contenedor de la ventana modal / bottom sheet en móvil */}
+      <div className="relative max-h-[86vh] w-full max-w-lg overflow-y-auto rounded-t-3xl border border-border bg-surface p-5.5 shadow-2xl elev-lg sm:rounded-3xl sm:p-7 animate-slide-up pb-[calc(28px_+_env(safe-area-inset-bottom))] sm:pb-7">
+        {/* Píldora táctil indicadora en móviles */}
+        <div className="mx-auto -mt-1.5 mb-3 h-1.5 w-12 rounded-full bg-border-strong/70 sm:hidden" />
+
         {/* Cabecera */}
         <div className="flex items-center justify-between border-b border-border pb-4">
           <div className="flex items-center gap-2.5">
@@ -198,6 +208,7 @@ export function ModalOpcionesCarnet({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

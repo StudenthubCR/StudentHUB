@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import {
   IconoCerrar,
   IconoCompartir,
@@ -16,6 +17,16 @@ type Props = {
 export function ModalInstalarApp({ abierto, alCerrar }: Props) {
   const { plataforma, esInApp, puedeInstalarDirecto, instalando, instalar } = usePwaInstall()
   const [copiado, setCopiado] = useState(false)
+
+  // Bloquear scroll de fondo
+  useEffect(() => {
+    if (!abierto) return
+    const scrollOriginal = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = scrollOriginal
+    }
+  }, [abierto])
 
   if (!abierto) return null
 
@@ -38,12 +49,12 @@ export function ModalInstalarApp({ abierto, alCerrar }: Props) {
     }
   }
 
-  return (
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-label="Instalar Student HUB"
-      className="fixed inset-0 z-200 flex items-end justify-center bg-black/60 p-0 backdrop-blur-xs sm:items-center sm:p-4 animate-fade-in"
+      className="fixed inset-0 z-[10000] flex items-end justify-center bg-black/75 p-0 backdrop-blur-md sm:items-center sm:p-4 animate-fade-in"
       onClick={alCerrar}
     >
       <div
@@ -211,6 +222,7 @@ export function ModalInstalarApp({ abierto, alCerrar }: Props) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
