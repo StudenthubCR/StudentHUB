@@ -667,4 +667,382 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     console.log('Student HUB: Sistema SPA inicializado correctamente.');
+
+    // =========================================
+    // CHATBOT — Dashboard
+    // =========================================
+
+    /**
+     * initChatbot()
+     *
+     * Configura el chatbot de texto disponible en el Dashboard.
+     * El bot responde preguntas sobre tres temas:
+     *   - Comedor: muestra el menú del día o de cualquier día de la semana.
+     *   - Horarios: lista las clases del grupo del estudiante agrupadas por día.
+     *   - Noticias: muestra los eventos del colegio con texto e imagen.
+     *
+     * No usa inteligencia artificial externa. Detecta la intención
+     * del usuario mediante palabras clave y responde con los datos
+     * que ya maneja la app (Google Sheets, datos locales y el carrusel).
+     */
+    const initChatbot = () => {
+        // Referencias a los elementos del DOM que conforman la interfaz del chat
+        const chatToggleBtn = document.getElementById('chat-toggle-btn'); // Botón flotante 💬
+        const chatCloseBtn  = document.getElementById('chat-close-btn');  // Botón ✕ del panel
+        const chatPanel     = document.getElementById('chat-panel');      // Panel de conversación
+        const chatMessages  = document.getElementById('chat-messages');   // Área de burbujas
+        const chatInput     = document.getElementById('chat-input');      // Campo de texto
+        const chatSendBtn   = document.getElementById('chat-send-btn');   // Botón de enviar
+
+        // Si el chatbot no existe en el DOM (por ejemplo, en otra sección), no hace nada
+        if (!chatToggleBtn || !chatPanel) return;
+
+        /**
+         * normalizar(txt)
+         * Convierte el texto a minúsculas, elimina espacios sobrantes y quita tildes.
+         * Sirve para comparar palabras sin importar cómo las escriba el usuario.
+         * Ejemplo: "¿Qué hay de Cenar?" → "que hay de cenar"
+         */
+        const normalizar = (txt) =>
+            txt.toLowerCase().trim()
+               .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+        /**
+         * abrirChat()
+         * Muestra el panel de conversación y resalta el botón flotante.
+         * La primera vez que se abre, envía automáticamente un mensaje
+         * de bienvenida del bot explicando qué puede responder.
+         */
+        const abrirChat = () => {
+            chatPanel.classList.remove('hidden');
+            chatPanel.classList.add('chat-open');
+            chatToggleBtn.classList.add('chat-active');
+            if (chatMessages.children.length === 0) {
+                agregarMensaje(
+                    '¡Hola! 👋 Soy el Chatbot de Student HUB.<br>' +
+                    'Puedo ayudarte con:<br>' +
+                    '🍽️ <b>Comedor</b> — menú de hoy o de cualquier día<br>' +
+                    '📅 <b>Horarios</b> — clases del grupo 11-2<br>' +
+                    '📰 <b>Noticias</b> — eventos del colegio',
+                    'bot'
+                );
+            }
+            setTimeout(() => chatInput.focus(), 300);
+        };
+
+        /**
+         * cerrarChat()
+         * Oculta el panel de conversación y devuelve el botón flotante
+         * a su estado visual normal.
+         */
+        const cerrarChat = () => {
+            chatPanel.classList.add('hidden');
+            chatPanel.classList.remove('chat-open');
+            chatToggleBtn.classList.remove('chat-active');
+        };
+
+        // El botón flotante alterna entre abrir y cerrar el panel con cada clic
+        chatToggleBtn.addEventListener('click', () => {
+            chatPanel.classList.contains('hidden') ? abrirChat() : cerrarChat();
+        });
+        // El botón ✕ siempre cierra el panel
+        chatCloseBtn.addEventListener('click', cerrarChat);
+
+        /**
+         * agregarMensaje(html, tipo, imagenSrc)
+         * Crea y muestra una burbuja de mensaje dentro del área de conversación.
+         *
+         * @param {string} html      - Contenido del mensaje (puede incluir HTML básico).
+         * @param {string} tipo      - 'bot' (burbuja izquierda) o 'user' (burbuja derecha).
+         * @param {string} imagenSrc - URL opcional de imagen que aparece debajo del texto.
+         *
+         * Después de agregar el mensaje, el scroll baja automáticamente
+         * para que el último mensaje siempre esté visible.
+         */
+        const agregarMensaje = (html, tipo, imagenSrc = null) => {
+            const burbuja = document.createElement('div');
+            burbuja.className = `chat-message ${tipo}`;
+
+            const contenido = document.createElement('div');
+            contenido.className = 'chat-bubble';
+            contenido.innerHTML = html;
+            burbuja.appendChild(contenido);
+
+            if (imagenSrc) {
+                const img = document.createElement('img');
+                img.src = imagenSrc;
+                img.className = 'chat-image';
+                img.alt = 'Imagen de noticia';
+                burbuja.appendChild(img);
+            }
+
+            chatMessages.appendChild(burbuja);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        };
+
+        /**
+         * mostrarEscribiendo()
+         * Muestra una animación de tres puntos pulsantes que simula que el bot
+         * está procesando la pregunta del usuario.
+         * Devuelve el elemento para que pueda eliminarse cuando llega la respuesta real.
+         */
+        const mostrarEscribiendo = () => {
+            const typing = document.createElement('div');
+            typing.className = 'chat-message bot chat-typing-indicator';
+            typing.innerHTML = '<div class="chat-bubble"><span></span><span></span><span></span></div>';
+            chatMessages.appendChild(typing);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return typing;
+        };
+
+        /**
+         * obtenerNoticias()
+         * Lee directamente del carrusel de noticias del Dashboard.
+         * Por cada slide extrae el título y la URL de la imagen.
+         * Así el chatbot siempre tiene la misma información que se muestra en pantalla,
+         * sin necesitar una fuente de datos separada.
+         *
+         * @returns {Array<{texto, imagen, alt}>}
+         */
+        const obtenerNoticias = () => {
+            const slides = document.querySelectorAll('.carousel-slide');
+            return Array.from(slides).map(slide => ({
+                texto: slide.querySelector('.slide-overlay span')?.textContent?.trim() || '',
+                imagen: slide.querySelector('img')?.src || null,
+                alt: slide.querySelector('img')?.alt || ''
+            }));
+        };
+
+        /**
+         * detectarIntencion(txt)
+         * Analiza el mensaje del usuario y determina sobre qué tema pregunta.
+         * Funciona comparando el texto normalizado contra tres listas de palabras clave:
+         *   - Si contiene palabras de noticias → 'noticias'
+         *   - Si contiene palabras de comedor  → 'comedor'
+         *   - Si contiene palabras de horarios → 'horarios'
+         *   - Si no coincide con ninguna       → 'desconocido'
+         *
+         * Las noticias se evalúan primero para evitar falsos positivos
+         * (por ejemplo "¿qué evento hay hoy?" no debe interpretarse como comedor).
+         *
+         * @param {string} txt - Mensaje original del usuario.
+         * @returns {string} Intención detectada.
+         */
+        const detectarIntencion = (txt) => {
+            const t = normalizar(txt);
+            const palabrasComedor   = ['cenar','almorzar','comer','menu','comida','comedor','almuerzo','cena','plato','hoy','desayuno','come','hay'];
+            const palabrasHorarios  = ['horario','clase','clases','hora','materia','materias','grupo','horarios','lunes','martes','miercoles','jueves','viernes','tengo','estudio'];
+            const palabrasNoticias  = ['noticia','noticias','evento','eventos','actividad','actividades','que pasa','novedades','novedad','anuncio','anuncios'];
+
+            if (palabrasNoticias.some(p => t.includes(p))) return 'noticias';
+            if (palabrasComedor.some(p => t.includes(p)))  return 'comedor';
+            if (palabrasHorarios.some(p => t.includes(p))) return 'horarios';
+            return 'desconocido';
+        };
+
+        /**
+         * responderComedor(txt)
+         * Busca el menú de la semana activa (definida en StudentHubConfig.comedorSemanaActiva)
+         * y retorna el plato correspondiente al día preguntado.
+         *
+         * Lógica de día:
+         *   1. Si el mensaje menciona un día ("martes", "jueves", etc.), busca ese día.
+         *   2. Si no menciona ninguno, usa el día actual del calendario.
+         *   3. Si es fin de semana, informa que el comedor está cerrado.
+         *
+         * Usa los datos de MOCK_MENUS (ya definidos en el código del comedor)
+         * como fuente principal, igual que la sección de Comedor de la app.
+         *
+         * @param {string} txt - Mensaje del usuario.
+         * @returns {{ html: string }} Respuesta formateada con el menú.
+         */
+        const responderComedor = (txt) => {
+            const t = normalizar(txt);
+            const semana = StudentHubConfig.comedorSemanaActiva || 4;
+            const menuSemana = (typeof MOCK_MENUS !== 'undefined' ? MOCK_MENUS : {})[semana] || [];
+
+            // Mapa de nombre de día → índice en el array del menú (Lunes=0 … Viernes=4)
+            const diasMap = { lunes: 0, martes: 1, miercoles: 2, jueves: 3, viernes: 4 };
+
+            let diaIndex = -1;
+            for (const [clave, idx] of Object.entries(diasMap)) {
+                if (t.includes(clave)) { diaIndex = idx; break; }
+            }
+
+            // Si no se pidió un día concreto, se usa el día de hoy
+            if (diaIndex === -1) {
+                const hoy = new Date().getDay(); // 0=Domingo, 6=Sábado
+                if (hoy === 0 || hoy === 6) {
+                    return { html: '🔒 El comedor está <b>cerrado</b> los fines de semana. ¡Descansa bien! 😊' };
+                }
+                diaIndex = hoy - 1; // Convierte: Lunes(1)→0, Martes(2)→1, etc.
+            }
+
+            const item = menuSemana[diaIndex];
+            if (!item) {
+                return { html: '😕 No encontré el menú para ese día. Intenta revisar la sección de <b>Comedor</b> directamente.' };
+            }
+
+            return {
+                html: `🍽️ <b>${item.dia}</b><br>` +
+                      `🥩 <b>Plato principal:</b> ${item.plato}<br>` +
+                      `🥗 <b>Acompañamiento:</b> ${item.acompanamiento}<br>` +
+                      `🥤 <b>Bebida:</b> ${item.bebida}<br>` +
+                      `🍌 <b>Fruta/Postre:</b> ${item.postre}`
+            };
+        };
+
+        /**
+         * responderHorarios()   [async]
+         * Obtiene el horario del grupo del estudiante desde la API de Google Sheets.
+         * Si ya se cargó antes (está en cacheHorarios), lo usa directamente sin
+         * hacer otra petición a internet.
+         *
+         * Agrupa las clases por día de la semana en orden (Lunes → Viernes)
+         * y construye una respuesta con el horario completo formateado.
+         *
+         * Si la API no responde o devuelve un error, muestra un mensaje amigable
+         * en lugar de romper el chat.
+         *
+         * @returns {Promise<{ html: string }>} Horario formateado.
+         */
+        const responderHorarios = async () => {
+            const grupo = StudentHubConfig.estudianteGrupo || '11-2';
+            try {
+                // Reutiliza el caché en memoria de la sección de Horarios si ya existe
+                const cache = typeof cacheHorarios !== 'undefined' ? cacheHorarios : new Map();
+                let filas = cache.get(grupo);
+                if (!filas) {
+                    const url = `${StudentHubConfig.horariosApiUrl}?grupo=${encodeURIComponent(grupo)}`;
+                    const res = await fetch(url);
+                    if (!res.ok) throw new Error('Sin respuesta');
+                    filas = await res.json();
+                }
+
+                if (!Array.isArray(filas) || filas.length === 0) {
+                    return { html: '😕 No encontré horarios para tu grupo en este momento. Revisa la sección de <b>Horarios</b>.' };
+                }
+
+                // Agrupa cada clase bajo su día correspondiente
+                const diasOrden = ['lunes','martes','miercoles','jueves','viernes'];
+                const porDia = {};
+                filas.forEach(f => {
+                    const dia = normalizar(f.dia || f.Dia || '');
+                    if (!porDia[dia]) porDia[dia] = [];
+                    porDia[dia].push(`⏰ ${f.hora || f.Hora} — ${f.materia || f.Materia}`);
+                });
+
+                // Construye el texto de respuesta día por día en orden correcto
+                let resp = `📅 <b>Horario grupo ${grupo}:</b><br>`;
+                diasOrden.forEach(dia => {
+                    if (porDia[dia]) {
+                        const nombre = dia.charAt(0).toUpperCase() + dia.slice(1);
+                        resp += `<br><b>${nombre}:</b><br>` + porDia[dia].join('<br>') + '<br>';
+                    }
+                });
+                return { html: resp };
+
+            } catch (e) {
+                return { html: '⚠️ No pude cargar los horarios en este momento. Revisa la sección de <b>Horarios</b> en la app.' };
+            }
+        };
+
+        /**
+         * responderNoticias(txt)
+         * Responde preguntas sobre eventos y noticias del colegio.
+         *
+         * Comportamiento:
+         *   - Si la pregunta menciona el nombre de un evento específico
+         *     (ej: "feria", "futsal", "expotecnica"), devuelve ese evento
+         *     con su imagen del carrusel.
+         *   - Si la pregunta es general ("¿qué noticias hay?"), lista todos
+         *     los eventos disponibles y pide al usuario que pregunte por uno
+         *     específico para ver su imagen.
+         *
+         * @param {string} txt - Mensaje del usuario.
+         * @returns {{ html: string, imagen?: string }} Respuesta con texto e imagen opcional.
+         */
+        const responderNoticias = (txt) => {
+            const t = normalizar(txt);
+            const noticias = obtenerNoticias();
+
+            if (noticias.length === 0) {
+                return { html: '😕 No encontré noticias disponibles ahora mismo.' };
+            }
+
+            // Busca si alguna palabra del mensaje (de más de 3 letras) coincide
+            // con el título de alguna noticia del carrusel
+            const especifica = noticias.find(n =>
+                t.split(' ').some(palabra => palabra.length > 3 && normalizar(n.texto).includes(palabra))
+            );
+
+            if (especifica) {
+                return {
+                    html: `📰 <b>${especifica.texto}</b>`,
+                    imagen: especifica.imagen
+                };
+            }
+
+            // Si no hay coincidencia específica, lista todos los eventos
+            const lista = noticias.map((n, i) => `${i + 1}. ${n.texto}`).join('<br>');
+            return {
+                html: `📰 <b>Eventos y noticias del colegio:</b><br><br>${lista}<br><br>Pregúntame por alguno específico para ver su imagen.`
+            };
+        };
+
+        /**
+         * procesarMensaje(texto)   [async]
+         * Coordina el flujo completo cuando el usuario envía un mensaje:
+         *   1. Muestra el mensaje del usuario en el chat.
+         *   2. Muestra la animación de "escribiendo..." mientras procesa.
+         *   3. Detecta la intención del mensaje.
+         *   4. Llama a la función de respuesta correspondiente.
+         *   5. Elimina la animación y muestra la respuesta del bot.
+         *
+         * Si el mensaje está vacío, no hace nada.
+         *
+         * @param {string} texto - Texto escrito por el usuario.
+         */
+        const procesarMensaje = async (texto) => {
+            if (!texto.trim()) return;
+
+            agregarMensaje(texto, 'user');
+            chatInput.value = '';
+
+            const typing = mostrarEscribiendo();
+
+            // Pausa breve de 600ms para simular que el bot "piensa" la respuesta
+            await new Promise(r => setTimeout(r, 600));
+            typing.remove();
+
+            const intencion = detectarIntencion(texto);
+            let respuesta = { html: '' };
+
+            if (intencion === 'comedor') {
+                respuesta = responderComedor(texto);
+            } else if (intencion === 'horarios') {
+                respuesta = await responderHorarios();
+            } else if (intencion === 'noticias') {
+                respuesta = responderNoticias(texto);
+            } else {
+                // Mensaje de ayuda cuando la pregunta no se reconoce
+                respuesta = {
+                    html: '🤔 No estoy seguro de cómo ayudarte con eso. Puedes preguntarme sobre:<br>' +
+                          '🍽️ <b>Comedor</b> — "¿qué hay de cenar?"<br>' +
+                          '📅 <b>Horarios</b> — "¿cuál es mi horario?"<br>' +
+                          '📰 <b>Noticias</b> — "¿qué eventos hay?"'
+                };
+            }
+
+            agregarMensaje(respuesta.html, 'bot', respuesta.imagen || null);
+        };
+
+        // El usuario puede enviar su mensaje presionando el botón de enviar o la tecla Enter
+        chatSendBtn.addEventListener('click', () => procesarMensaje(chatInput.value));
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') procesarMensaje(chatInput.value);
+        });
+    };
+
+    initChatbot();
 });

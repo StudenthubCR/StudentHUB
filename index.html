@@ -104,7 +104,69 @@
                     </div>
                 </div>
             </div>
+
+            <!-- =========================================
+                 CHATBOT — Solo disponible en el Dashboard
+
+                 Compuesto por dos partes:
+                   1. #chat-toggle-btn — botón circular flotante que aparece
+                      en la esquina inferior derecha. Al presionarlo abre o
+                      cierra el panel de conversación.
+                   2. #chat-panel — ventana de chat que contiene el encabezado,
+                      el área de mensajes y el campo de texto para escribir.
+
+                 La lógica que lo controla está en js/script.js → initChatbot().
+                 Los estilos visuales están en css/styles.css.
+                 ========================================= -->
+
+            <!-- Botón flotante 💬:
+                 Permanece visible en el Dashboard para que el estudiante
+                 pueda abrir el chat en cualquier momento. -->
+            <button id="chat-toggle-btn" aria-label="Abrir chatbot">
+                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </button>
+
+            <!-- Panel de conversación:
+                 Comienza oculto (class="hidden"). Se muestra cuando el estudiante
+                 presiona el botón flotante. Contiene:
+                   - Encabezado (.chat-header): nombre del bot y botón de cierre ✕.
+                   - Área de mensajes (#chat-messages): aquí aparecen las burbujas
+                     de texto del bot y del usuario. Se puebla dinámicamente con JS.
+                   - Área de entrada (.chat-input-area): campo de texto donde el
+                     estudiante escribe su pregunta, y botón de enviar. -->
+            <div id="chat-panel" class="hidden" role="dialog" aria-label="Chatbot">
+
+                <!-- Encabezado del panel: muestra el avatar 🤖, el nombre del bot
+                     y el botón ✕ para cerrar el chat. -->
+                <div class="chat-header">
+                    <div class="chat-header-info">
+                        <div class="chat-avatar">🤖</div>
+                        <div>
+                            <span class="chat-title">Chatbot</span>
+                            <span class="chat-subtitle">Student HUB</span>
+                        </div>
+                    </div>
+                    <button id="chat-close-btn" aria-label="Cerrar chatbot">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+
+                <!-- Área de mensajes: vacía al inicio. JavaScript inserta aquí
+                     cada burbuja de conversación (bot y usuario) dinámicamente. -->
+                <div id="chat-messages"></div>
+
+                <!-- Campo de entrada: el estudiante escribe su pregunta y la envía
+                     presionando el botón o con la tecla Enter. -->
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Escribe tu pregunta..." autocomplete="off" maxlength="200">
+                    <button id="chat-send-btn" aria-label="Enviar">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                </div>
+            </div>
+
         </section>
+
 
         <!-- Sección: Carnet Digital -->
         <section id="carnet" class="page-section hidden">
