@@ -1,3 +1,10 @@
+/**
+ * Hook de React para gestionar las notificaciones estudiantiles.
+ *
+ * Expone el estado del permiso actual, la configuración de canales activos
+ * y funciones para solicitar permisos, alternar canales y disparar pruebas.
+ */
+
 import { useState, useEffect, useCallback } from 'react'
 import {
   type EstadoPermisoNotificacion,
@@ -11,11 +18,14 @@ import {
 } from './notificaciones.service'
 
 export function useNotificaciones() {
+  /** Estado reactivo del permiso ('default', 'granted', 'denied', 'unsupported') */
   const [permiso, setPermiso] = useState<EstadoPermisoNotificacion>(obtenerEstadoPermiso)
+  /** Estado reactivo de los canales seleccionados (comedor, horarios, noticias) */
   const [canales, setCanales] = useState<CanalesNotificacion>(obtenerCanalesGuardados)
+  /** Indicador de carga mientras el usuario interactúa con el diálogo del navegador */
   const [cargando, setCargando] = useState(false)
 
-  // Sincronizar estado cuando la ventana recobra foco (por si cambiaron permisos en la barra del navegador)
+  // Sincroniza el estado cuando la pestaña recobra foco (por si el usuario cambió permisos desde la barra del navegador)
   useEffect(() => {
     const sincronizar = () => {
       setPermiso(obtenerEstadoPermiso())
@@ -24,6 +34,10 @@ export function useNotificaciones() {
     return () => window.removeEventListener('focus', sincronizar)
   }, [])
 
+  /**
+   * Solicita el permiso nativo al navegador. Si es concedido,
+   * emite automáticamente una notificación de bienvenida y confirmación.
+   */
   const solicitarPermiso = useCallback(async () => {
     setCargando(true)
     const nuevoEstado = await solicitarPermisoNotificacion()
@@ -40,6 +54,9 @@ export function useNotificaciones() {
     return false
   }, [])
 
+  /**
+   * Alterna el estado activo/inactivo de un canal específico y persiste el cambio en localStorage.
+   */
   const alternarCanal = useCallback((canal: keyof CanalesNotificacion) => {
     setCanales((prev) => {
       const nuevo = { ...prev, [canal]: !prev[canal] }
@@ -48,6 +65,10 @@ export function useNotificaciones() {
     })
   }, [])
 
+  /**
+   * Dispara una notificación de prueba realista para el canal indicado.
+   * Si el permiso aún no ha sido concedido, lo solicita previamente.
+   */
   const probarNotificacion = useCallback(
     async (tipo: 'comedor' | 'horarios' | 'noticias') => {
       if (permiso !== 'granted') {
@@ -87,3 +108,4 @@ export function useNotificaciones() {
     probarNotificacion,
   }
 }
+

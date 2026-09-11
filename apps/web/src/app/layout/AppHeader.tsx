@@ -59,7 +59,9 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
           </button>
         )}
 
-        {/* Botón de Notificaciones */}
+        {/* Botón de Notificaciones:
+            Permite al estudiante acceder a la configuración de alertas.
+            Muestra un punto pulsante si las notificaciones aún no han sido activadas. */}
         <button
           type="button"
           onClick={() => setModalNotifAbierto(true)}
@@ -76,6 +78,7 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
             <span className="absolute top-2.5 right-2.5 size-2 rounded-full bg-primary animate-pulse" />
           )}
         </button>
+
 
         <ThemeToggle />
 

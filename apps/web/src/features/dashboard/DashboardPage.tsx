@@ -48,7 +48,9 @@ export function DashboardPage() {
         </p>
       </header>
 
-      {/* Banner de activación de notificaciones si están pendientes */}
+      {/* Banner de bienvenida para Notificaciones:
+          Aparece en la pantalla principal sólo cuando el estudiante aún no ha
+          configurado ni bloqueado las notificaciones, ofreciendo acceso rápido. */}
       {!notificacionesActivas && permiso !== 'denied' && !bannerOculto && (
         <div className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary-tint/50 p-4 shadow-xs">
           <div className="flex items-center gap-3">

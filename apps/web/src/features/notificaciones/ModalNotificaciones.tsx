@@ -1,3 +1,13 @@
+/**
+ * Modal de Configuración y Gestión de Notificaciones Estudiantiles.
+ *
+ * Proporciona una interfaz clara para que el estudiante:
+ *  - Comprenda el beneficio de activar las notificaciones.
+ *  - Conceda el permiso nativo al navegador mediante un solo clic.
+ *  - Active o desactive individualmente las alertas de Comedor, Horarios y Noticias.
+ *  - Pruebe en tiempo real cómo se visualizan las notificaciones en su dispositivo.
+ */
+
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { IconoCerrar, IconoCampana, IconoCalendario } from '@/components/icons'
@@ -7,6 +17,7 @@ type Props = {
   abierto: boolean
   alCerrar: () => void
 }
+
 
 export function ModalNotificaciones({ abierto, alCerrar }: Props) {
   const {

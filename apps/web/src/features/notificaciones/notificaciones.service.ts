@@ -1,13 +1,25 @@
+/**
+ * Servicio central de Notificaciones para Student HUB.
+ *
+ * Administra el ciclo de vida de los permisos nativos de la Web Notification API,
+ * la persistencia de preferencias de canales en localStorage y el despacho
+ * de alertas visuales mediante Service Worker o fallback directo del navegador.
+ */
+
+/** Estados posibles de los permisos de notificación en el navegador */
 export type EstadoPermisoNotificacion = 'default' | 'granted' | 'denied' | 'unsupported'
 
+/** Canales temáticos configurables por el estudiante */
 export type CanalesNotificacion = {
   comedor: boolean
   horarios: boolean
   noticias: boolean
 }
 
+/** Clave de almacenamiento en localStorage para persistir las preferencias */
 const CLAVE_STORAGE_CANALES = 'studenthub_notif_canales'
 
+/** Configuración por defecto: todos los canales activos al otorgar permiso */
 export const CANALES_POR_DEFECTO: CanalesNotificacion = {
   comedor: true,
   horarios: true,
@@ -16,13 +28,18 @@ export const CANALES_POR_DEFECTO: CanalesNotificacion = {
 
 /**
  * Comprueba si la API de Notificaciones está soportada en el navegador actual.
+ * Devuelve true si el objeto 'Notification' existe en el contexto global window.
  */
 export function notificacionesSoportadas(): boolean {
   return typeof window !== 'undefined' && 'Notification' in window
 }
 
 /**
- * Obtiene el estado actual del permiso en el navegador.
+ * Obtiene el estado actual del permiso en el navegador:
+ * - 'granted': El estudiante ya autorizó notificaciones.
+ * - 'denied': El estudiante bloqueó las notificaciones en el navegador.
+ * - 'default': Aún no se ha solicitado el permiso (estado pendiente).
+ * - 'unsupported': El navegador o dispositivo no soporta la API.
  */
 export function obtenerEstadoPermiso(): EstadoPermisoNotificacion {
   if (!notificacionesSoportadas()) {
@@ -33,6 +50,7 @@ export function obtenerEstadoPermiso(): EstadoPermisoNotificacion {
 
 /**
  * Lee la configuración de canales guardada por el estudiante en localStorage.
+ * Si no existen preferencias previas, retorna los valores por defecto.
  */
 export function obtenerCanalesGuardados(): CanalesNotificacion {
   if (typeof window === 'undefined') return CANALES_POR_DEFECTO
@@ -51,7 +69,8 @@ export function obtenerCanalesGuardados(): CanalesNotificacion {
 }
 
 /**
- * Guarda las preferencias de canales en localStorage.
+ * Guarda las preferencias de canales activos en el almacenamiento local (localStorage).
+ * Permite que las elecciones del estudiante persistan entre sesiones de la app.
  */
 export function guardarCanales(canales: CanalesNotificacion): void {
   if (typeof window === 'undefined') return
@@ -63,7 +82,8 @@ export function guardarCanales(canales: CanalesNotificacion): void {
 }
 
 /**
- * Solicita el permiso nativo de notificaciones al navegador.
+ * Dispara la solicitud nativa de permiso de notificación del navegador.
+ * Devuelve el nuevo estado asignado por el usuario ('granted' o 'denied').
  */
 export async function solicitarPermisoNotificacion(): Promise<EstadoPermisoNotificacion> {
   if (!notificacionesSoportadas()) {
@@ -80,7 +100,15 @@ export async function solicitarPermisoNotificacion(): Promise<EstadoPermisoNotif
 }
 
 /**
- * Envía una notificación nativa utilizando el Service Worker o el constructor Notification.
+ * Emite una notificación nativa visible en el sistema operativo o celular.
+ *
+ * Estrategia de emisión en 2 fases:
+ *   1. Intenta mostrarla a través del Service Worker activo (`showNotification`),
+ *      lo cual es obligatorio para PWAs en Android/iOS y segundo plano.
+ *   2. Si no hay Service Worker disponible, utiliza el constructor estándar `new Notification()`.
+ *
+ * @param titulo Texto principal de la notificación.
+ * @param opciones Configuración adicional (cuerpo, ícono, tag, vibración).
  */
 export async function emitirNotificacion(
   titulo: string,
@@ -110,7 +138,7 @@ export async function emitirNotificacion(
     new Notification(titulo, configCompleta)
     return true
   } catch (err) {
-    console.warn('Fallo al emitir notificación, intentando fallback directo:', err)
+    console.warn('Fallo al emitir notificación con Service Worker, intentando fallback directo:', err)
     try {
       new Notification(titulo, configCompleta)
       return true
@@ -120,3 +148,4 @@ export async function emitirNotificacion(
     }
   }
 }
+
