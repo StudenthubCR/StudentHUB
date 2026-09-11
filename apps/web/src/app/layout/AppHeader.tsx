@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { IconoSalir, IconoDescargar } from '@/components/icons'
+import { IconoSalir, IconoDescargar, IconoCampana } from '@/components/icons'
 import { useSesion } from '@/features/auth/useSesion'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
+import { useNotificaciones } from '@/features/notificaciones/useNotificaciones'
+import { ModalNotificaciones } from '@/features/notificaciones/ModalNotificaciones'
 import { obtenerIniciales } from '@/lib/texto'
 import { ThemeToggle } from './ThemeToggle'
 
@@ -13,6 +16,8 @@ type Props = {
 export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
   const { estudiante } = useEstudiante()
   const { sesion, cerrarSesion } = useSesion()
+  const { permiso, notificacionesActivas } = useNotificaciones()
+  const [modalNotifAbierto, setModalNotifAbierto] = useState(false)
 
   return (
     <header
@@ -53,6 +58,24 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
             <span className="sm:hidden">Instalar</span>
           </button>
         )}
+
+        {/* Botón de Notificaciones */}
+        <button
+          type="button"
+          onClick={() => setModalNotifAbierto(true)}
+          aria-label="Configurar notificaciones"
+          title="Notificaciones estudiantiles"
+          className={
+            'relative flex size-10 cursor-pointer items-center justify-center rounded-full ' +
+            'border border-border bg-surface text-text-muted transition-all duration-200 ' +
+            'hover:border-border-strong hover:bg-surface-alt hover:text-text active:scale-95'
+          }
+        >
+          <IconoCampana className="size-4.5" />
+          {!notificacionesActivas && permiso !== 'denied' && (
+            <span className="absolute top-2.5 right-2.5 size-2 rounded-full bg-primary animate-pulse" />
+          )}
+        </button>
 
         <ThemeToggle />
 
@@ -113,6 +136,12 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
           </Link>
         )}
       </div>
+
+      <ModalNotificaciones
+        abierto={modalNotifAbierto}
+        alCerrar={() => setModalNotifAbierto(false)}
+      />
     </header>
   )
 }
+

@@ -1,7 +1,11 @@
+import { useState } from 'react'
+import { IconoCampana } from '@/components/icons'
 import { estadoDelDia, nombreLargoDeFecha } from '@/features/comedor/menu.service'
 import { useMenuSemanal } from '@/features/comedor/useMenuSemanal'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import { useHorario } from '@/features/horarios/useHorario'
+import { useNotificaciones } from '@/features/notificaciones/useNotificaciones'
+import { ModalNotificaciones } from '@/features/notificaciones/ModalNotificaciones'
 import { useReloj } from '@/lib/useReloj'
 import { AlmuerzoDeHoy } from './components/AlmuerzoDeHoy'
 import { CarruselNoticias } from './components/CarruselNoticias'
@@ -28,6 +32,9 @@ export function DashboardPage() {
   const comedor = useMenuSemanal(ahora)
 
   const diaDeHoy = horario.dias.find((dia) => dia.esHoy) ?? null
+  const { permiso, notificacionesActivas } = useNotificaciones()
+  const [modalNotifAbierto, setModalNotifAbierto] = useState(false)
+  const [bannerOculto, setBannerOculto] = useState(false)
 
   return (
     <section className="animate-fade-in">
@@ -40,6 +47,40 @@ export function DashboardPage() {
           {nombreLargoDeFecha(ahora)}
         </p>
       </header>
+
+      {/* Banner de activación de notificaciones si están pendientes */}
+      {!notificacionesActivas && permiso !== 'denied' && !bannerOculto && (
+        <div className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary-tint/50 p-4 shadow-xs">
+          <div className="flex items-center gap-3">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-xs">
+              <IconoCampana className="size-4.5" />
+            </span>
+            <div>
+              <p className="font-bold text-menor text-text">Activá las notificaciones estudiantiles</p>
+              <p className="text-micro text-text-muted">
+                Enterate del almuerzo diario, recordatorios de clases y eventos del colegio.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setModalNotifAbierto(true)}
+              className="shrink-0 cursor-pointer rounded-xl bg-primary px-3.5 py-1.5 text-micro font-bold text-white shadow-xs transition-all hover:bg-primary-dark active:scale-95"
+            >
+              Configurar
+            </button>
+            <button
+              type="button"
+              onClick={() => setBannerOculto(true)}
+              aria-label="Ocultar aviso de notificaciones"
+              className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-border/40 hover:text-text"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Las noticias van primero. En pantalla ancha se quedan en su propia
           columna, más angosta, para no empujar el día hacia abajo. */}
@@ -67,6 +108,12 @@ export function DashboardPage() {
           />
         </div>
       </div>
+
+      <ModalNotificaciones
+        abierto={modalNotifAbierto}
+        alCerrar={() => setModalNotifAbierto(false)}
+      />
     </section>
   )
 }
+
