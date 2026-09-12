@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Navigate, useNavigate, useLocation } from 'react-router-dom'
+import { Navigate, useNavigate, useLocation, Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/cn'
 import {
@@ -147,6 +147,13 @@ export function LoginPage() {
           />
         </div>
         <div className="flex items-center gap-2.5 sm:gap-3">
+          <Link
+            to="/expo"
+            className="flex cursor-pointer items-center gap-1.5 rounded-full border border-primary/30 bg-primary-tint px-3 py-1.5 text-etiqueta font-bold text-primary shadow-xs transition-all duration-200 hover:bg-primary-tint-strong active:scale-95"
+            title="Ver portal interactivo para la Expotécnica 2026"
+          >
+            <span>🚀 Expotécnica</span>
+          </Link>
           {!esModoInstalado && (
             <button
               type="button"

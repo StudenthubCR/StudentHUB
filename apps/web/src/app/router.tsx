@@ -8,6 +8,7 @@ import { HorariosPage } from '@/features/horarios/HorariosPage'
 import { ComedorPage } from '@/features/comedor/ComedorPage'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { RutaProtegida } from '@/features/auth/RutaProtegida'
+import { ExpoLandingPage } from '@/features/expo/ExpoLandingPage'
 
 /**
  * `handle.titulo` alimenta el título del documento (ver `useTituloDeRuta`), y
@@ -15,6 +16,17 @@ import { RutaProtegida } from '@/features/auth/RutaProtegida'
  * cualquier error de render.
  */
 export const router = createBrowserRouter([
+  // Portal público de la Expotécnica
+  {
+    path: '/expo',
+    element: <ExpoLandingPage />,
+    handle: { titulo: 'Expotécnica 2026 · Student HUB' },
+    errorElement: <PaginaDeError />,
+  },
+  {
+    path: '/landing',
+    element: <Navigate to="/expo" replace />,
+  },
   // El login va fuera del layout a propósito: sin barra de navegación ni
   // cabecera, para que no invite a irse a otro lado a mitad del ingreso.
   { path: '/entrar', element: <LoginPage />, errorElement: <PaginaDeError /> },
