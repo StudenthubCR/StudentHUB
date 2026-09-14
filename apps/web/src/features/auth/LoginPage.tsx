@@ -307,10 +307,32 @@ export function LoginPage() {
                   )}
                 </button>
 
+                <div className="relative my-1 flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-border" />
+                  </div>
+                  <span className="relative bg-surface px-2 text-micro font-semibold text-text-muted uppercase">
+                    O exploración rápida
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.setItem('studenthub_demo_sesion', 'true')
+                    window.location.href = '/'
+                  }}
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary-tint px-4 py-2.5 text-menor font-bold text-primary transition-all hover:bg-primary-tint-strong active:scale-98 shadow-xs"
+                >
+                  <span>Entrar en modo demo (Sin esperar correo)</span>
+                  <IconoFlechaDerecha className="size-3.5" />
+                </button>
+
                 <div className="flex items-center justify-center gap-1.5 pt-2 text-micro text-text-muted">
                   <IconoEscudo className="size-3.5 text-primary" />
                   <span>Acceso seguro protegido por OTP • Sin necesidad de contraseña</span>
                 </div>
+
               </form>
             ) : (
               <form onSubmit={verificar} noValidate className="flex flex-col gap-5">

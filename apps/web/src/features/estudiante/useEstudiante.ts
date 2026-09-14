@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { useSesion } from '@/features/auth/useSesion'
-import type { Estudiante } from './estudiante.fixture'
+import { ESTUDIANTE_DEMO, type Estudiante } from './estudiante.fixture'
 
 type FilaEstudiante = {
+
   codigo: string
   correo: string
   nombre: string
@@ -46,6 +47,9 @@ export function useEstudiante() {
     enabled: Boolean(sesion),
     staleTime: 1000 * 60 * 30,
     queryFn: async (): Promise<Estudiante | null> => {
+      if (sesion?.user.id === '00000000-0000-0000-0000-000000000001') {
+        return ESTUDIANTE_DEMO
+      }
       const { data, error } = await supabase
         .from('estudiantes')
         .select('codigo, correo, nombre, especialidad, estado, grupos(codigo, nivel, jornada), instituciones(nombre, slug)')
@@ -54,6 +58,7 @@ export function useEstudiante() {
       if (error) throw error
       return data ? aEstudiante(data) : null
     },
+
   })
 
   return {

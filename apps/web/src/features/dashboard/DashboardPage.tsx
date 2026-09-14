@@ -11,7 +11,9 @@ import { AlmuerzoDeHoy } from './components/AlmuerzoDeHoy'
 import { CarruselNoticias } from './components/CarruselNoticias'
 import { ClaseAhora } from './components/ClaseAhora'
 import { RestoDelDia } from './components/RestoDelDia'
+import { WidgetAgendaDashboard } from '@/features/agenda/components/WidgetAgendaDashboard'
 import { NOTICIAS } from './noticias.fixture'
+
 import { primerNombre, saludoSegunHora } from './saludo'
 
 /**
@@ -103,11 +105,13 @@ export function DashboardPage() {
             aHorario="/horarios"
           />
           <RestoDelDia dia={diaDeHoy} ahora={ahora} />
+          <WidgetAgendaDashboard />
           <AlmuerzoDeHoy
             estado={estadoDelDia(comedor.menus, ahora)}
             cargando={comedor.cargando}
             hayError={Boolean(comedor.error)}
           />
+
         </div>
       </div>
 

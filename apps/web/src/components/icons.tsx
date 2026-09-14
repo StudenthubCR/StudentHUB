@@ -412,3 +412,104 @@ export function IconoCampana(props: Props) {
     </Base>
   )
 }
+
+/** Agenda / Planificador: cuaderno con marcador de página que se estira y líneas */
+export function IconoAgenda(props: Props) {
+  return (
+    <Base {...props}>
+      <path
+        d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"
+        className="transition-transform duration-300 ease-out group-hover:scale-[1.03] hover:scale-[1.03]"
+      />
+      <path
+        d="M6 2v20"
+        className="transition-opacity duration-300 opacity-60"
+      />
+      <path
+        d="M10 7h6"
+        className="origin-left transition-transform duration-200 ease-out group-hover:translate-x-0.5 hover:translate-x-0.5"
+      />
+      <path
+        d="M10 11h6"
+        className="origin-left transition-transform duration-300 ease-out group-hover:translate-x-1 hover:translate-x-1"
+      />
+      <path
+        d="M10 15h4"
+        className="origin-left transition-transform duration-200 ease-out group-hover:translate-x-0.5 hover:translate-x-0.5"
+      />
+    </Base>
+  )
+}
+
+/** Examen: hoja de evaluación con lápiz / puntaje */
+export function IconoExamen(props: Props) {
+  return (
+    <Base {...props}>
+      <path
+        d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+        className="transition-transform duration-300 group-hover:scale-[1.02] hover:scale-[1.02]"
+      />
+      <polyline points="14 2 14 8 20 8" />
+      <path
+        d="M9 13h6"
+        className="transition-transform duration-200 group-hover:translate-x-0.5"
+      />
+      <path
+        d="M9 17h3"
+        className="transition-transform duration-200 group-hover:translate-x-0.5"
+      />
+      <circle
+        cx="16.5"
+        cy="16.5"
+        r="2.5"
+        className="origin-center transition-transform duration-300 group-hover:scale-125 hover:scale-125 text-primary"
+      />
+    </Base>
+  )
+}
+
+/** Tarea: checklist interactivo con marca de verificación */
+export function IconoTarea(props: Props) {
+  return (
+    <Base {...props}>
+      <rect
+        x="3"
+        y="5"
+        width="6"
+        height="6"
+        rx="1"
+        className="transition-transform duration-200 group-hover:scale-110"
+      />
+      <path d="m5 8 1 1 2-2" />
+      <path d="M13 6h8" className="transition-transform duration-200 group-hover:translate-x-1" />
+      <rect x="3" y="14" width="6" height="6" rx="1" />
+      <path d="M13 15h8" className="transition-transform duration-200 group-hover:translate-x-1" />
+      <path d="M13 19h5" className="transition-transform duration-200 group-hover:translate-x-0.5" />
+    </Base>
+  )
+}
+
+/** Profesor ausente: silueta de docente con alerta o escudo de aviso */
+export function IconoProfesorAusente(props: Props) {
+  return (
+    <Base {...props}>
+      <circle cx="9" cy="7" r="4" />
+      <path d="M2 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2" />
+      <line
+        x1="17"
+        y1="8"
+        x2="23"
+        y2="14"
+        className="origin-center transition-transform duration-300 group-hover:rotate-45"
+      />
+      <line
+        x1="23"
+        y1="8"
+        x2="17"
+        y2="14"
+        className="origin-center transition-transform duration-300 group-hover:-rotate-45"
+      />
+    </Base>
+  )
+}
+

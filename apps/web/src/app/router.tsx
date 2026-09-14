@@ -4,7 +4,9 @@ import { PaginaDeError } from './PaginaDeError'
 import { PaginaNoEncontrada } from './PaginaNoEncontrada'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
 import { CarnetPage } from '@/features/carnet/CarnetPage'
+import { AgendaPage } from '@/features/agenda/AgendaPage'
 import { HorariosPage } from '@/features/horarios/HorariosPage'
+
 import { ComedorPage } from '@/features/comedor/ComedorPage'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { RutaProtegida } from '@/features/auth/RutaProtegida'
@@ -40,6 +42,7 @@ export const router = createBrowserRouter([
     errorElement: <PaginaDeError />,
     children: [
       { index: true, element: <DashboardPage />, handle: { titulo: 'Inicio' } },
+      { path: 'agenda', element: <AgendaPage />, handle: { titulo: 'Agenda' } },
       { path: 'carnet', element: <CarnetPage />, handle: { titulo: 'Carnet' } },
       { path: 'horarios', element: <HorariosPage />, handle: { titulo: 'Horarios' } },
       {
@@ -49,5 +52,6 @@ export const router = createBrowserRouter([
       { path: 'comedor', element: <ComedorPage />, handle: { titulo: 'Comedor' } },
       { path: '*', element: <PaginaNoEncontrada />, handle: { titulo: 'Página no encontrada' } },
     ],
+
   },
 ])
