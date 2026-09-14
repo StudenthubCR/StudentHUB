@@ -148,8 +148,14 @@ export function ModalCrearEventoAgenda({
     }
 
     if (tipo === 'examen') {
-      const p = parseFloat(porcentaje)
-      if (!isNaN(p)) datosEvento.porcentaje = p
+      if (porcentaje.trim()) {
+        const p = parseFloat(porcentaje)
+        if (isNaN(p) || p < 0 || p > 100) {
+          setError('El porcentaje del examen debe ser un número entre 0% y 100%.')
+          return
+        }
+        datosEvento.porcentaje = Math.round(p * 10) / 10
+      }
       if (temarioTexto.trim()) {
         datosEvento.temario = temarioTexto
           .split('\n')

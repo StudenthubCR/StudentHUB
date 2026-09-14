@@ -127,6 +127,9 @@ export function MiniCalendarioAgenda({
                 if (seleccionado) {
                   alSeleccionarFecha(null)
                 } else {
+                  if (!esDelMes) {
+                    setMesActual(dia)
+                  }
                   alSeleccionarFecha(iso)
                 }
               }}

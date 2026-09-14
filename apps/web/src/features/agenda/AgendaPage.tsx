@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import {
+  IconoAgenda,
   IconoExamen,
   IconoProfesorAusente,
   IconoTarea,
@@ -56,6 +57,7 @@ export function AgendaPage() {
       tarea: eventos.filter((e) => e.tipo === 'tarea' && !e.completada).length,
       examen: eventos.filter((e) => e.tipo === 'examen').length,
       ausencia: eventos.filter((e) => e.tipo === 'ausencia_profesor').length,
+      recordatorio: eventos.filter((e) => e.tipo === 'recordatorio').length,
       completadas: eventos.filter((e) => e.tipo === 'tarea' && e.completada).length,
     }
   }, [eventos])
@@ -182,11 +184,28 @@ export function AgendaPage() {
 
           <button
             type="button"
+            onClick={() => setFiltro('recordatorio')}
+            className={cn(
+              'inline-flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1.5 text-micro font-bold transition-all',
+              filtro === 'recordatorio'
+                ? 'border-emerald-600 bg-emerald-600 text-white shadow-xs'
+                : 'border-border bg-surface text-text-muted hover:border-border-strong hover:text-text',
+            )}
+          >
+            <IconoAgenda className="size-3.5" />
+            <span>Avisos</span>
+            <span className={cn('rounded-full px-1.5 py-0.2 text-[10px]', filtro === 'recordatorio' ? 'bg-white/20 text-white' : 'bg-surface-alt text-text-muted')}>
+              {contadores.recordatorio}
+            </span>
+          </button>
+
+          <button
+            type="button"
             onClick={() => setFiltro('completadas')}
             className={cn(
               'inline-flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1.5 text-micro font-bold transition-all',
               filtro === 'completadas'
-                ? 'border-emerald-600 bg-emerald-600 text-white shadow-xs'
+                ? 'border-emerald-700 bg-emerald-700 text-white shadow-xs'
                 : 'border-border bg-surface text-text-muted hover:border-border-strong hover:text-text',
             )}
           >

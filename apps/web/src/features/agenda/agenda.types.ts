@@ -35,7 +35,7 @@ export type EventoAgenda = {
   sustituto?: string
 }
 
-export type FiltroAgenda = 'todos' | 'examen' | 'tarea' | 'ausencia_profesor' | 'completadas'
+export type FiltroAgenda = 'todos' | 'examen' | 'tarea' | 'ausencia_profesor' | 'recordatorio' | 'completadas'
 
 export type ResumenAgendaDia = {
   fecha: string

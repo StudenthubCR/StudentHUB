@@ -30,6 +30,7 @@ export function TarjetaCarnet({
   onToggleVoltear: onToggleExterna,
 }: Props) {
   const [volteadaInterna, setVolteadaInterna] = useState(false)
+  const [tilt, setTilt] = useState({ rotX: 0, rotY: 0, xPct: 50, yPct: 50, activo: false })
   const estaVolteada = volteadaExterna !== undefined ? volteadaExterna : volteadaInterna
   const alternarVoltear = () => {
     if (onToggleExterna) {
@@ -39,6 +40,25 @@ export function TarjetaCarnet({
     }
   }
 
+  const manejarMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!personalizacion.efecto3d) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const xPct = Math.max(0, Math.min(100, (x / rect.width) * 100))
+    const yPct = Math.max(0, Math.min(100, (y / rect.height) * 100))
+
+    // Rotación suave de +-10 grados
+    const rotY = ((x / rect.width) - 0.5) * 20
+    const rotX = -((y / rect.height) - 0.5) * 20
+
+    setTilt({ rotX, rotY, xPct, yPct, activo: true })
+  }
+
+  const manejarMouseLeave = () => {
+    setTilt({ rotX: 0, rotY: 0, xPct: 50, yPct: 50, activo: false })
+  }
+
   const tema = buscarTema(personalizacion.temaId)
   const insignia = resolverInsignia(personalizacion.insigniaId, estudiante.especialidad)
   const valorQR = `Nombre: ${estudiante.nombre}\nSección: ${estudiante.grupo}`
@@ -46,6 +66,20 @@ export function TarjetaCarnet({
   const tieneFotoReal = Boolean(
     estudiante.fotoUrl && !estudiante.fotoUrl.includes('placeholder'),
   )
+
+  // Reflejo holográfico dinámico que sigue el cursor en 3D
+  const renderizarReflejo = () => {
+    if (!personalizacion.efecto3d || !tilt.activo) return null
+    return (
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-30 opacity-40 mix-blend-color-dodge transition-opacity duration-150"
+        style={{
+          background: `radial-gradient(circle at ${tilt.xPct}% ${tilt.yPct}%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 60%)`,
+        }}
+      />
+    )
+  }
 
   // Capa común de textura o patrón de fondo
   const renderizarPatron = () => {
@@ -89,6 +123,8 @@ export function TarjetaCarnet({
 
   return (
     <div
+      onMouseMove={manejarMouseMove}
+      onMouseLeave={manejarMouseLeave}
       className="relative w-full max-w-[350px] select-none"
       style={{ perspective: '1200px' }}
     >
@@ -105,12 +141,12 @@ export function TarjetaCarnet({
         <span>{estaVolteada ? 'Ver Frente' : 'Ver Reverso'}</span>
       </button>
 
-      {/* Contenedor con rotación 3D Flip estable */}
+      {/* Contenedor con rotación 3D Flip estable + Tilt dinámico */}
       <div
-        className="relative w-full transition-transform duration-500 ease-ui"
+        className="relative w-full transition-transform duration-300 ease-out"
         style={{
           transformStyle: 'preserve-3d',
-          transform: `rotateY(${estaVolteada ? 180 : 0}deg)`,
+          transform: `rotateY(${estaVolteada ? 180 : 0}deg) rotateX(${tilt.activo && personalizacion.efecto3d ? tilt.rotX : 0}deg) rotateY(${tilt.activo && personalizacion.efecto3d ? (estaVolteada ? -tilt.rotY : tilt.rotY) : 0}deg)`,
         }}
       >
         {/* ========================================================= */}
@@ -133,6 +169,7 @@ export function TarjetaCarnet({
           }
         >
           {renderizarPatron()}
+          {renderizarReflejo()}
 
           {/* Cabecera institucional + Insignia técnica */}
           <header className="relative z-10 flex items-center justify-between border-b border-white/15 bg-white/10 px-4.5 py-3.5 backdrop-blur-sm">
@@ -254,6 +291,7 @@ export function TarjetaCarnet({
           }
         >
           {renderizarPatron()}
+          {renderizarReflejo()}
 
           {/* Franja superior imitación banda magnética / institucional */}
           <div className="relative z-10 border-b border-white/10 bg-black/40 px-5 py-2.5">

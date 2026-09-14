@@ -111,6 +111,9 @@ export function useAgenda(fechaReferencia: Date = new Date()) {
       case 'ausencia_profesor':
         resultado = resultado.filter((e) => e.tipo === 'ausencia_profesor')
         break
+      case 'recordatorio':
+        resultado = resultado.filter((e) => e.tipo === 'recordatorio')
+        break
       case 'completadas':
         resultado = resultado.filter((e) => e.tipo === 'tarea' && e.completada)
         break
