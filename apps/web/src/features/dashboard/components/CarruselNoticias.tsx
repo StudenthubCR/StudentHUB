@@ -74,13 +74,13 @@ export function CarruselNoticias({ noticias }: { noticias: Noticia[] }) {
         else anterior()
       }}
       className={
-        'relative w-full overflow-hidden rounded-lg border border-border bg-surface elev-md ' +
-        'md:mx-auto md:max-w-[440px] lg:max-w-[430px] xl:mx-0'
+        'relative w-full overflow-hidden rounded-2xl border border-border bg-surface elev-md ' +
+        'md:mx-auto md:max-w-[500px] xl:max-w-[430px] xl:mx-0'
       }
     >
-      {/* Las imágenes son cuadradas (1024×1024). Fijar la proporción evita que
-          la página salte mientras cargan. */}
-      <div className="relative aspect-square w-full touch-pan-y">
+      {/* En móvil usamos proporción panorámica 16:9 para no desplazar las clases;
+          en escritorio grande (xl) vuelve a su formato para la columna lateral. */}
+      <div className="relative aspect-[16/9] sm:aspect-[2/1] xl:aspect-square w-full touch-pan-y">
         {noticias.map((noticia, indice) => (
           <figure
             key={noticia.id}
@@ -103,10 +103,10 @@ export function CarruselNoticias({ noticias }: { noticias: Noticia[] }) {
             />
             <figcaption
               className={
-                'absolute right-3 bottom-10 left-3 flex items-center justify-center rounded-md ' +
-                'border border-white/15 bg-[rgba(12,21,56,0.72)] px-4 py-2.5 text-center ' +
-                'text-dato font-bold tracking-[0.2px] text-white backdrop-blur-[14px] ' +
-                'shadow-[0_8px_24px_rgba(0,0,0,0.35)] md:text-cuerpo'
+                'absolute right-3 bottom-8 left-3 flex items-center justify-center rounded-xl ' +
+                'border border-white/15 bg-[rgba(12,21,56,0.78)] px-3.5 py-1.5 text-center ' +
+                'text-micro sm:text-dato font-bold tracking-[0.2px] text-white backdrop-blur-[14px] ' +
+                'shadow-sm truncate'
               }
             >
               {noticia.titulo}
@@ -117,14 +117,14 @@ export function CarruselNoticias({ noticias }: { noticias: Noticia[] }) {
 
       {total > 1 && (
         <>
-          <button type="button" onClick={anterior} aria-label="Noticia anterior" className={cn(BOTON, 'left-3')}>
-            <IconoChevron hacia="izquierda" className="size-5" />
+          <button type="button" onClick={anterior} aria-label="Noticia anterior" className={cn(BOTON, 'left-2.5 sm:left-3')}>
+            <IconoChevron hacia="izquierda" className="size-4 sm:size-5" />
           </button>
-          <button type="button" onClick={siguiente} aria-label="Noticia siguiente" className={cn(BOTON, 'right-3')}>
-            <IconoChevron hacia="derecha" className="size-5" />
+          <button type="button" onClick={siguiente} aria-label="Noticia siguiente" className={cn(BOTON, 'right-2.5 sm:right-3')}>
+            <IconoChevron hacia="derecha" className="size-4 sm:size-5" />
           </button>
 
-          <div className="absolute inset-x-0 bottom-3 z-10 flex items-center justify-center gap-[7px]">
+          <div className="absolute inset-x-0 bottom-2.5 z-10 flex items-center justify-center gap-[6px]">
             {noticias.map((noticia, indice) => (
               <button
                 key={noticia.id}
@@ -133,9 +133,9 @@ export function CarruselNoticias({ noticias }: { noticias: Noticia[] }) {
                 aria-label={`Ir a la noticia ${indice + 1} de ${total}`}
                 aria-current={indice === actual}
                 className={cn(
-                  'h-[7px] cursor-pointer rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.45)]',
+                  'h-[6px] cursor-pointer rounded-full shadow-[0_1px_3px_rgba(0,0,0,0.45)]',
                   'transition-[width,background-color] duration-350 ease-soft',
-                  indice === actual ? 'w-[22px] bg-white' : 'w-[7px] bg-white/50',
+                  indice === actual ? 'w-[20px] bg-white' : 'w-[6px] bg-white/50',
                 )}
               />
             ))}

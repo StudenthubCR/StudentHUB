@@ -29,7 +29,6 @@ export function AgendaPage() {
     modificarEvento,
     borrarEvento,
     toggleCompletada,
-    restaurarMuestras,
   } = useAgenda()
 
   const [busqueda, setBusqueda] = useState('')
@@ -247,17 +246,6 @@ export function AgendaPage() {
               className="w-full rounded-xl border border-amber-500/30 bg-amber-500/15 py-1.5 text-micro font-bold text-amber-800 dark:text-amber-200 hover:bg-amber-500/25 transition-colors"
             >
               Reportar ausencia docente
-            </button>
-          </div>
-
-          {/* Restaurar datos de ejemplo */}
-          <div className="text-center pt-1">
-            <button
-              type="button"
-              onClick={restaurarMuestras}
-              className="text-micro font-medium text-text-muted hover:text-text hover:underline"
-            >
-              Restablecer ejemplos de prueba
             </button>
           </div>
         </aside>

@@ -84,31 +84,34 @@ export function generarEventosSemilla(fechaReferencia: Date = new Date()): Event
 
 /**
  * Lee los eventos guardados en localStorage.
- * Si no existen, inicializa los datos semilla.
+ * Por defecto la agenda inicia vacía (sin placeholders ficticios).
+ * Además, purga cualquier evento semilla anterior para limpiar el estado del usuario.
  */
 export function obtenerEventos(): EventoAgenda[] {
   if (typeof window === 'undefined') {
-    return generarEventosSemilla()
+    return []
   }
 
   try {
     const data = localStorage.getItem(STORAGE_KEY_AGENDA)
     if (!data) {
-      const semillas = generarEventosSemilla()
-      guardarEnStorage(semillas)
-      return semillas
+      return []
     }
 
     const parseados: EventoAgenda[] = JSON.parse(data)
     if (!Array.isArray(parseados)) {
-      const semillas = generarEventosSemilla()
-      guardarEnStorage(semillas)
-      return semillas
+      return []
     }
 
-    return parseados
+    // Purgar cualquier placeholder de prueba anterior ('semilla-*')
+    const limpios = parseados.filter((e) => !e.id?.startsWith('semilla-'))
+    if (limpios.length !== parseados.length) {
+      guardarEnStorage(limpios)
+    }
+
+    return limpios
   } catch {
-    return generarEventosSemilla()
+    return []
   }
 }
 
@@ -176,11 +179,30 @@ export function alternarCompletadoTarea(id: string): EventoAgenda | null {
   })
 }
 
-/** Restablece los eventos a las muestras predeterminadas */
+/** Restablece los eventos para pruebas unitarias */
 export function reiniciarEventosEjemplo(): EventoAgenda[] {
-  const semillas = generarEventosSemilla()
-  guardarEnStorage(semillas)
-  return semillas
+  const muestras: EventoAgenda[] = [
+    {
+      id: 'test-tarea-1',
+      tipo: 'tarea',
+      titulo: 'Práctica de clase',
+      materia: 'Matemática',
+      fecha: new Date().toISOString().slice(0, 10),
+      completada: false,
+      creadoEn: new Date().toISOString(),
+    },
+    {
+      id: 'test-examen-1',
+      tipo: 'examen',
+      titulo: 'Examen de prueba',
+      materia: 'Ciencias',
+      fecha: new Date().toISOString().slice(0, 10),
+      porcentaje: 20,
+      creadoEn: new Date().toISOString(),
+    },
+  ]
+  guardarEnStorage(muestras)
+  return muestras
 }
 
 /** Obtiene los eventos para una fecha específica (formato YYYY-MM-DD) */

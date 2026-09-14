@@ -52,67 +52,64 @@ export function WidgetAgendaDashboard() {
           </div>
         </div>
 
-        {/* ALERTA CRÍTICA: Ausencia de profesor hoy */}
+        {/* ALERTA CRÍTICA: Ausencia de profesor hoy (compacta y directa) */}
         {ausenciasHoy.length > 0 && (
-          <div className="mb-3.5 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 shadow-xs">
-            <div className="flex items-start gap-2.5">
-              <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-white mt-0.5">
-                <IconoProfesorAusente className="size-4" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-menor font-bold text-amber-900 dark:text-amber-200">
-                  Aviso: {ausenciasHoy[0].profesor || 'Docente ausente'} hoy
-                </p>
-                <p className="text-micro font-medium text-amber-800/80 dark:text-amber-300">
-                  {ausenciasHoy[0].materia} · {ausenciasHoy[0].bloqueAfectado || 'Lecciones libres'}
-                </p>
-                {ausenciasHoy[0].indicacion && (
-                  <p className="mt-1 text-micro text-amber-900 dark:text-amber-200/90 font-medium">
-                    📌 {ausenciasHoy[0].indicacion}
-                  </p>
-                )}
-              </div>
+          <div className="mb-3 flex items-center gap-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-amber-900 dark:text-amber-200">
+            <span className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-white">
+              <IconoProfesorAusente className="size-3.5" />
+            </span>
+            <div className="min-w-0 flex-1 truncate text-micro">
+              <span className="font-bold">Docente ausente hoy: </span>
+              <span>{ausenciasHoy[0].profesor || 'Profesor'} ({ausenciasHoy[0].materia})</span>
+              {ausenciasHoy[0].indicacion && (
+                <span className="ml-1 text-amber-800/80 dark:text-amber-300">· {ausenciasHoy[0].indicacion}</span>
+              )}
             </div>
           </div>
         )}
 
-        {/* Resumen rápido de pendientes */}
-        <div className="mb-3 grid grid-cols-3 gap-2 rounded-xl bg-surface-alt/70 p-2 text-center">
-          <div className="p-1">
-            <p className="text-titulo font-bold text-primary leading-tight">
-              {resumenHoy.tareasPendientes.length}
-            </p>
-            <p className="text-micro font-semibold text-text-muted">Para hoy</p>
-          </div>
-          <div className="border-x border-border p-1">
-            <p className="text-titulo font-bold text-rose-600 dark:text-rose-400 leading-tight">
-              {proximos.filter((e) => e.tipo === 'examen').length}
-            </p>
-            <p className="text-micro font-semibold text-text-muted">Exámenes</p>
-          </div>
-          <div className="p-1">
-            <p className="text-titulo font-bold text-amber-600 dark:text-amber-400 leading-tight">
-              {proximos.filter((e) => e.tipo === 'ausencia_profesor').length}
-            </p>
-            <p className="text-micro font-semibold text-text-muted">Ausencias</p>
-          </div>
-        </div>
+        {/* Resumen en chips discretos: sólo visible si hay pendientes activos */}
+        {(resumenHoy.tareasPendientes.length > 0 ||
+          proximos.filter((e) => e.tipo === 'examen').length > 0 ||
+          proximos.filter((e) => e.tipo === 'ausencia_profesor').length > 0) && (
+          <div className="mb-2.5 flex flex-wrap items-center gap-1.5 text-micro">
+            {resumenHoy.tareasPendientes.length > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-primary-tint px-2.5 py-1 font-bold text-primary">
+                <span>📝 {resumenHoy.tareasPendientes.length} para hoy</span>
+              </span>
+            )}
 
-        {/* Lista corta de los próximos eventos */}
-        <div className="space-y-2">
+            {proximos.filter((e) => e.tipo === 'examen').length > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-rose-500/10 px-2.5 py-1 font-bold text-rose-600 dark:text-rose-400">
+                <span>🎯 {proximos.filter((e) => e.tipo === 'examen').length} {proximos.filter((e) => e.tipo === 'examen').length === 1 ? 'examen' : 'exámenes'}</span>
+              </span>
+            )}
+
+            {proximos.filter((e) => e.tipo === 'ausencia_profesor').length > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-lg bg-amber-500/10 px-2.5 py-1 font-bold text-amber-600 dark:text-amber-400">
+                <span>⚠️ {proximos.filter((e) => e.tipo === 'ausencia_profesor').length} ausencias</span>
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Lista compacta: sólo hasta 2 eventos más inmediatos */}
+        <div className="space-y-1.5">
           {eventosInminentes.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border py-4 text-center">
-              <p className="text-menor text-text-muted">No tenés eventos próximos anotados.</p>
-              <button
-                type="button"
-                onClick={() => setModalAbierto(true)}
-                className="mt-1 text-micro font-bold text-primary hover:underline"
-              >
-                + Anotar una tarea o examen
-              </button>
+            <div className="rounded-xl border border-dashed border-border py-2.5 px-3 text-center">
+              <p className="text-micro text-text-muted">
+                No tenés pendientes urgentes.{' '}
+                <button
+                  type="button"
+                  onClick={() => setModalAbierto(true)}
+                  className="font-bold text-primary hover:underline"
+                >
+                  + Anotar tarea o examen
+                </button>
+              </p>
             </div>
           ) : (
-            eventosInminentes.map((ev) => {
+            eventosInminentes.slice(0, 2).map((ev) => {
               const colores = obtenerColoresTipo(ev.tipo)
               const fechaRel = formatearFechaRelativa(ev.fecha)
               const esTarea = ev.tipo === 'tarea'
@@ -122,7 +119,7 @@ export function WidgetAgendaDashboard() {
                 <div
                   key={ev.id}
                   className={cn(
-                    'flex items-center justify-between gap-2.5 rounded-xl border border-border p-2.5 transition-all',
+                    'flex items-center justify-between gap-2.5 rounded-xl border border-border px-3 py-2 transition-all',
                     colores.borde,
                     'border-l-3',
                     esCompletada && 'opacity-60 line-through bg-surface-alt/50',
@@ -134,7 +131,7 @@ export function WidgetAgendaDashboard() {
                         type="button"
                         onClick={() => toggleCompletada(ev.id)}
                         className={cn(
-                          'flex size-5 shrink-0 items-center justify-center rounded-md border transition-all',
+                          'flex size-4.5 shrink-0 items-center justify-center rounded-md border transition-all',
                           esCompletada
                             ? 'bg-emerald-500 border-emerald-500 text-white'
                             : 'border-border-strong hover:border-primary',
@@ -142,36 +139,36 @@ export function WidgetAgendaDashboard() {
                         aria-label="Alternar tarea"
                       >
                         {esCompletada && (
-                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" className="size-3">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" className="size-2.5">
                             <polyline points="20 6 9 17 4 12" />
                           </svg>
                         )}
                       </button>
                     ) : ev.tipo === 'examen' ? (
-                      <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-rose-500/10 text-rose-600">
-                        <IconoExamen className="size-3.5" />
+                      <span className="flex size-4.5 shrink-0 items-center justify-center rounded-md bg-rose-500/10 text-rose-600">
+                        <IconoExamen className="size-3" />
                       </span>
                     ) : ev.tipo === 'ausencia_profesor' ? (
-                      <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-amber-500/15 text-amber-600">
-                        <IconoProfesorAusente className="size-3.5" />
+                      <span className="flex size-4.5 shrink-0 items-center justify-center rounded-md bg-amber-500/15 text-amber-600">
+                        <IconoProfesorAusente className="size-3" />
                       </span>
                     ) : (
-                      <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-600">
-                        <IconoAgenda className="size-3.5" />
+                      <span className="flex size-4.5 shrink-0 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-600">
+                        <IconoAgenda className="size-3" />
                       </span>
                     )}
 
                     <div className="min-w-0">
-                      <p className="text-dato font-bold text-text truncate leading-snug">
+                      <p className="text-micro sm:text-dato font-bold text-text truncate leading-tight">
                         {ev.titulo}
                       </p>
-                      <p className="text-micro text-text-muted truncate">
+                      <p className="text-[11px] text-text-muted truncate">
                         {ev.materia} {ev.hora ? `· ${ev.hora}` : ''}
                       </p>
                     </div>
                   </div>
 
-                  <span className="shrink-0 rounded-lg bg-surface-alt px-2 py-0.5 text-micro font-bold text-text">
+                  <span className="shrink-0 rounded-md bg-surface-alt px-1.5 py-0.5 text-[11px] font-bold text-text">
                     {fechaRel}
                   </span>
                 </div>

@@ -52,34 +52,35 @@ export function DashboardPage() {
       </header>
 
       {/* Banner de bienvenida para Notificaciones:
-          Aparece en la pantalla principal sólo cuando el estudiante aún no ha
-          configurado ni bloqueado las notificaciones, ofreciendo acceso rápido. */}
+          Barra compacta y discreta que no satura la pantalla en móvil. */}
       {!notificacionesActivas && permiso !== 'denied' && !bannerOculto && (
-        <div className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary-tint/50 p-4 shadow-xs">
-          <div className="flex items-center gap-3">
-            <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-xs">
-              <BellIcon size={20} />
+        <div className="mb-4 sm:mb-6 flex items-center justify-between gap-2.5 rounded-2xl border border-primary/20 bg-primary-tint/40 px-3.5 py-2.5 sm:p-3.5 shadow-xs">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <span className="flex size-7.5 sm:size-8.5 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-xs">
+              <BellIcon size={16} />
             </span>
-            <div>
-              <p className="font-bold text-menor text-text">Activá las notificaciones estudiantiles</p>
-              <p className="text-micro text-text-muted">
-                Enterate del almuerzo diario, recordatorios de clases y eventos del colegio.
+            <div className="min-w-0">
+              <p className="truncate text-micro sm:text-menor font-bold text-text">
+                Activá notificaciones para avisos y almuerzo
+              </p>
+              <p className="hidden text-[11px] text-text-muted sm:block">
+                Enterate del menú diario, recordatorios y ausencias docentes.
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5">
             <button
               type="button"
               onClick={() => setModalNotifAbierto(true)}
-              className="shrink-0 cursor-pointer rounded-xl bg-primary px-3.5 py-1.5 text-micro font-bold text-white shadow-xs transition-all hover:bg-primary-dark active:scale-95"
+              className="cursor-pointer rounded-xl bg-primary px-3 py-1 text-micro font-bold text-white shadow-xs transition-all hover:bg-primary-dark active:scale-95"
             >
-              Configurar
+              Activar
             </button>
             <button
               type="button"
               onClick={() => setBannerOculto(true)}
               aria-label="Ocultar aviso de notificaciones"
-              className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-border/40 hover:text-text"
+              className="flex size-6 cursor-pointer items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-border/40 hover:text-text"
             >
               ✕
             </button>
@@ -87,17 +88,12 @@ export function DashboardPage() {
         </div>
       )}
 
-      {/* Las noticias van primero. En pantalla ancha se quedan en su propia
-          columna, más angosta, para no empujar el día hacia abajo. */}
-      <div className="xl:grid xl:grid-cols-[1fr_1.35fr] xl:items-start xl:gap-7.5">
-        <section className="mb-7 xl:mb-0">
-          <h2 className="mb-3 text-etiqueta font-bold tracking-[0.09em] text-text-muted uppercase">
-            Noticias
-          </h2>
-          <CarruselNoticias noticias={NOTICIAS} />
-        </section>
-
-        <div>
+      {/* En móvil: primero la rutina diaria del estudiante (Clase, Agenda, Almuerzo)
+          y al final las Noticias en formato banner panorámico.
+          En pantallas de escritorio (xl): distribución en 2 columnas paralelas. */}
+      <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[1fr_1.35fr] xl:items-start xl:gap-7.5">
+        {/* Columna de rutina escolar (orden 1 en móvil, columna derecha en xl) */}
+        <div className="order-1 xl:order-2 flex flex-col gap-3.5">
           <ClaseAhora
             dia={diaDeHoy}
             ahora={ahora}
@@ -112,8 +108,20 @@ export function DashboardPage() {
             cargando={comedor.cargando}
             hayError={Boolean(comedor.error)}
           />
-
         </div>
+
+        {/* Columna de Noticias (orden 2 en móvil, columna izquierda en xl) */}
+        <section className="order-2 xl:order-1 mt-1 xl:mt-0">
+          <div className="flex items-center justify-between mb-2.5 px-0.5">
+            <h2 className="text-etiqueta font-bold tracking-[0.09em] text-text-muted uppercase">
+              Noticias del CTP
+            </h2>
+            <span className="text-[11px] font-semibold text-text-muted">
+              Actualizaciones
+            </span>
+          </div>
+          <CarruselNoticias noticias={NOTICIAS} />
+        </section>
       </div>
 
       <ModalNotificaciones
