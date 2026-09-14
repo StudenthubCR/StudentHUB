@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import {
   IconoCalendario,
-  IconoCerrar,
   IconoExamen,
   IconoProfesorAusente,
   IconoReloj,
   IconoTarea,
+  TrashIcon,
 } from '@/components/icons'
+
 import type { EventoAgenda } from '../agenda.types'
 import { formatearFechaRelativa, obtenerColoresTipo, obtenerEtiquetaTipo } from '../agenda.service'
 import { cn } from '@/lib/cn'
@@ -116,9 +117,10 @@ export function TarjetaEventoAgenda({
               aria-label="Eliminar de la agenda"
               className="flex size-7 items-center justify-center rounded-lg text-text-muted hover:bg-rose-500/10 hover:text-rose-600 transition-colors"
             >
-              <IconoCerrar className="size-3.5" />
+              <TrashIcon size={16} />
             </button>
           )}
+
         </div>
       </div>
 

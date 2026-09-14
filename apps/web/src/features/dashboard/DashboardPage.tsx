@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { IconoCampana } from '@/components/icons'
+import { BellIcon } from '@/components/icons'
+
 import { estadoDelDia, nombreLargoDeFecha } from '@/features/comedor/menu.service'
 import { useMenuSemanal } from '@/features/comedor/useMenuSemanal'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
@@ -57,7 +58,7 @@ export function DashboardPage() {
         <div className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary-tint/50 p-4 shadow-xs">
           <div className="flex items-center gap-3">
             <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-xs">
-              <IconoCampana className="size-4.5" />
+              <BellIcon size={20} />
             </span>
             <div>
               <p className="font-bold text-menor text-text">Activá las notificaciones estudiantiles</p>

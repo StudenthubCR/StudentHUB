@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { format } from 'date-fns'
 import {
   IconoAgenda,
@@ -99,7 +100,22 @@ export function ModalCrearEventoAgenda({
     setError(null)
   }, [eventoParaEditar, fechaInicial, abierto])
 
-  if (!abierto) return null
+  // Bloquear scroll del fondo y escuchar tecla Escape
+  useEffect(() => {
+    if (!abierto) return
+    const scrollOriginal = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const manejarTecla = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') alCerrar()
+    }
+    window.addEventListener('keydown', manejarTecla)
+
+    return () => {
+      document.body.style.overflow = scrollOriginal
+      window.removeEventListener('keydown', manejarTecla)
+    }
+  }, [abierto, alCerrar])
 
   const manejarEnvio = (e: React.FormEvent) => {
     e.preventDefault()
@@ -159,13 +175,21 @@ export function ModalCrearEventoAgenda({
     alCerrar()
   }
 
-  return (
+  if (!abierto) return null
+  if (typeof document === 'undefined') return null
+
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in"
+      aria-label={eventoParaEditar ? 'Editar Registro' : 'Nuevo en la Agenda'}
+      onClick={alCerrar}
+      className="fixed inset-0 z-[10000] flex items-center justify-center p-3.5 sm:p-6 bg-black/75 backdrop-blur-md animate-fade-in"
     >
-      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-border bg-surface p-5 md:p-6 shadow-xl">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-lg max-h-[88vh] sm:max-h-[85vh] overflow-y-auto rounded-2xl sm:rounded-3xl border border-border bg-surface p-5 sm:p-6 shadow-2xl animate-slide-up"
+      >
         {/* Cabecera del modal */}
         <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
           <div className="flex items-center gap-2.5">
@@ -504,6 +528,7 @@ export function ModalCrearEventoAgenda({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

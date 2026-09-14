@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
 import {
-  IconoAgenda,
   IconoExamen,
   IconoProfesorAusente,
   IconoTarea,
+  MagnifyingGlassIcon,
+  BackpackIcon,
 } from '@/components/icons'
+
 import { useAgenda } from './useAgenda'
 import { MiniCalendarioAgenda } from './components/MiniCalendarioAgenda'
 import { TarjetaEventoAgenda } from './components/TarjetaEventoAgenda'
@@ -104,19 +106,9 @@ export function AgendaPage() {
             placeholder="Buscar por materia, título o nombre del profesor..."
             className="w-full rounded-xl border border-border bg-surface px-4 py-2.5 pl-10 text-dato text-text placeholder:text-text-muted/70 shadow-xs focus:border-primary focus:outline-none"
           />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-text-muted"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.3-4.3" />
-          </svg>
+          <div className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted">
+            <MagnifyingGlassIcon size={18} />
+          </div>
         </div>
 
         {/* Píldoras de Filtros */}
@@ -280,8 +272,8 @@ export function AgendaPage() {
           {/* Lista de tarjetas */}
           {eventosVisibles.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border bg-surface/50 p-8 text-center">
-              <span className="mx-auto mb-2 flex size-12 items-center justify-center rounded-2xl bg-surface-alt text-text-muted">
-                <IconoAgenda className="size-6" />
+              <span className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl bg-surface-alt text-primary shadow-xs">
+                <BackpackIcon size={34} />
               </span>
               <h3 className="text-dato font-bold text-text mb-1">
                 No hay actividades registradas

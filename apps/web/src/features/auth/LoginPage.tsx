@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Navigate, useNavigate, useLocation, Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
-import { cn } from '@/lib/cn'
 import {
   IconoCalendario,
   IconoCarnet,
@@ -15,6 +14,7 @@ import {
 import { ThemeToggle } from '@/app/layout/ThemeToggle'
 import { usePwaInstall } from '@/features/pwa/usePwaInstall'
 import { ModalInstalarApp } from '@/features/pwa/ModalInstalarApp'
+import { OtpInput } from '@/components/ui/otp-input'
 import {
   LARGO_MAXIMO,
   codigoCompleto,
@@ -107,15 +107,18 @@ export function LoginPage() {
   )
 
   const verificar = useCallback(
-    async (evento: React.FormEvent) => {
-      evento.preventDefault()
+    async (evento?: React.FormEvent, codigoDirecto?: string) => {
+      evento?.preventDefault()
       if (paso.nombre !== 'codigo') return
+
+      const tokenAUsar = soloDigitos(codigoDirecto || codigo)
+      if (!codigoCompleto(tokenAUsar)) return
 
       setEnviando(true)
       setError(null)
       const { error: fallo } = await supabase.auth.verifyOtp({
         email: paso.correo,
-        token: soloDigitos(codigo),
+        token: tokenAUsar,
         type: 'email',
       })
       setEnviando(false)
@@ -353,28 +356,29 @@ export function LoginPage() {
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="codigo"
-                    className="mb-2 flex items-center gap-1.5 text-etiqueta font-bold tracking-[0.08em] text-text-muted uppercase"
-                  >
-                    <IconoCandado className="size-3.5 text-primary" />
-                    <span>Código de 6 dígitos</span>
-                  </label>
-                  <input
-                    id="codigo"
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="one-time-code"
-                    autoFocus
-                    value={codigo}
-                    onChange={(e) => {
-                      setCodigo(soloDigitos(e.target.value))
-                      if (error) setError(null)
-                    }}
-                    placeholder="000000"
-                    maxLength={LARGO_MAXIMO}
-                    className={cn(CAMPO, 'text-center text-titulo font-bold tracking-[0.35em]')}
-                  />
+                  <div className="mb-2 flex items-center justify-between text-etiqueta font-bold tracking-[0.08em] text-text-muted uppercase">
+                    <span className="flex items-center gap-1.5">
+                      <IconoCandado className="size-3.5 text-primary" />
+                      <span>Código de 6 dígitos</span>
+                    </span>
+                    <span className="text-micro font-semibold lowercase text-text-muted">
+                      {codigo.length}/6 dígitos
+                    </span>
+                  </div>
+                  <div className="flex justify-center py-2">
+                    <OtpInput
+                      length={LARGO_MAXIMO}
+                      value={codigo}
+                      onChange={(val) => {
+                        setCodigo(val)
+                        if (error) setError(null)
+                      }}
+                      onComplete={(val) => void verificar(undefined, val)}
+                      status={error ? 'error' : codigo.length === LARGO_MAXIMO ? 'success' : 'idle'}
+                      disabled={enviando}
+                      autoFocus
+                    />
+                  </div>
                 </div>
 
                 {error && (

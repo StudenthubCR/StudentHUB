@@ -513,3 +513,9 @@ export function IconoProfesorAusente(props: Props) {
   )
 }
 
+/**
+ * Colección de iconos animados con física de resortes de Iconimate (https://iconimate.app/).
+ */
+export * from './iconimate'
+
+

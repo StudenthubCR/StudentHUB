@@ -10,8 +10,9 @@
 
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { IconoCerrar, IconoCampana, IconoCalendario } from '@/components/icons'
+import { IconoCerrar, BellIcon, IconoCalendario } from '@/components/icons'
 import { useNotificaciones } from './useNotificaciones'
+
 
 type Props = {
   abierto: boolean
@@ -68,7 +69,7 @@ export function ModalNotificaciones({ abierto, alCerrar }: Props) {
         {/* Encabezado */}
         <div className="flex items-center gap-3.5 mb-5">
           <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary-tint text-primary shadow-xs">
-            <IconoCampana className="size-6" />
+            <BellIcon size={24} />
           </div>
           <div>
             <h2 className="text-titulo font-bold tracking-tight text-text">
@@ -104,7 +105,7 @@ export function ModalNotificaciones({ abierto, alCerrar }: Props) {
               disabled={cargando}
               className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-menor font-bold text-white shadow-xs transition-all hover:bg-primary-dark active:scale-95 disabled:opacity-50"
             >
-              <IconoCampana className="size-4" />
+              <BellIcon size={18} />
               <span>{cargando ? 'Solicitando...' : 'Activar Notificaciones'}</span>
             </button>
           </div>
