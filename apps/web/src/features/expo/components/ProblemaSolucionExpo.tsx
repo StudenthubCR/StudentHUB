@@ -67,6 +67,28 @@ export function ProblemaSolucionExpo() {
       },
     },
     {
+      titulo: 'Agenda & Avisos Docentes',
+      icono: '📝',
+      problema: {
+        etiqueta: 'Modelo Tradicional',
+        puntos: [
+          'Avisos de docentes ausentes pegados en papel tarde en el día',
+          'Estudiantes que viajan kilómetros en bus para toparse con horas libres',
+          'Fechas de tareas y exámenes anotadas en cuadernos que se pierden',
+          'Falta de recordatorios oportunos para proyectos técnicos',
+        ],
+      },
+      solucion: {
+        etiqueta: 'Con Student HUB',
+        puntos: [
+          'Alertas en vivo de profesores ausentes con guía de trabajo autónomo',
+          'Planificación previa de horas libres y tiempos de estudio',
+          'Calendario de exámenes con cuenta regresiva en días',
+          'Checklist interactivo de entregas disponible 100% offline',
+        ],
+      },
+    },
+    {
       titulo: 'Conectividad y Redes',
       icono: '📡',
       problema: {

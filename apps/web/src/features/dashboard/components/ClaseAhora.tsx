@@ -14,11 +14,35 @@ type Estado =
 function estadoDe(dia: DiaDeClases | null, ahora: Date, cargando: boolean, hayError: boolean): Estado {
   if (cargando) return { tipo: 'cargando' }
   if (hayError) return { tipo: 'error' }
-  if (!dia) return { tipo: 'sin-clases' }
+
+  const esModoDemo = typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true'
+
+  if (!dia) {
+    if (esModoDemo) {
+      return {
+        tipo: 'bloque',
+        enCurso: true,
+        bloque: {
+          materia: 'Desarrollo Web Frontend',
+          inicio: '09:30',
+          fin: '11:15',
+          lecciones: 2,
+          esReceso: false,
+          docente: 'Lic. Erick García',
+        },
+      }
+    }
+    return { tipo: 'sin-clases' }
+  }
 
   const { actual, siguiente } = progresoDelDia(dia.bloques, ahoraEnMinutos(ahora))
   if (actual !== null) return { tipo: 'bloque', bloque: dia.bloques[actual]!, enCurso: true }
   if (siguiente !== null) return { tipo: 'bloque', bloque: dia.bloques[siguiente]!, enCurso: false }
+
+  if (esModoDemo && dia.bloques.length > 0) {
+    return { tipo: 'bloque', bloque: dia.bloques[0]!, enCurso: true }
+  }
+
   return { tipo: 'termino' }
 }
 

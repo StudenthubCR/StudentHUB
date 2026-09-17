@@ -80,6 +80,16 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
         </button>
 
 
+        {typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true' && (
+          <Link
+            to="/expo"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-primary-tint border border-primary/30 px-3 py-1 text-etiqueta font-bold text-primary hover:bg-primary-tint-strong transition-all shadow-2xs active:scale-95"
+            title="Volver al portal interactivo de Expotécnica 2026"
+          >
+            <span>🚀 Portal Expo</span>
+          </Link>
+        )}
+
         <ThemeToggle />
 
         {sesion && (

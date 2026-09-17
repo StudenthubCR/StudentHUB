@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTheme } from '@/app/use-theme'
-import { IconoSol, IconoLuna, IconoFlechaDerecha, IconoDescargar } from '@/components/icons'
+import { IconoSol, IconoLuna, IconoDescargar } from '@/components/icons'
 
 type Props = {
   onAbrirInstalar?: () => void
@@ -21,51 +21,63 @@ export function ExpoNavbar({ onAbrirInstalar }: Props) {
   }, [])
 
   const navLinks = [
-    { href: '#tecnologias', label: 'Tecnologías' },
     { href: '#simulador', label: 'Simulador 3D' },
-    { href: '#problema', label: 'Problema vs Solución' },
     { href: '#modulos', label: 'Módulos' },
+    { href: '#problema', label: 'Problema vs Solución' },
     { href: '#ficha-tecnica', label: 'Ficha Técnica' },
+    { href: '#rubrica', label: 'Rúbrica Jueces' },
     { href: '#stand-qr', label: 'Escanear QR' },
   ]
+
+  const entrarModoDemo = () => {
+    localStorage.setItem('studenthub_demo_sesion', 'true')
+    window.location.href = '/'
+  }
 
   return (
     <header
       className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
         hizoScroll
-          ? 'border-b border-border/40 bg-surface/85 shadow-sm backdrop-blur-md'
+          ? 'border-b border-border/60 bg-surface/85 shadow-md backdrop-blur-xl'
           : 'bg-transparent'
       }`}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-        {/* Logo */}
-        <a href="#hero" className="flex items-center gap-2 group">
-          <div className="relative flex h-10 w-36 items-center overflow-hidden">
-            <img
-              src="/SHlarge.webp"
-              alt="Student HUB"
-              className="absolute top-1/2 left-[-35px] h-32 w-auto -translate-y-1/2 object-contain transition-transform duration-300 group-hover:scale-105 dark:brightness-0 dark:invert"
-            />
-          </div>
-          <span className="hidden sm:inline-block rounded-full bg-primary-tint border border-primary/25 px-2.5 py-0.5 text-micro font-bold tracking-wider text-primary uppercase">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        {/* Logo con espaciado balanceado */}
+        <div className="flex items-center gap-3">
+          <a href="#hero" className="flex items-center group">
+            <div className="relative flex h-10 w-28 sm:w-32 items-center overflow-hidden">
+              <img
+                src="/SHlarge.webp"
+                alt="Student HUB"
+                className="absolute top-1/2 left-[-30px] h-32 w-auto -translate-y-1/2 object-contain transition-transform duration-300 group-hover:scale-105 dark:brightness-0 dark:invert"
+              />
+            </div>
+          </a>
+          <span className="inline-flex items-center gap-1 rounded-md bg-primary-tint border border-primary/25 px-2 py-0.5 text-[10px] font-black tracking-widest text-primary uppercase shadow-2xs">
+            <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
             Expo 2026
           </span>
-        </a>
+        </div>
 
-        {/* Links de escritorio */}
-        <nav className="hidden md:flex items-center gap-6 text-nota font-medium text-text-muted">
+        {/* Links de navegación en escritorio con hover tipo píldora */}
+        <nav className="hidden xl:flex items-center gap-1 text-nota font-semibold text-text-muted">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="transition-colors duration-150 hover:text-primary active:scale-98"
+              className={`px-3 py-1.5 rounded-full transition-all duration-150 hover:text-primary hover:bg-surface-alt/80 active:scale-95 ${
+                link.href === '#rubrica'
+                  ? 'text-primary font-bold bg-primary-tint/30'
+                  : ''
+              }`}
             >
               {link.label}
             </a>
           ))}
         </nav>
 
-        {/* Acciones: Modo Oscuro, Instalar y Entrar */}
+        {/* Acciones: Modo Oscuro, Instalar, Botón Juez y Entrar */}
         <div className="flex items-center gap-2 sm:gap-3">
           <button
             type="button"
@@ -81,26 +93,35 @@ export function ExpoNavbar({ onAbrirInstalar }: Props) {
             <button
               type="button"
               onClick={onAbrirInstalar}
-              className="hidden sm:flex cursor-pointer items-center gap-1.5 rounded-full border border-primary/30 bg-primary-tint px-3 py-1.5 text-etiqueta font-semibold text-primary transition-all duration-200 hover:bg-primary-tint-strong active:scale-95"
+              className="hidden lg:flex cursor-pointer items-center gap-1.5 rounded-full border border-primary/30 bg-primary-tint px-3 py-1.5 text-etiqueta font-semibold text-primary transition-all duration-200 hover:bg-primary-tint-strong active:scale-95"
             >
               <IconoDescargar className="size-3.5" />
               <span>Instalar</span>
             </button>
           )}
 
+          {/* Botón directo de Modo Juez (1 Clic) con brillo visual */}
+          <button
+            type="button"
+            onClick={entrarModoDemo}
+            className="relative inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-primary-light px-4 py-1.5 text-etiqueta sm:text-nota font-black text-white shadow-md shadow-primary/30 ring-1 ring-white/20 transition-all duration-200 hover:scale-105 active:scale-95"
+            title="Entrar a la app real en modo demostración para evaluadores"
+          >
+            <span>⚡ Modo Juez</span>
+          </button>
+
           <Link
             to="/entrar"
-            className="flex cursor-pointer items-center gap-1 rounded-full bg-primary px-4 py-1.5 text-etiqueta sm:text-nota font-semibold text-white shadow-xs transition-all duration-200 hover:bg-primary-dark hover:shadow-md active:scale-95"
+            className="hidden sm:flex cursor-pointer items-center gap-1 rounded-full border border-border bg-surface px-3 py-1.5 text-etiqueta text-text-muted hover:text-text hover:border-primary/40 transition-colors"
           >
-            <span>Acceder</span>
-            <IconoFlechaDerecha className="size-3.5" />
+            <span>Login MEP</span>
           </Link>
 
           {/* Botón hamburguesa móvil */}
           <button
             type="button"
             onClick={() => setMenuMovilAbierto(!menuMovilAbierto)}
-            className="flex size-9 cursor-pointer items-center justify-center rounded-lg border border-border text-text-muted md:hidden active:scale-95"
+            className="flex size-9 cursor-pointer items-center justify-center rounded-lg border border-border text-text-muted xl:hidden active:scale-95"
             aria-label="Abrir menú"
           >
             <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -116,8 +137,19 @@ export function ExpoNavbar({ onAbrirInstalar }: Props) {
 
       {/* Menú desplegable en móviles */}
       {menuMovilAbierto && (
-        <div className="border-b border-border bg-surface/95 px-4 py-3 backdrop-blur-md md:hidden animate-fade-in shadow-md">
-          <nav className="flex flex-col gap-2.5">
+        <div className="border-b border-border bg-surface/95 px-4 py-3 backdrop-blur-xl xl:hidden animate-fade-in shadow-xl">
+          <nav className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setMenuMovilAbierto(false)
+                entrarModoDemo()
+              }}
+              className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary-light px-3 py-2.5 text-nota font-bold text-white shadow-md cursor-pointer"
+            >
+              <span>⚡ Probar App Real (Modo Juez)</span>
+            </button>
+
             {navLinks.map((link) => (
               <a
                 key={link.href}
@@ -128,6 +160,7 @@ export function ExpoNavbar({ onAbrirInstalar }: Props) {
                 {link.label}
               </a>
             ))}
+
             {onAbrirInstalar && (
               <button
                 type="button"
@@ -141,6 +174,14 @@ export function ExpoNavbar({ onAbrirInstalar }: Props) {
                 <span>Instalar App en este teléfono</span>
               </button>
             )}
+
+            <Link
+              to="/entrar"
+              onClick={() => setMenuMovilAbierto(false)}
+              className="rounded-lg px-3 py-2 text-nota font-medium text-text-muted hover:bg-surface-alt"
+            >
+              Acceso Institucional MEP (@est.mep.go.cr)
+            </Link>
           </nav>
         </div>
       )}

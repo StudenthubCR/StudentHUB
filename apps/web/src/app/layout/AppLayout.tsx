@@ -44,8 +44,74 @@ export function AppLayout({ children }: { children?: ReactNode }) {
           'lg:col-start-2 lg:row-start-2 lg:max-w-[1200px] lg:px-10 lg:py-9 lg:pb-9'
         }
       >
-        {/* Banner para instalar fácilmente cuando entraron por el enlace */}
-        {!esModoInstalado && !bannerDescartado && (
+        {/* Barra de Evaluación Rápida para Jueces (Expotécnica 2026) */}
+        {typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true' && (
+          <div className="mb-5 rounded-2xl border-2 border-primary/40 bg-surface/90 backdrop-blur-md p-3 sm:p-3.5 shadow-md shadow-primary/10 animate-fade-in">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2.5 border-b border-border/60">
+              <div className="flex items-center gap-2.5">
+                <span className="flex size-7.5 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-light text-white text-nota font-bold shadow-xs">
+                  🎓
+                </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="font-black text-text text-nota leading-tight">
+                      Modo Juez · Expotécnica 2026
+                    </p>
+                    <span className="inline-block rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold uppercase">
+                      ● Sesión Demo Activa
+                    </span>
+                  </div>
+                  <p className="text-micro text-text-muted mt-0.5">
+                    Tocá los atajos para evaluar cada módulo o volver a la ficha técnica:
+                  </p>
+                </div>
+              </div>
+              <a
+                href="/expo"
+                className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-3.5 py-1.5 text-micro font-bold text-white shadow-xs hover:bg-primary-dark transition-all active:scale-95 shrink-0"
+              >
+                <span>← Volver al Portal de Jueces</span>
+              </a>
+            </div>
+
+            {/* Píldoras de Acceso Rápido para el Jurado */}
+            <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+              <a
+                href="/carnet"
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
+              >
+                <span>🪪 Carnet 3D & SOS</span>
+              </a>
+              <a
+                href="/agenda"
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
+              >
+                <span>📝 Agenda & Ausencias</span>
+              </a>
+              <a
+                href="/horarios"
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
+              >
+                <span>📅 Horarios por Sección</span>
+              </a>
+              <a
+                href="/comedor"
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
+              >
+                <span>🍽️ Menú & Pase Comedor</span>
+              </a>
+              <a
+                href="/"
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
+              >
+                <span>🏠 Dashboard Inicio</span>
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* Banner para instalar fácilmente cuando entraron por el enlace (oculto en modo juez para evitar saturación) */}
+        {!esModoInstalado && !bannerDescartado && !(typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true') && (
           <div className="mb-5 flex items-center justify-between gap-3 rounded-2xl border border-primary/25 bg-primary-tint/60 px-4 py-3 text-menuda shadow-xs animate-fade-in">
             <div className="flex items-center gap-2.5">
               <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-xs">

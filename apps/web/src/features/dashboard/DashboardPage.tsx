@@ -38,22 +38,42 @@ export function DashboardPage() {
   const { permiso, notificacionesActivas } = useNotificaciones()
   const [modalNotifAbierto, setModalNotifAbierto] = useState(false)
   const [bannerOculto, setBannerOculto] = useState(false)
+  const esModoDemo = typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true'
 
   return (
     <section className="animate-fade-in">
-      <header className="mb-5.5 md:mb-6.5">
-        <h1 className="text-hero leading-tight font-bold tracking-[-0.03em] md:text-[2rem]">
+      <header className="mb-5 md:mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-tint border border-primary/20 px-3 py-0.5 text-micro font-black uppercase tracking-wider text-primary shadow-2xs">
+            <span>CTP de Educación Técnica</span>
+            <span>·</span>
+            <span>Sección {estudiante?.grupo ?? '12-1'}</span>
+          </span>
+          {esModoDemo && (
+            <span className="inline-flex items-center gap-1.5 text-micro font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 px-2.5 py-0.5 rounded-full shadow-2xs">
+              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Simulación Expotécnica 2026</span>
+            </span>
+          )}
+        </div>
+
+        <h1 className="text-hero leading-tight font-black tracking-[-0.03em] text-text md:text-[2.2rem]">
           {saludoSegunHora(ahora)}
-          {estudiante ? `, ${primerNombre(estudiante.nombre)}` : ''}
+          {estudiante ? (
+            <span className="bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
+              {`, ${primerNombre(estudiante.nombre)}`}
+            </span>
+          ) : (
+            ''
+          )}
         </h1>
-        <p className="mt-1 text-dato text-text-muted first-letter:uppercase md:text-base">
+        <p className="mt-1 text-dato text-text-muted first-letter:uppercase font-medium md:text-base">
           {nombreLargoDeFecha(ahora)}
         </p>
       </header>
 
-      {/* Banner de bienvenida para Notificaciones:
-          Barra compacta y discreta que no satura la pantalla en móvil. */}
-      {!notificacionesActivas && permiso !== 'denied' && !bannerOculto && (
+      {/* Banner de bienvenida para Notificaciones (oculto en modo demo para mantener el dashboard limpio) */}
+      {!esModoDemo && !notificacionesActivas && permiso !== 'denied' && !bannerOculto && (
         <div className="mb-4 sm:mb-6 flex items-center justify-between gap-2.5 rounded-2xl border border-primary/20 bg-primary-tint/40 px-3.5 py-2.5 sm:p-3.5 shadow-xs">
           <div className="flex items-center gap-2.5 min-w-0">
             <span className="flex size-7.5 sm:size-8.5 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-xs">

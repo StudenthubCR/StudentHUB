@@ -92,26 +92,36 @@ export function obtenerEventos(): EventoAgenda[] {
     return []
   }
 
+  const esModoDemo = localStorage.getItem('studenthub_demo_sesion') === 'true'
+
   try {
     const data = localStorage.getItem(STORAGE_KEY_AGENDA)
     if (!data) {
-      return []
+      // En modo demo de Expotécnica, proveer datos vivos para que el jurado evalúe la experiencia
+      return esModoDemo ? generarEventosSemilla() : []
     }
 
     const parseados: EventoAgenda[] = JSON.parse(data)
     if (!Array.isArray(parseados)) {
-      return []
+      return esModoDemo ? generarEventosSemilla() : []
     }
 
-    // Purgar cualquier placeholder de prueba anterior ('semilla-*')
-    const limpios = parseados.filter((e) => !e.id?.startsWith('semilla-'))
-    if (limpios.length !== parseados.length) {
-      guardarEnStorage(limpios)
+    if (esModoDemo && parseados.length === 0) {
+      return generarEventosSemilla()
     }
 
-    return limpios
+    // Purgar cualquier placeholder de prueba anterior ('semilla-*') únicamente si NO estamos en modo demo
+    if (!esModoDemo) {
+      const limpios = parseados.filter((e) => !e.id?.startsWith('semilla-'))
+      if (limpios.length !== parseados.length) {
+        guardarEnStorage(limpios)
+      }
+      return limpios
+    }
+
+    return parseados
   } catch {
-    return []
+    return esModoDemo ? generarEventosSemilla() : []
   }
 }
 

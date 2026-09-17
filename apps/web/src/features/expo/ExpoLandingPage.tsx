@@ -6,6 +6,7 @@ import { SimuladorCarnetExpo } from './components/SimuladorCarnetExpo'
 import { ProblemaSolucionExpo } from './components/ProblemaSolucionExpo'
 import { ModulosExpo } from './components/ModulosExpo'
 import { FichaTecnicaExpo } from './components/FichaTecnicaExpo'
+import { RubricaEvaluacionExpo } from './components/RubricaEvaluacionExpo'
 import { StandQrExpo } from './components/StandQrExpo'
 import { CreditosExpo } from './components/CreditosExpo'
 import { ModalInstalarApp } from '@/features/pwa/ModalInstalarApp'
@@ -20,25 +21,28 @@ export function ExpoLandingPage() {
 
       {/* Contenido de la Landing */}
       <main>
-        {/* 1. Hero Principal */}
+        {/* 1. Hero Principal con Guía en 3 Pasos para Jueces */}
         <HeroExpo onAbrirInstalar={() => setModalInstalarAbierto(true)} />
 
         {/* 2. Stack Tecnológico (Logos oficiales) */}
         <TechStackExpo />
 
-        {/* 3. Simulador Interactivo del Carnet */}
+        {/* 3. Simulador Interactivo del Carnet con Presets para Jueces */}
         <SimuladorCarnetExpo />
 
-        {/* 3. Comparativa Problema vs Solución */}
+        {/* 4. Comparativa Problema vs Solución */}
         <ProblemaSolucionExpo />
 
-        {/* 4. Showcase de Módulos */}
+        {/* 5. Showcase Interactivo de Módulos */}
         <ModulosExpo />
 
-        {/* 5. Ficha Técnica para Jueces y Docentes */}
+        {/* 6. Ficha Técnica de Arquitectura y Seguridad */}
         <FichaTecnicaExpo />
 
-        {/* 6. Sección de Escaneo en el Stand */}
+        {/* 7. Rúbrica Oficial de Evaluación y FAQ para Jueces */}
+        <RubricaEvaluacionExpo />
+
+        {/* 8. Sección de Escaneo en el Stand */}
         <StandQrExpo onAbrirInstalar={() => setModalInstalarAbierto(true)} />
       </main>
 
