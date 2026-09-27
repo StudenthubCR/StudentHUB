@@ -1,60 +1,14 @@
-import { rm } from 'node:fs/promises'
 import { fileURLToPath, URL } from 'node:url'
-import { defineConfig, type Plugin } from 'vitest/config'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 /**
- * Las imágenes siguen viviendo en el `assets/` de la raíz del repositorio: se
- * sirven tal cual, sin duplicarlas ni tocar la app actual. Quedan expuestas en
- * la raíz del sitio (`/SHlarge.webp`).
+ * Las imágenes viven en `assets/` de la raíz del repositorio: se
+ * sirven tal cual en la raíz del sitio (ej. `/SHlarge.webp`).
  */
 const assetsDir = fileURLToPath(new URL('../../assets', import.meta.url))
-
-/**
- * Nota sobre el enrutado del SPA: aquí hubo un archivo `_redirects` con la
- * regla `/* -> /index.html 200`, que es como se resuelve en Cloudflare Pages.
- * En Workers con assets estáticos esa regla es inválida y el despliegue la
- * rechaza: Workers ya quita `.html` y `/index` por su cuenta, así que
- * `/index.html` se reescribe a `/`, vuelve a caer en `/*` y detecta el bucle.
- *
- * Lo que corresponde ahí es `not_found_handling: "single-page-application"`,
- * que está en wrangler.jsonc y hace exactamente lo mismo de forma nativa.
- */
-
-/**
- * Saca del build los originales que sólo usa la app de la raíz.
- *
- * `publicDir` apunta a la carpeta `assets/` compartida y Vite la copia entera,
- * así que el despliegue se llevaba también los PNG de 700 KB y los SVG de
- * 1.1 MB que la app nueva ya no referencia: unos 7 MB de subida por despliegue
- * que nadie descarga nunca. Se quedan en el repositorio; sólo no viajan aquí.
- */
-function sinOriginalesDeLaAppVieja(): Plugin {
-  const soloParaLaAppVieja = [
-    'SHOG.svg',
-    'SHlarge.svg',
-    'SHlogo.svg',
-    'SHlogo.png',
-    'Paleta de colores.png',
-    'news_fiestas_patrias.png',
-    'news_festival_artes.png',
-    'news_practica_profesional.png',
-    'news_matricula_2027.png',
-    'news_graduacion_2026.png',
-  ]
-
-  return {
-    name: 'studenthub-sin-originales',
-    apply: 'build',
-    async closeBundle() {
-      for (const archivo of soloParaLaAppVieja) {
-        await rm(fileURLToPath(new URL(`./dist/${archivo}`, import.meta.url)), { force: true })
-      }
-    },
-  }
-}
 
 export default defineConfig({
   plugins: [
@@ -131,7 +85,6 @@ export default defineConfig({
       },
       devOptions: { enabled: false },
     }),
-    sinOriginalesDeLaAppVieja(),
   ],
   publicDir: assetsDir,
   resolve: {
