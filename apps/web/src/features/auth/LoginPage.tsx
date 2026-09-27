@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Navigate, useNavigate, useLocation, Link } from 'react-router-dom'
+import { Navigate, useLocation, Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import {
   IconoCalendario,
@@ -40,10 +40,9 @@ const BOTON_PRIMARIO =
 type Paso = { nombre: 'correo' } | { nombre: 'codigo'; correo: string }
 
 export function LoginPage() {
-  const { sesion, cargando } = useSesion()
+  const { sesion, cargando, establecerSesion } = useSesion()
   const { esModoInstalado } = usePwaInstall()
   const [modalInstalarAbierto, setModalInstalarAbierto] = useState(false)
-  const navegar = useNavigate()
   const location = useLocation()
 
   const [paso, setPaso] = useState<Paso>({ nombre: 'correo' })
@@ -52,6 +51,9 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
   const [segundos, setSegundos] = useState(0)
+
+  // Configuración de largo de código OTP (soporta 6 u 8 dígitos según el servidor)
+  const [largoOtp, setLargoOtp] = useState<number>(LARGO_CODIGO)
 
   // Autenticación administrativa con contraseña (evita bloqueos si Resend/OTP falla)
   const [modoAdminPassword, setModoAdminPassword] = useState(false)
@@ -134,25 +136,30 @@ export function LoginPage() {
       setError(null)
 
       try {
-        const { error: fallo } = await supabase.auth.signInWithPassword({
+        const { data, error: fallo } = await supabase.auth.signInWithPassword({
           email: destinoCorreo,
           password: contrasenaAdmin,
         })
-        setEnviando(false)
 
         if (fallo) {
+          setEnviando(false)
           setError(traducirErrorAuth(fallo.message))
           return
         }
 
+        if (data?.session) {
+          establecerSesion?.(data.session)
+        }
+
+        // Navegación limpia de recarga para garantizar sincronización completa de la sesión
         const destino = (location.state as { desde?: { pathname?: string } })?.desde?.pathname || '/'
-        navegar(destino, { replace: true })
+        window.location.href = destino
       } catch (err) {
         setEnviando(false)
         setError('Error al conectar con el servidor de autenticación.')
       }
     },
-    [contrasenaAdmin, correo, location.state, navegar, paso],
+    [contrasenaAdmin, correo, establecerSesion, location.state, paso],
   )
 
   const verificar = useCallback(
@@ -165,23 +172,59 @@ export function LoginPage() {
 
       setEnviando(true)
       setError(null)
-      const { error: fallo } = await supabase.auth.verifyOtp({
-        email: paso.correo,
-        token: tokenAUsar,
-        type: 'email',
-      })
-      setEnviando(false)
 
-      if (fallo) {
-        setError(traducirErrorAuth(fallo.message))
-        return
+      try {
+        // 1. Intentar verificar con type 'email' (estándar para OTP por email en Supabase)
+        let resultado = await supabase.auth.verifyOtp({
+          email: paso.correo,
+          token: tokenAUsar,
+          type: 'email',
+        })
+
+        // 2. Si falla con error de token/inválido/expirado, intentar con 'magiclink' o 'signup'
+        if (resultado.error) {
+          const m = resultado.error.message.toLowerCase()
+          if (m.includes('invalid') || m.includes('expired') || m.includes('token') || m.includes('otp')) {
+            const intento2 = await supabase.auth.verifyOtp({
+              email: paso.correo,
+              token: tokenAUsar,
+              type: 'magiclink',
+            })
+            if (!intento2.error) {
+              resultado = intento2
+            } else {
+              const intento3 = await supabase.auth.verifyOtp({
+                email: paso.correo,
+                token: tokenAUsar,
+                type: 'signup',
+              })
+              if (!intento3.error) {
+                resultado = intento3
+              }
+            }
+          }
+        }
+
+        if (resultado.error) {
+          setEnviando(false)
+          setError(traducirErrorAuth(resultado.error.message))
+          return
+        }
+
+        // 3. Sincronizar de inmediato la sesión en el contexto de la aplicación
+        if (resultado.data?.session) {
+          establecerSesion?.(resultado.data.session)
+        }
+
+        // 4. Redirigir de manera atómica con recarga completa para evitar rebotes de RutaProtegida
+        const destino = (location.state as { desde?: { pathname?: string } })?.desde?.pathname || '/'
+        window.location.href = destino
+      } catch (err) {
+        setEnviando(false)
+        setError('Error inesperado al verificar el código.')
       }
-
-      // Redirigir al destino solicitado previamente o al inicio
-      const destino = (location.state as { desde?: { pathname?: string } })?.desde?.pathname || '/'
-      navegar(destino, { replace: true })
     },
-    [codigo, navegar, paso, location.state],
+    [codigo, establecerSesion, location.state, paso],
   )
 
   if (cargando) return null
@@ -499,7 +542,7 @@ export function LoginPage() {
                     <h2 className="text-titulo font-bold text-text">Código de verificación</h2>
                   </div>
                   <p className="mt-1.5 text-menor text-text-muted">
-                    Ingresá el código de {LARGO_CODIGO} dígitos que enviamos a{' '}
+                    Ingresá el código de verificación que enviamos a{' '}
                     <strong className="font-semibold text-text">{paso.correo}</strong>.
                   </p>
                   <p className="mt-1 text-micro text-amber-700 dark:text-amber-300">
@@ -537,22 +580,37 @@ export function LoginPage() {
                       <span>Código de verificación</span>
                     </span>
                     <span className="text-micro font-semibold lowercase text-text-muted">
-                      {codigo.length}/{LARGO_CODIGO} dígitos
+                      {codigo.length}/{largoOtp} dígitos
                     </span>
                   </div>
                   <div className="flex justify-center py-2">
                     <OtpInput
-                      length={LARGO_CODIGO}
+                      length={largoOtp}
                       value={codigo}
                       onChange={(val) => {
                         setCodigo(val)
                         if (error) setError(null)
                       }}
                       onComplete={(val) => void verificar(undefined, val)}
-                      status={error ? 'error' : codigo.length === LARGO_CODIGO ? 'success' : 'idle'}
+                      status={error ? 'error' : codigo.length === largoOtp ? 'success' : 'idle'}
                       disabled={enviando}
                       autoFocus
                     />
+                  </div>
+
+                  <div className="mt-2 flex items-center justify-center gap-2 text-micro text-text-muted">
+                    <span>¿Recibiste un código de {largoOtp === 8 ? '6' : '8'} dígitos?</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLargoOtp((prev) => (prev === 8 ? 6 : 8))
+                        setCodigo('')
+                        setError(null)
+                      }}
+                      className="font-bold text-primary hover:underline cursor-pointer"
+                    >
+                      Cambiar a {largoOtp === 8 ? '6 casillas' : '8 casillas'}
+                    </button>
                   </div>
                 </div>
 

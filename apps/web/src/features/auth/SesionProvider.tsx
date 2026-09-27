@@ -68,9 +68,14 @@ export function SesionProvider({ children }: { children: ReactNode }) {
     queryClient.clear()
   }, [queryClient])
 
+  const establecerSesion = useCallback((nueva: Session | null) => {
+    setSesion(nueva)
+    setCargando(false)
+  }, [])
+
   const valor = useMemo(
-    () => ({ cargando, sesion, cerrarSesion }),
-    [cargando, sesion, cerrarSesion],
+    () => ({ cargando, sesion, cerrarSesion, establecerSesion }),
+    [cargando, sesion, cerrarSesion, establecerSesion],
   )
 
   return <SesionContext value={valor}>{children}</SesionContext>
