@@ -10,6 +10,7 @@ import { ModalNotificaciones } from '@/features/notificaciones/ModalNotificacion
 import { useReloj } from '@/lib/useReloj'
 import { AlmuerzoDeHoy } from './components/AlmuerzoDeHoy'
 import { CarruselNoticias } from './components/CarruselNoticias'
+import { BannersAvisosRapidos } from '@/features/avisos'
 import { ClaseAhora } from './components/ClaseAhora'
 import { RestoDelDia } from './components/RestoDelDia'
 import { WidgetAgendaDashboard } from '@/features/agenda/components/WidgetAgendaDashboard'
@@ -42,7 +43,7 @@ export function DashboardPage() {
 
   return (
     <section className="animate-fade-in">
-      <header className="mb-5 md:mb-6">
+      <header className="mb-3.5 sm:mb-4">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-tint border border-primary/20 px-3 py-0.5 text-micro font-black uppercase tracking-wider text-primary shadow-2xs">
             <span>CTP de Educación Técnica</span>
@@ -108,12 +109,18 @@ export function DashboardPage() {
         </div>
       )}
 
-      {/* En móvil: primero la rutina diaria del estudiante (Clase, Agenda, Almuerzo)
-          y al final las Noticias en formato banner panorámico.
-          En pantallas de escritorio (xl): distribución en 2 columnas paralelas. */}
-      <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[1fr_1.35fr] xl:items-start xl:gap-7.5">
-        {/* Columna de rutina escolar (orden 1 en móvil, columna derecha en xl) */}
-        <div className="order-1 xl:order-2 flex flex-col gap-3.5">
+      {/* Comunicados Oficiales y Avisos Rápidos (por encima de las noticias) */}
+      <BannersAvisosRapidos />
+
+      {/* Sección compacta de Noticias del CTP (justo antes del contenido central) */}
+      <div className="mb-3.5 sm:mb-4.5">
+        <CarruselNoticias noticias={NOTICIAS} />
+      </div>
+
+      {/* Contenido Central: rutina diaria del estudiante */}
+      <div className="flex flex-col gap-3.5 xl:grid xl:grid-cols-2 xl:gap-4.5 xl:items-start">
+        {/* Columna 1: Clases y Horario de hoy */}
+        <div className="flex flex-col gap-3.5">
           <ClaseAhora
             dia={diaDeHoy}
             ahora={ahora}
@@ -122,6 +129,10 @@ export function DashboardPage() {
             aHorario="/horarios"
           />
           <RestoDelDia dia={diaDeHoy} ahora={ahora} />
+        </div>
+
+        {/* Columna 2: Agenda de pendientes y Menú de almuerzo */}
+        <div className="flex flex-col gap-3.5">
           <WidgetAgendaDashboard />
           <AlmuerzoDeHoy
             estado={estadoDelDia(comedor.menus, ahora)}
@@ -129,19 +140,6 @@ export function DashboardPage() {
             hayError={Boolean(comedor.error)}
           />
         </div>
-
-        {/* Columna de Noticias (orden 2 en móvil, columna izquierda en xl) */}
-        <section className="order-2 xl:order-1 mt-1 xl:mt-0">
-          <div className="flex items-center justify-between mb-2.5 px-0.5">
-            <h2 className="text-etiqueta font-bold tracking-[0.09em] text-text-muted uppercase">
-              Noticias del CTP
-            </h2>
-            <span className="text-[11px] font-semibold text-text-muted">
-              Actualizaciones
-            </span>
-          </div>
-          <CarruselNoticias noticias={NOTICIAS} />
-        </section>
       </div>
 
       <ModalNotificaciones
