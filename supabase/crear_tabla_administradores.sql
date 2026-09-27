@@ -191,3 +191,17 @@ end;
 $$;
 
 grant execute on function public.es_admin(uuid) to anon, authenticated, service_role;
+
+-- 8. Habilitar Supabase Realtime para la tabla de avisos institucionales (Difusión a estudiantes)
+do $$
+begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
+    if not exists (
+      select 1 from pg_publication_tables 
+      where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'institution_alerts'
+    ) then
+      alter publication supabase_realtime add table public.institution_alerts;
+    end if;
+  end if;
+end;
+$$;

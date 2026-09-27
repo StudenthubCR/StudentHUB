@@ -145,3 +145,33 @@ describe('formatearTiempoAviso', () => {
     expect(formatearTiempoAviso(hace15)).toBe('Hace 15 min')
   })
 })
+
+describe('Integración de Notificaciones para Avisos', () => {
+  it('convierte un aviso institucional en una notificación con formato adecuado', async () => {
+    const { convertirAvisoANotificacion } = await import('./avisos.service')
+    const aviso = AVISOS_FIXTURE[0]
+    const notif = convertirAvisoANotificacion(aviso)
+
+    expect(notif.id).toBe(`notif-aviso-${aviso.id}`)
+    expect(notif.titulo).toContain(aviso.title)
+    expect(notif.mensaje).toBe(aviso.message)
+    expect(notif.categoria).toBe('horarios') // early_departure -> horarios
+    expect(notif.importante).toBe(true)
+    expect(notif.leida).toBe(false)
+  })
+
+  it('evalúa correctamente si un aviso aplica al estudiante', async () => {
+    const { aplicaAvisoAEstudiante } = await import('./avisos.service')
+
+    // Aviso general: aplica a todos
+    expect(aplicaAvisoAEstudiante(AVISOS_FIXTURE[0], ESTUDIANTE_TEST)).toBe(true)
+    // Aviso Desarrollo Web: aplica al estudiante de Desarrollo Web
+    expect(aplicaAvisoAEstudiante(AVISOS_FIXTURE[1], ESTUDIANTE_TEST)).toBe(true)
+    // Aviso Contabilidad: NO aplica al estudiante de Desarrollo Web
+    expect(aplicaAvisoAEstudiante(AVISOS_FIXTURE[2], ESTUDIANTE_TEST)).toBe(false)
+    // Aviso 11-1: aplica a la sección 11-1
+    expect(aplicaAvisoAEstudiante(AVISOS_FIXTURE[3], ESTUDIANTE_TEST)).toBe(true)
+    // Aviso 12-2: NO aplica a la sección 11-1
+    expect(aplicaAvisoAEstudiante(AVISOS_FIXTURE[4], ESTUDIANTE_TEST)).toBe(false)
+  })
+})

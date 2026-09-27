@@ -312,6 +312,17 @@ export function ModalCrearAviso({ abierto, alCerrar, alGuardar }: Props) {
             )}
           </div>
 
+          {/* Notificación automática inmediata a estudiantes */}
+          <div className="rounded-xl border border-primary/25 bg-primary-tint/50 p-3 text-menuda text-text">
+            <div className="flex items-center gap-2 font-bold text-primary text-micro">
+              <span>🔔</span>
+              <span>Notificación automática estudiantil</span>
+            </div>
+            <p className="mt-0.5 text-[11px] text-text-muted leading-relaxed">
+              Al publicar, se enviará una notificación al buzón estudiantil y al sistema operativo/celular de los alumnos destinatarios.
+            </p>
+          </div>
+
           <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border/60 mt-1">
             <button
               type="button"

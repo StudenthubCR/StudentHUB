@@ -1,6 +1,13 @@
 import { supabase } from '@/lib/supabase'
 import type { Estudiante } from '@/features/estudiante/estudiante.fixture'
-import type { InstitutionAlert, NuevoAvisoPayload } from './avisos.types'
+import type { CategoriaAviso, InstitutionAlert, NuevoAvisoPayload } from './avisos.types'
+import {
+  agregarNotificacion,
+  obtenerNotificaciones,
+  guardarNotificaciones,
+  type CategoriaNotificacion,
+  type NotificacionItem,
+} from '@/features/notificaciones/notificaciones.service'
 
 const CLAVE_STORAGE = 'studenthub_avisos_institucionales_v1'
 const CLAVE_DESCARTADOS = 'studenthub_avisos_descartados_v1'
@@ -172,6 +179,15 @@ export async function crearAviso(
     const actuales = cargarAvisosLocales().filter((a) => a.id !== nuevoAviso.id)
     localStorage.setItem(CLAVE_STORAGE, JSON.stringify([nuevoAviso, ...actuales]))
     window.dispatchEvent(new CustomEvent('studenthub:avisos-actualizados'))
+
+    // 4. Disparar notificación estudiantil local inmediata
+    try {
+      const notificacion = convertirAvisoANotificacion(nuevoAviso)
+      agregarNotificacion(notificacion, true)
+      window.dispatchEvent(new Event('studenthub:notificaciones-actualizadas'))
+    } catch (e) {
+      console.warn('Error al despachar notificación local de aviso:', e)
+    }
   }
 
   return { ok: true, aviso: nuevoAviso }
@@ -222,45 +238,142 @@ export async function eliminarAviso(id: string, correoUsuario: string): Promise<
   return true
 }
 
+/**
+ * Determina si un aviso aplica para el perfil del estudiante actual o si es administrador.
+ */
+export function aplicaAvisoAEstudiante(
+  aviso: InstitutionAlert,
+  estudiante: Estudiante | null,
+  esAdmin = false,
+): boolean {
+  if (!aviso.active) return false
+
+  const ahora = new Date()
+  if (aviso.expires_at && new Date(aviso.expires_at) < ahora) {
+    return false
+  }
+
+  if (esAdmin) return true
+
+  if (aviso.target_type === 'all') {
+    return true
+  }
+
+  if (aviso.target_type === 'specialty') {
+    if (!estudiante?.especialidad) return false
+    const esp = estudiante.especialidad.trim().toLowerCase()
+    return aviso.target_values.some((val) => val.trim().toLowerCase() === esp)
+  }
+
+  if (aviso.target_type === 'section') {
+    if (!estudiante?.grupo) return false
+    const sec = estudiante.grupo.trim().toLowerCase()
+    return aviso.target_values.some((val) => val.trim().toLowerCase() === sec)
+  }
+
+  return false
+}
+
 export function filtrarAvisosParaEstudiante(
   avisos: InstitutionAlert[],
   estudiante: Estudiante | null,
   descartadosIds: string[],
   esAdmin = false,
 ): InstitutionAlert[] {
-  const ahora = new Date()
-
   return avisos.filter((aviso) => {
-    if (!aviso.active) return false
-
-    if (aviso.expires_at && new Date(aviso.expires_at) < ahora) {
-      return false
-    }
-
-    if (esAdmin) return true
-
-    if (descartadosIds.includes(aviso.id)) {
-      return false
-    }
-
-    if (aviso.target_type === 'all') {
-      return true
-    }
-
-    if (aviso.target_type === 'specialty') {
-      if (!estudiante?.especialidad) return false
-      const esp = estudiante.especialidad.trim().toLowerCase()
-      return aviso.target_values.some((val) => val.trim().toLowerCase() === esp)
-    }
-
-    if (aviso.target_type === 'section') {
-      if (!estudiante?.grupo) return false
-      const sec = estudiante.grupo.trim().toLowerCase()
-      return aviso.target_values.some((val) => val.trim().toLowerCase() === sec)
-    }
-
-    return false
+    if (descartadosIds.includes(aviso.id)) return false
+    return aplicaAvisoAEstudiante(aviso, estudiante, esAdmin)
   })
+}
+
+/**
+ * Mapea la categoría de un aviso institucional a una categoría del sistema de notificaciones.
+ */
+export function mapearCategoriaAvisoANotificacion(categoria: CategoriaAviso): CategoriaNotificacion {
+  switch (categoria) {
+    case 'absence':
+      return 'ausencias'
+    case 'menu_change':
+      return 'comedor'
+    case 'early_departure':
+      return 'horarios'
+    case 'event':
+    case 'general':
+    default:
+      return 'noticias'
+  }
+}
+
+/**
+ * Icono visual según el tipo de aviso institucional.
+ */
+export function obtenerIconoCategoriaAviso(categoria: CategoriaAviso): string {
+  switch (categoria) {
+    case 'early_departure':
+      return '⏰'
+    case 'absence':
+      return '⚠️'
+    case 'menu_change':
+      return '🍲'
+    case 'event':
+      return '📅'
+    case 'general':
+    default:
+      return '📢'
+  }
+}
+
+/**
+ * Convierte un aviso institucional en una notificación lista para el buzón del estudiante.
+ */
+export function convertirAvisoANotificacion(aviso: InstitutionAlert): NotificacionItem {
+  const icono = obtenerIconoCategoriaAviso(aviso.category)
+  return {
+    id: `notif-aviso-${aviso.id}`,
+    titulo: `${icono} ${aviso.title}`,
+    mensaje: aviso.message,
+    categoria: mapearCategoriaAvisoANotificacion(aviso.category),
+    fechaIso: aviso.created_at,
+    leida: false,
+    enlace: '/',
+    importante: aviso.priority === 'urgent' || aviso.priority === 'warning',
+  }
+}
+
+/**
+ * Sincroniza los avisos vigentes pertinentes al estudiante con su buzón de notificaciones.
+ * Asegura que cuando un estudiante abra la app, cualquier aviso nuevo aparezca en su bandeja.
+ */
+export function sincronizarAvisosConBandeja(
+  avisos: InstitutionAlert[],
+  estudiante: Estudiante | null,
+  esAdmin = false,
+): void {
+  if (typeof window === 'undefined') return
+  try {
+    const notificacionesActuales = obtenerNotificaciones()
+    const idsExistentes = new Set(notificacionesActuales.map((n) => n.id))
+
+    let huboNuevas = false
+    const nuevasNotificaciones: NotificacionItem[] = []
+
+    for (const aviso of avisos) {
+      if (!aplicaAvisoAEstudiante(aviso, estudiante, esAdmin)) continue
+
+      const notifId = `notif-aviso-${aviso.id}`
+      if (!idsExistentes.has(notifId)) {
+        nuevasNotificaciones.push(convertirAvisoANotificacion(aviso))
+        huboNuevas = true
+      }
+    }
+
+    if (huboNuevas) {
+      const combinadas = [...nuevasNotificaciones, ...notificacionesActuales]
+      guardarNotificaciones(combinadas)
+    }
+  } catch (err) {
+    console.warn('Error al sincronizar avisos con bandeja de notificaciones:', err)
+  }
 }
 
 export function formatearTiempoAviso(isoString: string): string {
