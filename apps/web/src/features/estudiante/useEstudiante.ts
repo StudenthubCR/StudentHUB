@@ -50,6 +50,21 @@ export function useEstudiante() {
       if (sesion?.user.id === '00000000-0000-0000-0000-000000000001') {
         return ESTUDIANTE_DEMO
       }
+      if (sesion?.user.email === 'studenthub.cr@gmail.com') {
+        return {
+          nombre: 'Administración StudentHUB',
+          codigo: 'ADMIN-01',
+          especialidad: 'Administración General',
+          institucion: 'Colegio Técnico Profesional',
+          siglaInstitucion: 'CTP',
+          grupo: 'ADMIN',
+          nivel: 'Personal Administrativo',
+          jornada: 'Diurna',
+          vigencia: `Ciclo Lectivo ${new Date().getFullYear()}`,
+          fotoUrl: '',
+          activo: true,
+        }
+      }
       const { data, error } = await supabase
         .from('estudiantes')
         .select('codigo, correo, nombre, especialidad, estado, grupos(codigo, nivel, jornada), instituciones(nombre, slug)')
