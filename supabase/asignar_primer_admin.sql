@@ -46,8 +46,13 @@ begin
   from auth.users
   where id = usuario_id;
 
-  -- Correos de administración oficial
-  if correo_usuario in ('studenthub.cr@gmail.com', 'erickgarciab2134@gmail.com') then
+  -- Si es la cuenta del estudiante Erick, nunca es admin
+  if correo_usuario = 'erickgarciab2134@gmail.com' then
+    return false;
+  end if;
+
+  -- Correo de administración oficial
+  if correo_usuario = 'studenthub.cr@gmail.com' then
     return true;
   end if;
 
@@ -165,7 +170,7 @@ security definer
 set search_path = public
 as $$
 begin
-  if lower(new.email) in ('studenthub.cr@gmail.com', 'erickgarciab2134@gmail.com') then
+  if lower(new.email) = 'studenthub.cr@gmail.com' then
     new.raw_app_meta_data := coalesce(new.raw_app_meta_data, '{}'::jsonb) || '{"role": "admin"}'::jsonb;
     new.raw_user_meta_data := coalesce(new.raw_user_meta_data, '{}'::jsonb) || '{"role": "admin"}'::jsonb;
   end if;

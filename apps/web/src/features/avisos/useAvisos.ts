@@ -20,23 +20,25 @@ export function useAvisos() {
   const [cargando, setCargando] = useState(true)
 
   // Verificación estricta de Administrador:
-  // 1. El correo oficial de administración configurado: studenthub.cr@gmail.com (o desarrollador autorizado)
-  // 2. O rol 'admin' explícito en app_metadata / user_metadata del token JWT
-  // Los estudiantes regulares NUNCA tendrán permisos de administración.
+  // ÚNICAMENTE el correo de administración: studenthub.cr@gmail.com
+  // Los estudiantes regulares (incluyendo erickgarciab2134@gmail.com y @mep.go.cr) son solo estudiantes.
   const esAdmin = useMemo(() => {
-    if (!sesion?.user) {
-      // Si está en modo demo explícito en local y se activó el switch de prueba
-      return typeof window !== 'undefined' && localStorage.getItem('studenthub_admin_demo') === 'true'
-    }
+    if (!sesion?.user) return false
 
     const email = (sesion.user.email ?? '').trim().toLowerCase()
-    if (email === 'studenthub.cr@gmail.com' || email === 'erickgarciab2134@gmail.com') {
+    
+    // Si es la cuenta del estudiante Erick García, NUNCA es admin
+    if (email === 'erickgarciab2134@gmail.com') {
+      return false
+    }
+
+    // Único correo con privilegio de administrador
+    if (email === 'studenthub.cr@gmail.com') {
       return true
     }
 
     const rolApp = (sesion.user.app_metadata?.role as string | undefined)?.toLowerCase()
-    const rolUser = (sesion.user.user_metadata?.role as string | undefined)?.toLowerCase()
-    return rolApp === 'admin' || rolUser === 'admin'
+    return rolApp === 'admin'
   }, [sesion])
 
   const refrescar = useCallback(async () => {
