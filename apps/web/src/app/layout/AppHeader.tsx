@@ -16,7 +16,7 @@ type Props = {
 export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
   const { estudiante } = useEstudiante()
   const { sesion, cerrarSesion } = useSesion()
-  const { permiso, notificacionesActivas } = useNotificaciones()
+  const { permiso, notificacionesActivas, noLeidas } = useNotificaciones()
   const [modalNotifAbierto, setModalNotifAbierto] = useState(false)
 
   return (
@@ -60,13 +60,12 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
         )}
 
         {/* Botón de Notificaciones:
-            Permite al estudiante acceder a la configuración de alertas.
-            Muestra un punto pulsante si las notificaciones aún no han sido activadas. */}
+            Muestra la cantidad de notificaciones sin leer o un pulso sutil si están inactivas. */}
         <button
           type="button"
           onClick={() => setModalNotifAbierto(true)}
-          aria-label="Configurar notificaciones"
-          title="Notificaciones estudiantiles"
+          aria-label={noLeidas > 0 ? `${noLeidas} notificaciones sin leer` : 'Centro de notificaciones'}
+          title={noLeidas > 0 ? `${noLeidas} alertas sin leer` : 'Notificaciones estudiantiles'}
           className={
             'relative flex size-10 cursor-pointer items-center justify-center rounded-full ' +
             'border border-border bg-surface text-text-muted transition-all duration-200 ' +
@@ -74,9 +73,13 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
           }
         >
           <IconoCampana className="size-4.5" />
-          {!notificacionesActivas && permiso !== 'denied' && (
+          {noLeidas > 0 ? (
+            <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-black text-white shadow-sm ring-2 ring-surface">
+              {noLeidas > 9 ? '9+' : noLeidas}
+            </span>
+          ) : !notificacionesActivas && permiso !== 'denied' ? (
             <span className="absolute top-2.5 right-2.5 size-2 rounded-full bg-primary animate-pulse" />
-          )}
+          ) : null}
         </button>
 
 

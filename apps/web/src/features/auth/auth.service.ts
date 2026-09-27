@@ -27,23 +27,23 @@ export function dominioPermitido(correo: string, dominio: string | null): boolea
 }
 
 /**
- * Largo del código.
+ * Largo del código de verificación OTP.
  *
- * Supabase lo genera según su propia configuración, y no siempre son 6: este
- * proyecto salió mandando 8. Si la app truncara a 6, el código llegaría por
- * correo y no se podría escribir — que fue justo lo que pasó en la primera
- * prueba real. Se acepta el rango que Supabase permite y se deja que sea el
- * servidor quien diga si el código es correcto.
+ * El proyecto de Supabase está configurado para emitir tokens de 8 dígitos.
+ * Permitimos validar códigos de 6 a 8 dígitos por si cambia la configuración
+ * del servidor, pero la longitud por defecto esperada en la interfaz es 8.
  */
+export const LARGO_CODIGO = 8
 export const LARGO_MINIMO = 6
-export const LARGO_MAXIMO = 10
+export const LARGO_MAXIMO = 8
 
 export function soloDigitos(codigo: string): string {
   return codigo.replace(/\D/g, '').slice(0, LARGO_MAXIMO)
 }
 
 export function codigoCompleto(codigo: string): boolean {
-  return soloDigitos(codigo).length >= LARGO_MINIMO
+  const largo = soloDigitos(codigo).length
+  return largo >= LARGO_MINIMO && largo <= LARGO_MAXIMO
 }
 
 /**

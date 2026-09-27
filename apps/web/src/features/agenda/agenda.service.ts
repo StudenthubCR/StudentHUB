@@ -1,4 +1,4 @@
-import { format, isSameDay, isToday, isTomorrow, isYesterday, parseISO, differenceInCalendarDays } from 'date-fns'
+import { format, isSameDay, parseISO, differenceInCalendarDays } from 'date-fns'
 import { es } from 'date-fns/locale'
 import type { EventoAgenda, ResumenAgendaDia, TipoEventoAgenda } from './agenda.types'
 
@@ -271,11 +271,10 @@ export function obtenerResumenAgenda(fecha: Date = new Date(), lista: EventoAgen
 export function formatearFechaRelativa(fechaIso: string, hoy: Date = new Date()): string {
   try {
     const fecha = parseISO(fechaIso)
-    if (isToday(fecha)) return 'Hoy'
-    if (isTomorrow(fecha)) return 'Mañana'
-    if (isYesterday(fecha)) return 'Ayer'
-
     const dias = differenceInCalendarDays(fecha, hoy)
+    if (dias === 0) return 'Hoy'
+    if (dias === 1) return 'Mañana'
+    if (dias === -1) return 'Ayer'
     if (dias > 1 && dias <= 7) return `En ${dias} días`
     if (dias < -1 && dias >= -7) return `Hace ${Math.abs(dias)} días`
 

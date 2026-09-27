@@ -15,8 +15,9 @@ import { ThemeToggle } from '@/app/layout/ThemeToggle'
 import { usePwaInstall } from '@/features/pwa/usePwaInstall'
 import { ModalInstalarApp } from '@/features/pwa/ModalInstalarApp'
 import { OtpInput } from '@/components/ui/otp-input'
+import { cn } from '@/lib/cn'
 import {
-  LARGO_MAXIMO,
+  LARGO_CODIGO,
   codigoCompleto,
   correoValido,
   normalizarCorreo,
@@ -176,7 +177,7 @@ export function LoginPage() {
       <main className="mx-auto flex max-w-6xl flex-col justify-center px-5 py-6 sm:px-8 lg:py-12">
         <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
           {/* Columna Izquierda: Bienvenida institucional y beneficios */}
-          <div className="flex flex-col gap-6">
+          <div className={cn('flex flex-col gap-6', paso.nombre === 'codigo' ? 'hidden lg:flex' : 'flex')}>
             <div>
               <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-tint px-3.5 py-1 text-micro font-bold tracking-[0.09em] text-primary uppercase shadow-sm">
                 <span className="size-2 animate-pulse rounded-full bg-primary" />
@@ -232,7 +233,7 @@ export function LoginPage() {
           </div>
 
           {/* Columna Derecha: Tarjeta interactiva de Autenticación */}
-          <div className="rounded-2xl border border-border bg-surface p-6.5 shadow-xl elev-md sm:p-8.5">
+          <div className="rounded-2xl border border-border bg-surface p-5 shadow-xl elev-md sm:p-8">
             {!esModoInstalado && (
               <div className="mb-5 flex items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary-tint/60 p-3.5 text-menuda">
                 <div className="flex items-center gap-2.5 text-text">
@@ -347,7 +348,7 @@ export function LoginPage() {
                     <h2 className="text-titulo font-bold text-text">Código de verificación</h2>
                   </div>
                   <p className="mt-1.5 text-menor text-text-muted">
-                    Ingresá el código de 6 dígitos que enviamos a{' '}
+                    Ingresá el código de {LARGO_CODIGO} dígitos que enviamos a{' '}
                     <strong className="font-semibold text-text">{paso.correo}</strong>.
                   </p>
                   <p className="mt-1 text-micro text-amber-700 dark:text-amber-300">
@@ -359,22 +360,22 @@ export function LoginPage() {
                   <div className="mb-2 flex items-center justify-between text-etiqueta font-bold tracking-[0.08em] text-text-muted uppercase">
                     <span className="flex items-center gap-1.5">
                       <IconoCandado className="size-3.5 text-primary" />
-                      <span>Código de 6 dígitos</span>
+                      <span>Código de verificación</span>
                     </span>
                     <span className="text-micro font-semibold lowercase text-text-muted">
-                      {codigo.length}/6 dígitos
+                      {codigo.length}/{LARGO_CODIGO} dígitos
                     </span>
                   </div>
                   <div className="flex justify-center py-2">
                     <OtpInput
-                      length={LARGO_MAXIMO}
+                      length={LARGO_CODIGO}
                       value={codigo}
                       onChange={(val) => {
                         setCodigo(val)
                         if (error) setError(null)
                       }}
                       onComplete={(val) => void verificar(undefined, val)}
-                      status={error ? 'error' : codigo.length === LARGO_MAXIMO ? 'success' : 'idle'}
+                      status={error ? 'error' : codigo.length === LARGO_CODIGO ? 'success' : 'idle'}
                       disabled={enviando}
                       autoFocus
                     />
