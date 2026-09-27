@@ -5,6 +5,18 @@ import type { InstitutionAlert, NuevoAvisoPayload } from './avisos.types'
 const CLAVE_STORAGE = 'studenthub_avisos_institucionales_v1'
 const CLAVE_DESCARTADOS = 'studenthub_avisos_descartados_v1'
 
+/**
+ * REGLA DE SEGURIDAD FUNDAMENTAL:
+ * Ningún estudiante puede publicar avisos en la aplicación.
+ * ÚNICAMENTE la cuenta institucional studenthub.cr@gmail.com tiene permisos de administración.
+ */
+export const CORREO_ADMIN_UNICO = 'studenthub.cr@gmail.com'
+
+export function esUsuarioAdmin(correo: string | null | undefined): boolean {
+  if (!correo) return false
+  return correo.trim().toLowerCase() === CORREO_ADMIN_UNICO
+}
+
 export const ESPECIALIDADES_CTP = [
   'Desarrollo Web',
   'Contabilidad',
@@ -37,7 +49,7 @@ export const AVISOS_SEMILLAS: InstitutionAlert[] = [
     priority: 'warning',
     target_type: 'all',
     target_values: [],
-    created_by: 'studenthub.cr@gmail.com',
+    created_by: CORREO_ADMIN_UNICO,
     created_at: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
     expires_at: null,
     active: true,
@@ -51,7 +63,7 @@ export const AVISOS_SEMILLAS: InstitutionAlert[] = [
     priority: 'urgent',
     target_type: 'section',
     target_values: ['11-1'],
-    created_by: 'studenthub.cr@gmail.com',
+    created_by: CORREO_ADMIN_UNICO,
     created_at: new Date(Date.now() - 1000 * 60 * 65).toISOString(),
     expires_at: null,
     active: true,
@@ -107,10 +119,24 @@ export function cargarAvisosLocales(): InstitutionAlert[] {
   }
 }
 
+/**
+ * Publicar aviso en Supabase.
+ * SEGURIDAD: Solo se procesa si el creador es exactamente studenthub.cr@gmail.com
+ * y la base de datos de Supabase confirma la inserción bajo RLS.
+ */
 export async function crearAviso(
   payload: NuevoAvisoPayload,
-  creadoPor: string,
-): Promise<{ ok: boolean; aviso: InstitutionAlert }> {
+  correoCreador: string,
+): Promise<{ ok: boolean; aviso?: InstitutionAlert; error?: string }> {
+  // 1. Barrera estricta en frontend
+  if (!esUsuarioAdmin(correoCreador)) {
+    console.error(`[Seguridad] Bloqueado intento no autorizado de publicación por: ${correoCreador}`)
+    return {
+      ok: false,
+      error: 'Operación denegada: Ningún estudiante tiene permisos para publicar comunicados.',
+    }
+  }
+
   const nuevoAviso: InstitutionAlert = {
     id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `aviso-${Date.now()}`,
     title: payload.title.trim(),
@@ -119,30 +145,32 @@ export async function crearAviso(
     priority: payload.priority,
     target_type: payload.target_type,
     target_values: payload.target_type === 'all' ? [] : payload.target_values,
-    created_by: creadoPor || 'studenthub.cr@gmail.com',
+    created_by: CORREO_ADMIN_UNICO,
     created_at: new Date().toISOString(),
     expires_at: payload.expires_at || null,
     active: true,
   }
 
-  try {
-    const { data, error } = await supabase
-      .from('institution_alerts')
-      .insert([nuevoAviso])
-      .select()
-      .maybeSingle()
+  // 2. Persistir en Supabase (validado por RLS en PostgreSQL)
+  const { data, error } = await supabase
+    .from('institution_alerts')
+    .insert([nuevoAviso])
+    .select()
+    .maybeSingle()
 
-    if (!error && data) {
-      nuevoAviso.id = data.id
-    }
-  } catch {
-    // Respaldo
+  if (error) {
+    console.error('[Seguridad] Supabase rechazó la inserción:', error.message)
+    return { ok: false, error: `Error en base de datos: ${error.message}` }
   }
 
+  if (data) {
+    nuevoAviso.id = data.id
+  }
+
+  // 3. Sincronizar copia local SOLO si Supabase aprobó la transacción
   if (typeof window !== 'undefined') {
-    const actuales = cargarAvisosLocales()
-    const actualizados = [nuevoAviso, ...actuales]
-    localStorage.setItem(CLAVE_STORAGE, JSON.stringify(actualizados))
+    const actuales = cargarAvisosLocales().filter((a) => a.id !== nuevoAviso.id)
+    localStorage.setItem(CLAVE_STORAGE, JSON.stringify([nuevoAviso, ...actuales]))
     window.dispatchEvent(new CustomEvent('studenthub:avisos-actualizados'))
   }
 
@@ -173,7 +201,12 @@ export function obtenerAvisosDescartados(): string[] {
   }
 }
 
-export async function eliminarAviso(id: string): Promise<boolean> {
+export async function eliminarAviso(id: string, correoUsuario: string): Promise<boolean> {
+  if (!esUsuarioAdmin(correoUsuario)) {
+    console.error(`[Seguridad] Intento no autorizado de eliminación por: ${correoUsuario}`)
+    return false
+  }
+
   try {
     await supabase.from('institution_alerts').delete().eq('id', id)
   } catch {

@@ -2,9 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSesion } from '@/features/auth/useSesion'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import {
+  CORREO_ADMIN_UNICO,
   crearAviso,
   descartarAvisoLocal,
   eliminarAviso,
+  esUsuarioAdmin,
   filtrarAvisosParaEstudiante,
   obtenerAvisos,
   obtenerAvisosDescartados,
@@ -19,27 +21,11 @@ export function useAvisos() {
   const [descartados, setDescartados] = useState<string[]>([])
   const [cargando, setCargando] = useState(true)
 
-  // Verificación estricta de Administrador:
-  // ÚNICAMENTE el correo de administración: studenthub.cr@gmail.com
-  // Los estudiantes regulares (incluyendo erickgarciab2134@gmail.com y @mep.go.cr) son solo estudiantes.
-  const esAdmin = useMemo(() => {
-    if (!sesion?.user) return false
-
-    const email = (sesion.user.email ?? '').trim().toLowerCase()
-    
-    // Si es la cuenta del estudiante Erick García, NUNCA es admin
-    if (email === 'erickgarciab2134@gmail.com') {
-      return false
-    }
-
-    // Único correo con privilegio de administrador
-    if (email === 'studenthub.cr@gmail.com') {
-      return true
-    }
-
-    const rolApp = (sesion.user.app_metadata?.role as string | undefined)?.toLowerCase()
-    return rolApp === 'admin'
-  }, [sesion])
+  // REGLA DE SEGURIDAD ABSOLUTA:
+  // Ningún estudiante (incluyendo erickgarciab2134@gmail.com o cualquier correo @mep.go.cr) puede publicar ni administrar avisos.
+  // ÚNICAMENTE el correo oficial studenthub.cr@gmail.com tiene permisos de administración.
+  const emailActual = (sesion?.user?.email ?? '').trim().toLowerCase()
+  const esAdmin = esUsuarioAdmin(emailActual)
 
   const refrescar = useCallback(async () => {
     setCargando(true)
@@ -81,25 +67,26 @@ export function useAvisos() {
   const publicarAviso = useCallback(
     async (payload: NuevoAvisoPayload) => {
       if (!esAdmin) {
-        throw new Error('Operación no autorizada: solo administradores pueden publicar avisos.')
+        throw new Error('Operación denegada: Ningún estudiante tiene permisos para publicar comunicados.')
       }
-      const creador = sesion?.user?.email || 'studenthub.cr@gmail.com'
-      const res = await crearAviso(payload, creador)
-      if (res.ok) {
-        setAvisos((prev) => [res.aviso, ...prev])
+      const res = await crearAviso(payload, CORREO_ADMIN_UNICO)
+      if (res.ok && res.aviso) {
+        setAvisos((prev) => [res.aviso!, ...prev])
       }
       return res
     },
-    [sesion, esAdmin],
+    [esAdmin],
   )
 
   const borrarAviso = useCallback(
     async (id: string) => {
       if (!esAdmin) {
-        throw new Error('Operación no autorizada: solo administradores pueden eliminar avisos.')
+        throw new Error('Operación denegada: Ningún estudiante tiene permisos para eliminar comunicados.')
       }
-      await eliminarAviso(id)
-      setAvisos((prev) => prev.filter((a) => a.id !== id))
+      const ok = await eliminarAviso(id, CORREO_ADMIN_UNICO)
+      if (ok) {
+        setAvisos((prev) => prev.filter((a) => a.id !== id))
+      }
     },
     [esAdmin],
   )
