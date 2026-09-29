@@ -31,6 +31,7 @@ export type Estudiante = {
   activo: boolean
   genero?: string
   rol?: string
+  esRespaldo?: boolean
 }
 
 export const ESTUDIANTE_DEMO: Estudiante = {

@@ -4,6 +4,7 @@ import { IconoInfo } from '@/components/icons'
 import { MenuHoyCard } from './components/MenuHoyCard'
 import { MenuSemanaGrid } from './components/MenuSemanaGrid'
 import { ConfirmacionAsistenciaComedor } from './components/ConfirmacionAsistenciaComedor'
+import { SafeBoundary } from '@/components/SafeBoundary'
 import { ErrorComedor } from './comedor.api'
 import {
   claveDeFecha,
@@ -70,20 +71,26 @@ export function ComedorPage() {
         </div>
 
         {/* Tarjeta del Menú de Hoy (Almuerzo / Cena) */}
-        <MenuHoyCard estado={estado} hoy={hoy} onReintentar={onReintentar} />
+        <SafeBoundary nombre="Menú de Hoy">
+          <MenuHoyCard estado={estado} hoy={hoy} onReintentar={onReintentar} />
+        </SafeBoundary>
 
         {/* Sistema de Confirmación de Asistencia ("Comeré hoy" / "No comeré hoy") */}
-        <ConfirmacionAsistenciaComedor fecha={hoy} />
+        <SafeBoundary nombre="Confirmación de Comedor">
+          <ConfirmacionAsistenciaComedor fecha={hoy} />
+        </SafeBoundary>
 
         {/* Parrilla Semanal */}
-        <MenuSemanaGrid
-          dias={menusDeSemana(menus, dias)}
-          subtitulo={subtitulo}
-          claveDeHoy={claveDeFecha(hoy)}
-          cargando={cargando}
-          error={error ? mensajeDeError(error) : null}
-          onReintentar={onReintentar}
-        />
+        <SafeBoundary nombre="Menú Semanal">
+          <MenuSemanaGrid
+            dias={menusDeSemana(menus, dias)}
+            subtitulo={subtitulo}
+            claveDeHoy={claveDeFecha(hoy)}
+            cargando={cargando}
+            error={error ? mensajeDeError(error) : null}
+            onReintentar={onReintentar}
+          />
+        </SafeBoundary>
       </div>
     </PageSection>
   )

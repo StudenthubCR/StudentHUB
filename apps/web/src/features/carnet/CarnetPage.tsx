@@ -8,6 +8,7 @@ import { usePersonalizacionCarnet } from './carnet.estilos'
 import { TarjetaCarnet } from './components/TarjetaCarnet'
 import { PanelDetalles } from './components/PanelDetalles'
 import { ModalOpcionesCarnet } from './components/ModalOpcionesCarnet'
+import { SafeBoundary } from '@/components/SafeBoundary'
 
 export function CarnetPage() {
   const { sesion, cargando: cargandoSesion, cerrarSesion } = useSesion()
@@ -78,21 +79,25 @@ export function CarnetPage() {
         }
       >
         <div className="flex w-full justify-center lg:max-w-[360px] lg:flex-1">
-          <TarjetaCarnet
+          <SafeBoundary nombre="Ficha del Carnet 3D">
+            <TarjetaCarnet
+              estudiante={estudiante}
+              personalizacion={personalizacion}
+              volteada={carnetVolteado}
+              onToggleVoltear={() => setCarnetVolteado((prev) => !prev)}
+            />
+          </SafeBoundary>
+        </div>
+        <SafeBoundary nombre="Detalles y Opciones del Carnet">
+          <PanelDetalles
             estudiante={estudiante}
-            personalizacion={personalizacion}
-            volteada={carnetVolteado}
+            onImprimir={imprimir}
+            onPersonalizar={() => setModalAbierta(true)}
+            onCerrarSesion={() => void cerrarSesion()}
+            estaVolteada={carnetVolteado}
             onToggleVoltear={() => setCarnetVolteado((prev) => !prev)}
           />
-        </div>
-        <PanelDetalles
-          estudiante={estudiante}
-          onImprimir={imprimir}
-          onPersonalizar={() => setModalAbierta(true)}
-          onCerrarSesion={() => void cerrarSesion()}
-          estaVolteada={carnetVolteado}
-          onToggleVoltear={() => setCarnetVolteado((prev) => !prev)}
-        />
+        </SafeBoundary>
       </div>
 
       <ModalOpcionesCarnet

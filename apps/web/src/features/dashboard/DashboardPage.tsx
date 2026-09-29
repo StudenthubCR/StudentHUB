@@ -15,6 +15,7 @@ import { ClaseAhora } from './components/ClaseAhora'
 import { RestoDelDia } from './components/RestoDelDia'
 import { WidgetAgendaDashboard } from '@/features/agenda/components/WidgetAgendaDashboard'
 import { NOTICIAS } from './noticias.fixture'
+import { SafeBoundary } from '@/components/SafeBoundary'
 
 import { primerNombre, saludoSegunHora } from './saludo'
 
@@ -145,35 +146,46 @@ export function DashboardPage() {
       )}
 
       {/* Comunicados Oficiales y Avisos Rápidos (por encima de las noticias) */}
-      <BannersAvisosRapidos />
+      <SafeBoundary nombre="Comunicados Institucionales">
+        <BannersAvisosRapidos />
+      </SafeBoundary>
 
       {/* Sección compacta de Noticias del CTP (justo antes del contenido central) */}
-      <div className="mb-3.5 sm:mb-4.5">
-        <CarruselNoticias noticias={NOTICIAS} />
-      </div>
+      <SafeBoundary nombre="Noticias del CTP">
+        <div className="mb-3.5 sm:mb-4.5">
+          <CarruselNoticias noticias={NOTICIAS} />
+        </div>
+      </SafeBoundary>
 
       {/* Contenido Central: rutina diaria del estudiante */}
       <div className="flex flex-col gap-3.5 xl:grid xl:grid-cols-2 xl:gap-4.5 xl:items-start">
         {/* Columna 1: Clases y Horario de hoy */}
-        <div className="flex flex-col gap-3.5">
-          <ClaseAhora
-            dia={diaDeHoy}
-            ahora={ahora}
-            cargando={horario.cargando}
-            hayError={Boolean(horario.error)}
-            aHorario="/horarios"
-          />
-          <RestoDelDia dia={diaDeHoy} ahora={ahora} />
-        </div>
+        <SafeBoundary nombre="Horario de Clases de Hoy">
+          <div className="flex flex-col gap-3.5">
+            <ClaseAhora
+              dia={diaDeHoy}
+              ahora={ahora}
+              cargando={horario.cargando}
+              hayError={Boolean(horario.error)}
+              aHorario="/horarios"
+            />
+            <RestoDelDia dia={diaDeHoy} ahora={ahora} />
+          </div>
+        </SafeBoundary>
 
         {/* Columna 2: Agenda de pendientes y Menú de almuerzo */}
         <div className="flex flex-col gap-3.5">
-          <WidgetAgendaDashboard />
-          <AlmuerzoDeHoy
-            estado={estadoDelDia(comedor.menus, ahora)}
-            cargando={comedor.cargando}
-            hayError={Boolean(comedor.error)}
-          />
+          <SafeBoundary nombre="Agenda Escolar">
+            <WidgetAgendaDashboard />
+          </SafeBoundary>
+
+          <SafeBoundary nombre="Menú de Almuerzo / Cena">
+            <AlmuerzoDeHoy
+              estado={estadoDelDia(comedor.menus, ahora)}
+              cargando={comedor.cargando}
+              hayError={Boolean(comedor.error)}
+            />
+          </SafeBoundary>
         </div>
       </div>
 

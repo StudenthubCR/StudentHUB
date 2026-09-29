@@ -173,16 +173,56 @@ export function useEstudiante() {
           }
         }
 
-        return filaEncontrada ? aEstudiante(filaEncontrada, sesion.user.user_metadata?.full_name) : null
+        if (filaEncontrada) {
+          return aEstudiante(filaEncontrada, sesion.user.user_metadata?.full_name)
+        }
+
+        // Respaldo resiliente automático con la información de la sesión
+        // La aplicación debe abrir y funcionar con estos datos base mientras se conecta con la base de datos
+        return {
+          id: sesion.user.id,
+          user_id: sesion.user.id,
+          nombre: (sesion.user.user_metadata?.full_name || sesion.user.email?.split('@')[0] || 'Estudiante').trim(),
+          correo: sesion.user.email || '',
+          codigo: '2026-CTP',
+          especialidad: 'Sección Nocturna',
+          grupo: '12-1',
+          seccion: '12-1',
+          institucion: 'Colegio Técnico Profesional',
+          siglaInstitucion: 'CTP',
+          nivel: '12',
+          jornada: 'Nocturna',
+          vigencia: `Ciclo Lectivo ${new Date().getFullYear()}`,
+          fotoUrl: '',
+          activo: true,
+          esRespaldo: true,
+        }
       } catch (err) {
-        console.warn('Excepción controlada en useEstudiante:', err)
-        return null
+        console.warn('Excepción controlada en useEstudiante, usando respaldo:', err)
+        return {
+          id: sesion.user.id,
+          user_id: sesion.user.id,
+          nombre: (sesion.user.user_metadata?.full_name || sesion.user.email?.split('@')[0] || 'Estudiante').trim(),
+          correo: sesion.user.email || '',
+          codigo: '2026-CTP',
+          especialidad: 'Sección Nocturna',
+          grupo: '12-1',
+          seccion: '12-1',
+          institucion: 'Colegio Técnico Profesional',
+          siglaInstitucion: 'CTP',
+          nivel: '12',
+          jornada: 'Nocturna',
+          vigencia: `Ciclo Lectivo ${new Date().getFullYear()}`,
+          fotoUrl: '',
+          activo: true,
+          esRespaldo: true,
+        }
       }
     },
   })
 
   const estaCargando = Boolean(sesion) && (consulta.isPending || consulta.isLoading)
-  const fueraDelPadron = Boolean(sesion) && !estaCargando && !consulta.data
+  const fueraDelPadron = Boolean(sesion) && !estaCargando && (Boolean(consulta.data?.esRespaldo) || !consulta.data)
 
   return {
     estudiante: consulta.data ?? null,

@@ -88,42 +88,50 @@ export function useNotificaciones() {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'institution_alerts' },
         (payload) => {
-          const nuevoAviso = payload.new as InstitutionAlert
-          if (!nuevoAviso || !nuevoAviso.active) return
+          try {
+            const nuevoAviso = payload.new as InstitutionAlert
+            if (!nuevoAviso || !nuevoAviso.active) return
 
-          // Comprobar si aplica al perfil del usuario
-          if (aplicaAvisoAEstudiante(nuevoAviso, estudiante, esAdmin)) {
-            const notif = convertirAvisoANotificacion(nuevoAviso)
-            agregarNotificacion(notif, true)
-            setNotificaciones(obtenerNotificaciones())
+            // Comprobar si aplica al perfil del usuario
+            if (aplicaAvisoAEstudiante(nuevoAviso, estudiante, esAdmin)) {
+              const notif = convertirAvisoANotificacion(nuevoAviso)
+              agregarNotificacion(notif, true)
+              setNotificaciones(obtenerNotificaciones())
 
-            // Desplegar toast flotante in-app no intrusivo
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(
-                new CustomEvent('studenthub:toast-alerta-in-app', {
-                  detail: {
-                    id: notif.id,
-                    titulo: notif.titulo,
-                    mensaje: notif.mensaje,
-                    categoria: notif.categoria,
-                    enlace: notif.enlace,
-                  },
-                }),
-              )
+              // Desplegar toast flotante in-app no intrusivo
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(
+                  new CustomEvent('studenthub:toast-alerta-in-app', {
+                    detail: {
+                      id: notif.id,
+                      titulo: notif.titulo,
+                      mensaje: notif.mensaje,
+                      categoria: notif.categoria,
+                      enlace: notif.enlace,
+                    },
+                  }),
+                )
+              }
             }
+          } catch (err) {
+            console.error('[StudentHUB Realtime Alerta Error]:', err)
           }
         },
       )
       .on('broadcast', { event: 'nueva-alerta' }, (payload) => {
-        if (payload?.payload) {
-          const item = payload.payload as NotificacionItem
-          agregarNotificacion(item, true)
-          setNotificaciones(obtenerNotificaciones())
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(
-              new CustomEvent('studenthub:toast-alerta-in-app', { detail: item }),
-            )
+        try {
+          if (payload?.payload) {
+            const item = payload.payload as NotificacionItem
+            agregarNotificacion(item, true)
+            setNotificaciones(obtenerNotificaciones())
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(
+                new CustomEvent('studenthub:toast-alerta-in-app', { detail: item }),
+              )
+            }
           }
+        } catch (err) {
+          console.error('[StudentHUB Broadcast Alerta Error]:', err)
         }
       })
       .subscribe()
