@@ -13,6 +13,9 @@
  */
 export type Estudiante = {
   id?: string
+  user_id?: string
+  correo?: string
+  cedula?: string
   nombre: string
   /** Código interno del colegio, nunca la cédula (plan §10). */
   codigo: string
@@ -20,11 +23,14 @@ export type Estudiante = {
   institucion: string
   siglaInstitucion: string
   grupo: string
+  seccion?: string
   nivel: string
   jornada: string
   vigencia: string
   fotoUrl: string
   activo: boolean
+  genero?: string
+  rol?: string
 }
 
 export const ESTUDIANTE_DEMO: Estudiante = {

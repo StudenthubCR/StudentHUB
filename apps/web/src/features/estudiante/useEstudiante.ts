@@ -16,6 +16,7 @@ type InstitucionFila = {
 
 type FilaEstudiante = {
   id?: string
+  user_id?: string | null
   codigo?: string
   correo?: string
   nombre?: string
@@ -54,12 +55,15 @@ function aEstudiante(
 
   return {
     id: fila.id || fila.codigo || 'estudiante-id',
+    user_id: fila.user_id || undefined,
+    correo: fila.correo || undefined,
     nombre: nombreFinal,
     codigo: fila.codigo || '0000',
     especialidad: fila.especialidad ?? '',
     institucion: inst?.nombre ?? 'Colegio Técnico Profesional',
     siglaInstitucion: (inst?.slug ?? 'CTP').toUpperCase(),
     grupo: grupo?.codigo || fila.seccion || '12-1',
+    seccion: grupo?.codigo || fila.seccion || '12-1',
     nivel: grupo?.nivel ?? '12',
     jornada: grupo?.jornada ?? 'Nocturna',
     vigencia: `Ciclo Lectivo ${new Date().getFullYear()}`,
@@ -110,42 +114,66 @@ export function useEstudiante() {
       const userId = sesion.user.id
 
       try {
-        // Consulta prioritaria con joins
-        let query = supabase
-          .from('estudiantes')
-          .select('id, codigo, correo, nombre, especialidad, estado, grupos(codigo, nivel, jornada), instituciones(nombre, slug)')
+        let filaEncontrada: FilaEstudiante | null = null
 
-        if (userId && email) {
-          query = query.or(`user_id.eq.${userId},correo.ilike.${email}`)
-        } else if (userId) {
-          query = query.eq('user_id', userId)
-        } else if (email) {
-          query = query.ilike('correo', email)
-        }
-
-        const { data, error } = await query.limit(1).maybeSingle<FilaEstudiante>()
-
-        if (error) {
-          console.warn('Aviso al consultar perfil en estudiantes con joins:', error.message)
-          // Fallback a consulta simple sobre tabla estudiantes si el join fallase
-          let querySimple = supabase
+        // 1. Prioridad: Consulta por user_id directo si existe
+        if (userId) {
+          const res = await supabase
             .from('estudiantes')
-            .select('id, codigo, correo, nombre, especialidad, estado')
+            .select('id, codigo, correo, nombre, especialidad, estado, grupos(codigo, nivel, jornada), instituciones(nombre, slug)')
+            .eq('user_id', userId)
+            .limit(1)
+            .maybeSingle<FilaEstudiante>()
 
-          if (userId && email) {
-            querySimple = querySimple.or(`user_id.eq.${userId},correo.ilike.${email}`)
-          } else if (email) {
-            querySimple = querySimple.ilike('correo', email)
+          if (!res.error && res.data) {
+            filaEncontrada = res.data
           }
-
-          const { data: dataSimple, error: errorSimple } = await querySimple.limit(1).maybeSingle<FilaEstudiante>()
-          if (!errorSimple && dataSimple) {
-            return aEstudiante(dataSimple, sesion.user.user_metadata?.full_name)
-          }
-          return null
         }
 
-        return data ? aEstudiante(data, sesion.user.user_metadata?.full_name) : null
+        // 2. Alternativa: Consulta por correo institucional exacto
+        if (!filaEncontrada && email) {
+          const res = await supabase
+            .from('estudiantes')
+            .select('id, codigo, correo, nombre, especialidad, estado, grupos(codigo, nivel, jornada), instituciones(nombre, slug)')
+            .ilike('correo', email)
+            .limit(1)
+            .maybeSingle<FilaEstudiante>()
+
+          if (!res.error && res.data) {
+            filaEncontrada = res.data
+          }
+        }
+
+        // 3. Fallback defensivo sin joins (en caso de que grupos o instituciones tengan problemas de RLS o esquema)
+        if (!filaEncontrada) {
+          if (userId) {
+            const resSimple = await supabase
+              .from('estudiantes')
+              .select('id, codigo, correo, nombre, especialidad, estado')
+              .eq('user_id', userId)
+              .limit(1)
+              .maybeSingle<FilaEstudiante>()
+
+            if (!resSimple.error && resSimple.data) {
+              filaEncontrada = resSimple.data
+            }
+          }
+
+          if (!filaEncontrada && email) {
+            const resSimple = await supabase
+              .from('estudiantes')
+              .select('id, codigo, correo, nombre, especialidad, estado')
+              .ilike('correo', email)
+              .limit(1)
+              .maybeSingle<FilaEstudiante>()
+
+            if (!resSimple.error && resSimple.data) {
+              filaEncontrada = resSimple.data
+            }
+          }
+        }
+
+        return filaEncontrada ? aEstudiante(filaEncontrada, sesion.user.user_metadata?.full_name) : null
       } catch (err) {
         console.warn('Excepción controlada en useEstudiante:', err)
         return null

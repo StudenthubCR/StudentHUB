@@ -99,13 +99,13 @@ export function AdminAvisosPage() {
         if (filtroDestino === 'all' && aviso.target_type !== 'all') return false
         if (filtroDestino.startsWith('esp:')) {
           const esp = filtroDestino.replace('esp:', '')
-          if (aviso.target_type !== 'specialty' || !aviso.target_values.includes(esp)) {
+          if (aviso.target_type !== 'specialty' || !aviso.target_values?.includes(esp)) {
             return false
           }
         }
         if (filtroDestino.startsWith('sec:')) {
           const sec = filtroDestino.replace('sec:', '')
-          if (aviso.target_type !== 'section' || !aviso.target_values.includes(sec)) {
+          if (aviso.target_type !== 'section' || !aviso.target_values?.includes(sec)) {
             return false
           }
         }
@@ -215,18 +215,19 @@ export function AdminAvisosPage() {
         </span>
       )
     }
+    const lista = Array.isArray(valores) ? valores : []
     if (tipo === 'specialty') {
       return (
         <span className="inline-flex items-center gap-1 rounded-lg border border-border bg-surface-alt/50 px-2 py-1 text-micro font-bold text-text">
           <IconoBirrete className="size-3 text-primary" />
-          {valores.join(', ')}
+          {lista.join(', ')}
         </span>
       )
     }
     return (
       <span className="inline-flex items-center gap-1 rounded-lg border border-border bg-surface-alt/50 px-2 py-1 text-micro font-bold text-text">
         <IconoUsuarios className="size-3 text-primary" />
-        Sec: {valores.join(', ')}
+        Sec: {lista.join(', ')}
       </span>
     )
   }

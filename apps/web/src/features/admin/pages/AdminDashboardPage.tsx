@@ -379,8 +379,8 @@ export function AdminDashboardPage() {
                         {aviso.target_type === 'all'
                           ? 'Todo el Colegio'
                           : aviso.target_type === 'specialty'
-                            ? `Esp: ${aviso.target_values.join(', ')}`
-                            : `Sec: ${aviso.target_values.join(', ')}`}
+                            ? `Esp: ${(aviso.target_values || []).join(', ')}`
+                            : `Sec: ${(aviso.target_values || []).join(', ')}`}
                       </span>
                       <span
                         className={`rounded-full px-2 py-0.2 text-[10px] font-black uppercase tracking-wider ${
@@ -478,8 +478,8 @@ export function AdminDashboardPage() {
                             {aviso.target_type === 'all'
                               ? 'Todo el Colegio'
                               : aviso.target_type === 'specialty'
-                                ? `Esp: ${aviso.target_values.join(', ')}`
-                                : `Sec: ${aviso.target_values.join(', ')}`}
+                                ? `Esp: ${(aviso.target_values || []).join(', ')}`
+                                : `Sec: ${(aviso.target_values || []).join(', ')}`}
                           </span>
                         </td>
                         <td className="px-4 py-3.5 text-menuda">

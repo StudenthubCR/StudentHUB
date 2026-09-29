@@ -18,7 +18,8 @@ export function indiceDia(dia: string): number {
 }
 
 /** '5:50pm-6:35pm' → { inicio: '5:50pm', fin: '6:35pm' } */
-export function partirHora(hora: string): { inicio: string; fin: string } {
+export function partirHora(hora?: string | null): { inicio: string; fin: string } {
+  if (!hora || typeof hora !== 'string') return { inicio: '—', fin: '' }
   const partes = hora.split('-').map((parte) => parte.trim())
   let inicio = partes[0] || '—'
   const fin = partes[1] ?? ''
@@ -111,7 +112,8 @@ export function abreviarDia(dia: string): string {
  * celda no tiene un formato que se pueda interpretar: en ese caso la interfaz
  * se limita a no marcar la hora, en vez de inventarse una.
  */
-export function aMinutos(hora: string): number | null {
+export function aMinutos(hora?: string | null): number | null {
+  if (!hora || typeof hora !== 'string') return null
   const texto = hora.trim().toLowerCase()
 
   const doceHoras = /^(\d{1,2}):(\d{2})\s*(am|pm)$/.exec(texto)
@@ -140,7 +142,8 @@ export function ahoraEnMinutos(fecha: Date): number {
 }
 
 /** ¿El fin de una lección coincide con el inicio de la siguiente? */
-function seEncadenan(fin: string, inicio: string): boolean {
+function seEncadenan(fin?: string | null, inicio?: string | null): boolean {
+  if (!fin || !inicio || typeof fin !== 'string' || typeof inicio !== 'string') return false
   const finEnMinutos = aMinutos(fin)
   const inicioEnMinutos = aMinutos(inicio)
   if (finEnMinutos !== null && inicioEnMinutos !== null) {

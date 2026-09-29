@@ -168,14 +168,15 @@ export function calcularAlcanceAviso(aviso: InstitutionAlert, totalEstudiantes: 
     }
   }
 
+  const valores = Array.isArray(aviso.target_values) ? aviso.target_values : []
   if (aviso.target_type === 'specialty') {
-    const cant = aviso.target_values.length
-    alcanceTexto = `Especialidad: ${aviso.target_values.join(', ')}`
+    const cant = valores.length
+    alcanceTexto = `Especialidad: ${valores.join(', ')}`
     porcentaje = Math.min(100, Math.round((cant / 7) * 100))
     destinatariosAprox = Math.round((totalEstudiantes * porcentaje) / 100)
   } else if (aviso.target_type === 'section') {
-    const cant = aviso.target_values.length
-    alcanceTexto = `Sección: ${aviso.target_values.join(', ')}`
+    const cant = valores.length
+    alcanceTexto = `Sección: ${valores.join(', ')}`
     porcentaje = Math.min(100, Math.round((cant / 9) * 100))
     destinatariosAprox = Math.round((totalEstudiantes * porcentaje) / 100)
   }

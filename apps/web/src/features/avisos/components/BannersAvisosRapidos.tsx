@@ -149,13 +149,13 @@ export function BannersAvisosRapidos() {
             {avisoActual.target_type === 'section' && (
               <span className="inline-flex items-center gap-1 rounded-md bg-surface/80 border border-border/60 px-1.5 py-0.5 text-[10px] font-bold text-text-muted">
                 <IconoUsuarios className="size-3 text-primary" />
-                <span>Sección: {avisoActual.target_values.join(', ')}</span>
+                <span>Sección: {(avisoActual.target_values || []).join(', ')}</span>
               </span>
             )}
             {avisoActual.target_type === 'specialty' && (
               <span className="inline-flex items-center gap-1 rounded-md bg-surface/80 border border-border/60 px-1.5 py-0.5 text-[10px] font-bold text-text-muted truncate max-w-[200px]">
                 <IconoBirrete className="size-3 text-primary" />
-                <span>{avisoActual.target_values.join(', ')}</span>
+                <span>{(avisoActual.target_values || []).join(', ')}</span>
               </span>
             )}
             {avisoActual.target_type === 'all' && (
