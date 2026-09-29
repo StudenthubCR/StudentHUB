@@ -174,4 +174,36 @@ describe('Integración de Notificaciones para Avisos', () => {
     // Aviso 12-2: NO aplica a la sección 11-1
     expect(aplicaAvisoAEstudiante(AVISOS_FIXTURE[4], ESTUDIANTE_TEST)).toBe(false)
   })
+
+  it('maneja con seguridad perfiles nulos, target_values indefinidos y avisos malformados', async () => {
+    const { aplicaAvisoAEstudiante } = await import('./avisos.service')
+
+    // Aviso general con estudiante null: debe retornar true
+    expect(aplicaAvisoAEstudiante(AVISOS_FIXTURE[0], null)).toBe(true)
+    expect(aplicaAvisoAEstudiante(AVISOS_FIXTURE[0], undefined)).toBe(true)
+
+    // Aviso segmentado con estudiante null: debe retornar false de forma segura
+    expect(aplicaAvisoAEstudiante(AVISOS_FIXTURE[1], null)).toBe(false)
+    expect(aplicaAvisoAEstudiante(AVISOS_FIXTURE[3], null)).toBe(false)
+
+    // Aviso con target_values nulo o indefinido: no debe arrojar excepción
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const avisoSinValores: any = {
+      ...AVISOS_FIXTURE[1],
+      target_values: null,
+    }
+    expect(aplicaAvisoAEstudiante(avisoSinValores, ESTUDIANTE_TEST)).toBe(false)
+
+    // Aviso con target_values que contienen valores no-string o nulos
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const avisoValoresMixtos: any = {
+      ...AVISOS_FIXTURE[1],
+      target_values: [null, undefined, 123, 'Desarrollo Web'],
+    }
+    expect(aplicaAvisoAEstudiante(avisoValoresMixtos, ESTUDIANTE_TEST)).toBe(true)
+
+    // Aviso completamente nulo o inactivo
+    expect(aplicaAvisoAEstudiante(null, ESTUDIANTE_TEST)).toBe(false)
+    expect(aplicaAvisoAEstudiante(undefined, ESTUDIANTE_TEST)).toBe(false)
+  })
 })

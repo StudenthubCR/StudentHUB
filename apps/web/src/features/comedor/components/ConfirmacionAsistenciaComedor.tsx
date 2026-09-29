@@ -30,7 +30,10 @@ export function ConfirmacionAsistenciaComedor({ fecha }: Props) {
   const [errorMensaje, setErrorMensaje] = useState<string | null>(null)
   const [mensajeExito, setMensajeExito] = useState<string | null>(null)
 
-  const fechaConsulta = useMemo(() => fecha ?? new Date(), [fecha])
+  const fechaConsulta = useMemo(() => {
+    if (fecha instanceof Date && !isNaN(fecha.getTime())) return fecha
+    return new Date()
+  }, [fecha])
   const estadoHorario = useMemo(() => esHorarioConfirmacionAbierto(fechaConsulta), [fechaConsulta])
   const fechaServicioStr = estadoHorario.fechaServicioStr
   const nombreFechaServicio = useMemo(

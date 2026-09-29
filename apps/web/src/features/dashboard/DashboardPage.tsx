@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BellIcon } from '@/components/icons'
+import { BellIcon, IconoAlertaTriangulo } from '@/components/icons'
 
 import { estadoDelDia, nombreLargoDeFecha } from '@/features/comedor/menu.service'
 import { useMenuSemanal } from '@/features/comedor/useMenuSemanal'
@@ -22,16 +22,12 @@ import { primerNombre, saludoSegunHora } from './saludo'
  * El inicio responde, en este orden, lo que un estudiante viene a mirar:
  * qué clase tiene ahora, qué viene después, qué hay de almuerzo y, ya de
  * último, las noticias.
- *
- * No lleva accesos directos a las secciones: los cuatro destinos ya están en
- * la barra de navegación, que en móvil está fija abajo y en escritorio es la
- * barra lateral. Repetirlos aquí ocupaba media pantalla sin agregar nada.
  */
 export function DashboardPage() {
-  const { estudiante } = useEstudiante()
+  const { estudiante, cargando: cargandoEstudiante, fueraDelPadron } = useEstudiante()
   const ahora = useReloj()
 
-  const grupoActivo = estudiante?.grupo ?? '11-1'
+  const grupoActivo = estudiante?.grupo || '12-1'
   const horario = useHorario(grupoActivo, ahora)
   const comedor = useMenuSemanal(ahora)
 
@@ -40,6 +36,32 @@ export function DashboardPage() {
   const [modalNotifAbierto, setModalNotifAbierto] = useState(false)
   const [bannerOculto, setBannerOculto] = useState(false)
   const esModoDemo = typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true'
+
+  // Skeleton de carga responsivo mientras se valida la sesión y el perfil en Supabase
+  if (cargandoEstudiante) {
+    return (
+      <div className="flex animate-pulse flex-col gap-6" aria-busy="true" aria-label="Cargando panel de estudiante">
+        <header className="flex flex-col gap-2.5">
+          <div className="h-6 w-44 rounded-full bg-surface-alt border border-border" />
+          <div className="h-10 w-72 rounded-2xl bg-surface-alt" />
+          <div className="h-4 w-40 rounded-lg bg-surface-alt" />
+        </header>
+
+        <div className="h-20 w-full rounded-2xl bg-surface-alt border border-border" />
+
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <div className="flex flex-col gap-4">
+            <div className="h-44 rounded-2xl bg-surface-alt border border-border" />
+            <div className="h-60 rounded-2xl bg-surface-alt border border-border" />
+          </div>
+          <div className="flex flex-col gap-4">
+            <div className="h-44 rounded-2xl bg-surface-alt border border-border" />
+            <div className="h-60 rounded-2xl bg-surface-alt border border-border" />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <section className="animate-fade-in">
@@ -72,6 +94,19 @@ export function DashboardPage() {
           {nombreLargoDeFecha(ahora)}
         </p>
       </header>
+
+      {/* Aviso institucional si el usuario no figura aún en el padrón oficial */}
+      {fueraDelPadron && (
+        <div className="mb-4 sm:mb-5 flex items-start gap-3 rounded-2xl border border-amber-500/35 bg-amber-500/10 p-3.5 sm:p-4 text-menor text-amber-950 dark:text-amber-200">
+          <IconoAlertaTriangulo className="size-5 shrink-0 text-amber-600 mt-0.5" />
+          <div className="min-w-0">
+            <p className="font-bold">Cuenta en proceso de vinculación al padrón estudiantil</p>
+            <p className="mt-0.5 text-micro text-amber-800 dark:text-amber-300">
+              Iniciaste sesión con éxito. Si eres estudiante regular del CTP, solicita a secretaría que agregue tu correo institucional al padrón para visualizar tu carnet personalizado y horarios específicos.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Banner de bienvenida para Notificaciones (oculto en modo demo para mantener el dashboard limpio) */}
       {!esModoDemo && !notificacionesActivas && permiso !== 'denied' && !bannerOculto && (

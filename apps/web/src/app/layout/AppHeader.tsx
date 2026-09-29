@@ -15,7 +15,7 @@ type Props = {
 }
 
 export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
-  const { estudiante } = useEstudiante()
+  const { estudiante, cargando: cargandoEstudiante } = useEstudiante()
   const { sesion, cerrarSesion } = useSesion()
   const { permiso, notificacionesActivas, noLeidas } = useNotificaciones()
   const [modalNotifAbierto, setModalNotifAbierto] = useState(false)
@@ -134,10 +134,12 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
         {/* La foto era decorativa y no llevaba a ningún lado; un avatar en la
             cabecera es justo lo que la gente toca buscando su ficha. Sin
             sesión no se muestra una cara ajena: se ofrece entrar. */}
-        {estudiante ? (
+        {cargandoEstudiante ? (
+          <div className="size-10 rounded-full bg-surface-alt border border-border animate-pulse md:size-11" />
+        ) : estudiante ? (
           <Link
             to="/carnet"
-            aria-label={`Ver el carnet de ${estudiante.nombre}`}
+            aria-label={`Ver el carnet de ${estudiante.nombre ?? 'estudiante'}`}
             className="rounded-full transition-transform duration-250 ease-ui active:scale-95"
           >
             {estudiante.fotoUrl && !estudiante.fotoUrl.includes('placeholder') ? (
@@ -156,9 +158,24 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
                   'bg-primary-solid text-nota font-bold text-white shadow-[0_0_0_3px_var(--color-primary-tint)] md:size-11'
                 }
               >
-                {obtenerIniciales(estudiante.nombre)}
+                {obtenerIniciales(estudiante.nombre ?? '')}
               </span>
             )}
+          </Link>
+        ) : sesion ? (
+          <Link
+            to="/carnet"
+            aria-label="Perfil de usuario"
+            className="rounded-full transition-transform duration-250 ease-ui active:scale-95"
+          >
+            <span
+              className={
+                'flex size-10 items-center justify-center rounded-full border-2 border-primary ' +
+                'bg-primary-solid text-nota font-bold text-white shadow-[0_0_0_3px_var(--color-primary-tint)] md:size-11'
+              }
+            >
+              {obtenerIniciales(sesion.user.email ?? 'Estudiante')}
+            </span>
           </Link>
         ) : (
           <Link

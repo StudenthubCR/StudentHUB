@@ -299,37 +299,51 @@ export async function obtenerTodosLosAvisosAdmin(): Promise<InstitutionAlert[]> 
   return cargarAvisosLocales()
 }
 
-/**
- * Determina si un aviso aplica para el perfil del estudiante actual o si es administrador.
- */
 export function aplicaAvisoAEstudiante(
-  aviso: InstitutionAlert,
-  estudiante: Estudiante | null,
+  aviso: InstitutionAlert | null | undefined,
+  estudiante: Estudiante | null | undefined,
   esAdmin = false,
 ): boolean {
-  if (!aviso.active) return false
+  if (!aviso || !aviso.active) return false
 
   const ahora = new Date()
   if (aviso.expires_at && new Date(aviso.expires_at) < ahora) {
     return false
   }
 
+  // Los administradores visualizan la totalidad de los avisos
   if (esAdmin) return true
 
+  // Avisos de alcance institucional general aplican a todos los estudiantes
   if (aviso.target_type === 'all') {
     return true
   }
 
+  // Si el aviso es específico (sección o especialidad) y el estudiante aún no está resuelto, no aplica
+  if (!estudiante) {
+    return false
+  }
+
+  const valoresDestino = Array.isArray(aviso.target_values)
+    ? aviso.target_values
+    : []
+
   if (aviso.target_type === 'specialty') {
-    if (!estudiante?.especialidad) return false
-    const esp = estudiante.especialidad.trim().toLowerCase()
-    return aviso.target_values.some((val) => val.trim().toLowerCase() === esp)
+    const espEstudiante = (estudiante.especialidad ?? '').trim().toLowerCase()
+    if (!espEstudiante) return false
+    return valoresDestino.some((val) => typeof val === 'string' && val.trim().toLowerCase() === espEstudiante)
   }
 
   if (aviso.target_type === 'section') {
-    if (!estudiante?.grupo) return false
-    const sec = estudiante.grupo.trim().toLowerCase()
-    return aviso.target_values.some((val) => val.trim().toLowerCase() === sec)
+    const seccionEstudiante = (
+      estudiante.grupo ||
+      (estudiante as unknown as { seccion?: string })?.seccion ||
+      ''
+    )
+      .trim()
+      .toLowerCase()
+    if (!seccionEstudiante) return false
+    return valoresDestino.some((val) => typeof val === 'string' && val.trim().toLowerCase() === seccionEstudiante)
   }
 
   return false

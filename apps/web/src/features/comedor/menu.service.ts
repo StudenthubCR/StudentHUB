@@ -160,6 +160,9 @@ export function estadoDelDia(menus: MenuDia[], fecha: Date): EstadoDelDia {
 
 /** 'lunes 31 de agosto' */
 export function nombreLargoDeFecha(fecha: Date): string {
+  if (!(fecha instanceof Date) || isNaN(fecha.getTime())) {
+    return 'Fecha no disponible'
+  }
   return format(fecha, "EEEE d 'de' MMMM", { locale: es })
 }
 

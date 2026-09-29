@@ -54,11 +54,12 @@ export function calcularFechaServicio(ahora: Date = new Date()): {
   fechaServicioStr: string
   esParaManana: boolean
 } {
-  const diaSemana = ahora.getDay() // 0 = Dom, 1 = Lun, ..., 5 = Vie, 6 = Sab
-  const minutos = ahora.getHours() * 60 + ahora.getMinutes()
+  const fechaRef = ahora instanceof Date && !isNaN(ahora.getTime()) ? ahora : new Date()
+  const diaSemana = fechaRef.getDay() // 0 = Dom, 1 = Lun, ..., 5 = Vie, 6 = Sab
+  const minutos = fechaRef.getHours() * 60 + fechaRef.getMinutes()
   const minutosApertura = HORA_APERTURA_PREVIA * 60 // 1200 (8:00 PM)
 
-  const d = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate())
+  const d = new Date(fechaRef.getFullYear(), fechaRef.getMonth(), fechaRef.getDate())
 
   if (minutos >= minutosApertura) {
     if (diaSemana === 5) {

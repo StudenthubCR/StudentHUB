@@ -20,9 +20,14 @@ export function HorarioGrupoPage() {
   const { estudiante } = useEstudiante()
   const ahora = useReloj()
 
+  const grupoEstudiante = estudiante?.grupo ?? null
+  const perteneceAlGrado = Boolean(
+    grado && grupoEstudiante && Array.isArray(grado.grupos) && grado.grupos.includes(grupoEstudiante),
+  )
+
   // Si el estudiante logueado pertenece a este grado, sugerir su grupo automáticamente
   const grupoPorDefecto =
-    (grado && estudiante && grado.grupos.includes(estudiante.grupo) ? estudiante.grupo : null) ??
+    (perteneceAlGrado ? grupoEstudiante : null) ??
     grado?.grupo ??
     null
 
@@ -31,12 +36,12 @@ export function HorarioGrupoPage() {
   useEffect(() => {
     if (grado) {
       const g =
-        (estudiante && grado.grupos.includes(estudiante.grupo) ? estudiante.grupo : null) ??
+        (perteneceAlGrado ? grupoEstudiante : null) ??
         grado.grupo ??
         null
       setGrupoSeleccionado(g)
     }
-  }, [grado, estudiante?.grupo])
+  }, [grado, perteneceAlGrado, grupoEstudiante])
 
   const grupoActivo = grupoSeleccionado ?? grado?.grupo ?? null
   const { dias, lecciones, cargando, error, reintentar } = useHorario(grupoActivo, ahora)

@@ -68,17 +68,20 @@ export function PanelDetalles({
       </h3>
 
       <div className="mb-4.5">
-        <InsigniaEstado activo={estudiante.activo} />
+        <InsigniaEstado activo={estudiante?.activo ?? true} />
       </div>
 
       <div className="mb-5 grid grid-cols-1 gap-3">
-        <Dato etiqueta="Institución" valor={`${estudiante.institucion} (${estudiante.siglaInstitucion})`} />
-        <Dato etiqueta="Especialidad" valor={estudiante.especialidad} />
+        <Dato
+          etiqueta="Institución"
+          valor={`${estudiante?.institucion ?? 'Colegio Técnico Profesional'} (${estudiante?.siglaInstitucion ?? 'CTP'})`}
+        />
+        <Dato etiqueta="Especialidad" valor={estudiante?.especialidad ?? 'Tronco Común'} />
         <Dato
           etiqueta="Sección / Nivel"
-          valor={`${estudiante.grupo} (${estudiante.nivel} — ${estudiante.jornada})`}
+          valor={`${estudiante?.grupo ?? '12-1'} (${estudiante?.nivel ?? '12'} — ${estudiante?.jornada ?? 'Nocturna'})`}
         />
-        <Dato etiqueta="Vigencia" valor={estudiante.vigencia} />
+        <Dato etiqueta="Vigencia" valor={estudiante?.vigencia ?? 'Ciclo Lectivo 2026'} />
       </div>
 
       <div className="flex flex-col gap-2.5">

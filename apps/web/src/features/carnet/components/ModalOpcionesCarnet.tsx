@@ -165,19 +165,19 @@ export function ModalOpcionesCarnet({
               <div className="flex flex-col gap-2 text-menor">
                 <div className="flex justify-between border-b border-border/60 pb-1.5">
                   <span className="text-text-muted">Nombre:</span>
-                  <span className="font-semibold text-text text-right">{estudiante.nombre}</span>
+                  <span className="font-semibold text-text text-right">{estudiante?.nombre ?? 'Estudiante'}</span>
                 </div>
                 <div className="flex justify-between border-b border-border/60 pb-1.5">
                   <span className="text-text-muted">Sección asignada:</span>
-                  <span className="font-bold text-primary">{estudiante.grupo}</span>
+                  <span className="font-bold text-primary">{estudiante?.grupo ?? '12-1'}</span>
                 </div>
                 <div className="flex justify-between border-b border-border/60 pb-1.5">
                   <span className="text-text-muted">ID Estudiantil:</span>
-                  <span className="font-semibold text-text">{estudiante.codigo}</span>
+                  <span className="font-semibold text-text">{estudiante?.codigo ?? '0000'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-text-muted">Especialidad:</span>
-                  <span className="font-semibold text-text text-right">{estudiante.especialidad}</span>
+                  <span className="font-semibold text-text text-right">{estudiante?.especialidad ?? 'General'}</span>
                 </div>
               </div>
             </div>
