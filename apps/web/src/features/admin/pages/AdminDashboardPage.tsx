@@ -4,6 +4,7 @@ import { StatCard } from '../components/StatCard'
 import { SkeletonCard, SkeletonTableRow } from '../components/Skeletons'
 import { ModalEditarCrearAviso } from '../components/ModalEditarCrearAviso'
 import { ModalConfirmacion } from '../components/ModalConfirmacion'
+import { WidgetMetricasComedor } from '../components/WidgetMetricasComedor'
 import {
   IconoBirrete,
   IconoMegafono,
@@ -207,7 +208,12 @@ export function AdminDashboardPage() {
         )}
       </div>
 
-      {/* 2. Visualización y Alcance de los Últimos Avisos */}
+      {/* 2. Control y Métricas de Asistencia al Comedor en Tiempo Real */}
+      <WidgetMetricasComedor
+        totalEstudiantesPadrone={kpis?.estudiantesActivos || kpis?.totalEstudiantes || 0}
+      />
+
+      {/* 3. Visualización y Alcance de los Últimos Avisos */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm lg:col-span-2">
           <div className="flex items-center justify-between mb-4">

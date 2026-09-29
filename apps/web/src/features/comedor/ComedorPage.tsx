@@ -1,7 +1,9 @@
 import { useCallback, useMemo } from 'react'
 import { PageSection } from '@/components/PageSection'
+import { IconoInfo } from '@/components/icons'
 import { MenuHoyCard } from './components/MenuHoyCard'
 import { MenuSemanaGrid } from './components/MenuSemanaGrid'
+import { ConfirmacionAsistenciaComedor } from './components/ConfirmacionAsistenciaComedor'
 import { ErrorComedor } from './comedor.api'
 import {
   claveDeFecha,
@@ -56,8 +58,24 @@ export function ComedorPage() {
 
   return (
     <PageSection titulo="Comedor Estudiantil">
-      <div className="mt-2.5 flex flex-col gap-7">
+      <div className="mt-2.5 flex flex-col gap-6">
+        {/* Descargo Logístico Institucional Visible */}
+        <div className="flex items-center gap-3 rounded-2xl border border-border/80 bg-surface-alt/70 px-4.5 py-3 text-menuda text-text-muted shadow-2xs">
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary-tint text-primary">
+            <IconoInfo className="size-4" />
+          </span>
+          <p className="leading-relaxed">
+            El menú del día está sujeto a cambios de última hora según la disponibilidad logística de insumos.
+          </p>
+        </div>
+
+        {/* Tarjeta del Menú de Hoy (Almuerzo / Cena) */}
         <MenuHoyCard estado={estado} hoy={hoy} onReintentar={onReintentar} />
+
+        {/* Sistema de Confirmación de Asistencia ("Comeré hoy" / "No comeré hoy") */}
+        <ConfirmacionAsistenciaComedor fecha={hoy} />
+
+        {/* Parrilla Semanal */}
         <MenuSemanaGrid
           dias={menusDeSemana(menus, dias)}
           subtitulo={subtitulo}

@@ -4,7 +4,7 @@ import { useSesion } from '@/features/auth/useSesion'
 import { ESTUDIANTE_DEMO, type Estudiante } from './estudiante.fixture'
 
 type FilaEstudiante = {
-
+  id?: string
   codigo: string
   correo: string
   nombre: string
@@ -16,6 +16,7 @@ type FilaEstudiante = {
 
 function aEstudiante(fila: FilaEstudiante): Estudiante {
   return {
+    id: fila.id,
     nombre: fila.nombre,
     codigo: fila.codigo,
     especialidad: fila.especialidad ?? '',
@@ -52,6 +53,7 @@ export function useEstudiante() {
       }
       if (sesion?.user.email === 'studenthub.cr@gmail.com') {
         return {
+          id: '00000000-0000-0000-0000-000000000099',
           nombre: 'Administración StudentHUB',
           codigo: 'ADMIN-01',
           especialidad: 'Administración General',
@@ -67,7 +69,7 @@ export function useEstudiante() {
       }
       const { data, error } = await supabase
         .from('estudiantes')
-        .select('codigo, correo, nombre, especialidad, estado, grupos(codigo, nivel, jornada), instituciones(nombre, slug)')
+        .select('id, codigo, correo, nombre, especialidad, estado, grupos(codigo, nivel, jornada), instituciones(nombre, slug)')
         .maybeSingle<FilaEstudiante>()
 
       if (error) throw error

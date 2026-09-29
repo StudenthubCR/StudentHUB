@@ -12,6 +12,7 @@
  * tabla `estudiantes` filtrada por la sesión.
  */
 export type Estudiante = {
+  id?: string
   nombre: string
   /** Código interno del colegio, nunca la cédula (plan §10). */
   codigo: string
@@ -27,6 +28,7 @@ export type Estudiante = {
 }
 
 export const ESTUDIANTE_DEMO: Estudiante = {
+  id: '00000000-0000-0000-0000-000000000001',
   nombre: 'Erick García Burgos',
   codigo: '208520530',
   especialidad: 'Desarrollo Web',

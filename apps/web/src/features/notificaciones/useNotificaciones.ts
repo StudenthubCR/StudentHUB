@@ -9,6 +9,15 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
+import { supabase } from '@/lib/supabase'
+import { useEstudiante } from '@/features/estudiante/useEstudiante'
+import { useSesion } from '@/features/auth/useSesion'
+import {
+  aplicaAvisoAEstudiante,
+  convertirAvisoANotificacion,
+  esUsuarioAdmin,
+} from '@/features/avisos/avisos.service'
+import type { InstitutionAlert } from '@/features/avisos/avisos.types'
 import {
   type EstadoPermisoNotificacion,
   type CanalesNotificacion,
@@ -26,9 +35,19 @@ import {
   contarNoLeidas,
   solicitarPermisoNotificacion,
   notificacionesSoportadas,
+  sincronizarNotificacionesDesdeUltimoAcceso,
 } from './notificaciones.service'
 
 export function useNotificaciones() {
+  const { estudiante } = useEstudiante()
+  const { sesion } = useSesion()
+
+  const email = (sesion?.user?.email ?? '').trim().toLowerCase()
+  const esAdmin =
+    esUsuarioAdmin(email) ||
+    sesion?.user?.app_metadata?.role === 'admin' ||
+    sesion?.user?.user_metadata?.role === 'admin'
+
   /** Estado reactivo del permiso ('default', 'granted', 'denied', 'unsupported') */
   const [permiso, setPermiso] = useState<EstadoPermisoNotificacion>(obtenerEstadoPermiso)
   /** Estado reactivo de los canales seleccionados (comedor, horarios, agenda, ausencias, noticias) */
@@ -55,6 +74,64 @@ export function useNotificaciones() {
       window.removeEventListener('studenthub:notificaciones-actualizadas', sincronizar)
     }
   }, [sincronizar])
+
+  // 1. Sincronización resiliente con Supabase tras reconexión o reapertura de app
+  useEffect(() => {
+    void sincronizarNotificacionesDesdeUltimoAcceso(estudiante, esAdmin)
+  }, [estudiante, esAdmin])
+
+  // 2. Escucha activa en tiempo real mediante canales Supabase Realtime (notificaciones-in-app)
+  useEffect(() => {
+    const canal = supabase
+      .channel('notificaciones-in-app')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'institution_alerts' },
+        (payload) => {
+          const nuevoAviso = payload.new as InstitutionAlert
+          if (!nuevoAviso || !nuevoAviso.active) return
+
+          // Comprobar si aplica al perfil del usuario
+          if (aplicaAvisoAEstudiante(nuevoAviso, estudiante, esAdmin)) {
+            const notif = convertirAvisoANotificacion(nuevoAviso)
+            agregarNotificacion(notif, true)
+            setNotificaciones(obtenerNotificaciones())
+
+            // Desplegar toast flotante in-app no intrusivo
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(
+                new CustomEvent('studenthub:toast-alerta-in-app', {
+                  detail: {
+                    id: notif.id,
+                    titulo: notif.titulo,
+                    mensaje: notif.mensaje,
+                    categoria: notif.categoria,
+                    enlace: notif.enlace,
+                  },
+                }),
+              )
+            }
+          }
+        },
+      )
+      .on('broadcast', { event: 'nueva-alerta' }, (payload) => {
+        if (payload?.payload) {
+          const item = payload.payload as NotificacionItem
+          agregarNotificacion(item, true)
+          setNotificaciones(obtenerNotificaciones())
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(
+              new CustomEvent('studenthub:toast-alerta-in-app', { detail: item }),
+            )
+          }
+        }
+      })
+      .subscribe()
+
+    return () => {
+      void supabase.removeChannel(canal)
+    }
+  }, [estudiante, esAdmin])
 
   /**
    * Solicita el permiso nativo al navegador. Si es concedido,

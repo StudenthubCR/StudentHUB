@@ -67,7 +67,7 @@ export function AlmuerzoDeHoy({ estado, cargando, hayError }: Props) {
     >
       <span className="mb-2.5 flex items-center gap-2 text-etiqueta font-bold tracking-[0.09em] text-text-muted uppercase">
         <IconoComedor className="size-3.5" />
-        Almuerzo de hoy
+        Almuerzo / Cena de hoy
       </span>
 
       {cargando ? (

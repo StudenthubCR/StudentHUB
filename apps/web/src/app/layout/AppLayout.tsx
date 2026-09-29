@@ -6,6 +6,7 @@ import { AppNav } from './AppNav'
 import { AvisoSinConexion } from './AvisoSinConexion'
 import { usePwaInstall } from '@/features/pwa/usePwaInstall'
 import { ModalInstalarApp } from '@/features/pwa/ModalInstalarApp'
+import { ToastNotificacionFlotante } from '@/features/notificaciones/components/ToastNotificacionFlotante'
 import {
   IconoDescargar,
   IconoBirrete,
@@ -165,6 +166,8 @@ export function AppLayout({ children }: { children?: ReactNode }) {
         abierto={modalInstalarAbierto}
         alCerrar={() => setModalInstalarAbierto(false)}
       />
+
+      <ToastNotificacionFlotante />
 
       {/* Sin esto el scroll se queda donde estaba: al pasar de un Comedor
           scrolleado a otra sección se caía a media página. Además restaura la

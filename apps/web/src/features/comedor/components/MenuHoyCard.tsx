@@ -63,7 +63,7 @@ export function MenuHoyCard({ estado, hoy, onReintentar }: Props) {
 
     return (
       <article className={CONTENEDOR}>
-        <Badge Icono={IconoComedor}>Menú Recomendado de Hoy</Badge>
+        <Badge Icono={IconoComedor}>Almuerzo / Cena de Hoy</Badge>
         <Titulo>{estado.menu.plato}</Titulo>
 
         {acompanamiento && (
@@ -105,7 +105,7 @@ export function MenuHoyCard({ estado, hoy, onReintentar }: Props) {
     'sin-menu': {
       titulo: 'Sin menú publicado para hoy',
       detalle:
-        'La cocina todavía no ha publicado el almuerzo de este día. Revisá la programación semanal más abajo.',
+        'La cocina todavía no ha publicado el almuerzo / cena de este día. Revisá la programación semanal más abajo.',
     },
   }
 

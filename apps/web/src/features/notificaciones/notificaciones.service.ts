@@ -40,9 +40,19 @@ export interface NotificacionItem {
   importante?: boolean
 }
 
+import { supabase } from '@/lib/supabase'
+import type { Estudiante } from '@/features/estudiante/estudiante.fixture'
+import type { InstitutionAlert } from '@/features/avisos/avisos.types'
+import {
+  aplicaAvisoAEstudiante,
+  convertirAvisoANotificacion,
+} from '@/features/avisos/avisos.service'
+
 /** Claves de almacenamiento en localStorage */
-const CLAVE_STORAGE_CANALES = 'studenthub_notif_canales'
-const CLAVE_STORAGE_INBOX = 'studenthub_notif_inbox'
+export const CLAVE_STORAGE_CANALES = 'studenthub_notif_canales'
+export const CLAVE_STORAGE_INBOX = 'studenthub_notif_inbox'
+export const CLAVE_STORAGE_ULTIMO_ACCESO = 'studenthub_notif_ultimo_acceso'
+export const CLAVE_PUSH_SUBSCRIPTION = 'studenthub_push_subscription'
 
 /** Configuración por defecto: todos los canales activos al otorgar permiso */
 export const CANALES_POR_DEFECTO: CanalesNotificacion = {
@@ -281,7 +291,128 @@ export function formatearTiempoRelativo(fechaIso: string): string {
 }
 
 /**
- * Solicita el permiso nativo de notificación al navegador.
+ * Convierte una clave pública VAPID base64 en Uint8Array para Web Push.
+ */
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
+  const rawData = window.atob(base64)
+  const outputArray = new Uint8Array(rawData.length)
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i)
+  }
+  return outputArray
+}
+
+/**
+ * Obtiene el registro activo del Service Worker o espera su inicialización.
+ */
+export async function obtenerRegistroServiceWorker(): Promise<ServiceWorkerRegistration | null> {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return null
+  try {
+    let reg = await navigator.serviceWorker.getRegistration()
+    if (!reg && 'register' in navigator.serviceWorker) {
+      try {
+        reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      } catch {
+        // En desarrollo o entornos locales sin sw.js compilado
+      }
+    }
+    if (reg) return reg
+
+    const timeout = new Promise<null>((res) => setTimeout(() => res(null), 1500))
+    const listo = await Promise.race([navigator.serviceWorker.ready, timeout])
+    return listo || null
+  } catch (err) {
+    console.warn('Error al verificar registro de Service Worker:', err)
+    return null
+  }
+}
+
+/**
+ * Sincroniza la suscripción Web Push (PushSubscription) con el Service Worker si está soportado.
+ */
+export async function sincronizarSuscripcionWebPush(
+  registroExistente?: ServiceWorkerRegistration | null,
+): Promise<PushSubscription | null> {
+  if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return null
+  if (!('PushManager' in window)) return null
+  if (Notification.permission !== 'granted') return null
+
+  try {
+    const reg = registroExistente ?? (await obtenerRegistroServiceWorker())
+    if (!reg || !('pushManager' in reg)) return null
+
+    let sub = await reg.pushManager.getSubscription()
+    const vapidKey = (import.meta.env as Record<string, string>).VITE_VAPID_PUBLIC_KEY
+
+    if (!sub && vapidKey) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidKey) as unknown as BufferSource,
+      })
+    }
+
+    if (sub) {
+      localStorage.setItem(CLAVE_PUSH_SUBSCRIPTION, JSON.stringify(sub))
+    }
+    return sub
+  } catch (err) {
+    console.warn('Advertencia al registrar suscripción Web Push:', err)
+    return null
+  }
+}
+
+/**
+ * Sincroniza notificaciones emitidas desde la última conexión del usuario (resiliencia offline).
+ */
+export async function sincronizarNotificacionesDesdeUltimoAcceso(
+  estudiante: Estudiante | null,
+  esAdmin = false,
+): Promise<NotificacionItem[]> {
+  if (typeof window === 'undefined') return []
+
+  const ahora = new Date().toISOString()
+  const ultimoAcceso = localStorage.getItem(CLAVE_STORAGE_ULTIMO_ACCESO)
+  const notificacionesActuales = obtenerNotificaciones()
+  const idsExistentes = new Set(notificacionesActuales.map((n) => n.id))
+  const nuevasNotificaciones: NotificacionItem[] = []
+
+  try {
+    let query = supabase.from('institution_alerts').select('*').eq('active', true)
+    if (ultimoAcceso) {
+      query = query.gt('created_at', ultimoAcceso)
+    }
+
+    const { data, error } = await query.order('created_at', { ascending: false })
+
+    if (!error && data && data.length > 0) {
+      for (const aviso of data as InstitutionAlert[]) {
+        if (!aplicaAvisoAEstudiante(aviso, estudiante, esAdmin)) continue
+        const notifId = `notif-aviso-${aviso.id}`
+        if (!idsExistentes.has(notifId)) {
+          const item = convertirAvisoANotificacion(aviso)
+          nuevasNotificaciones.push(item)
+          idsExistentes.add(notifId)
+        }
+      }
+    }
+
+    if (nuevasNotificaciones.length > 0) {
+      const combinadas = [...nuevasNotificaciones, ...notificacionesActuales]
+      guardarNotificaciones(combinadas)
+    }
+  } catch (err) {
+    console.warn('Fallo al sincronizar notificaciones offline desde Supabase:', err)
+  } finally {
+    localStorage.setItem(CLAVE_STORAGE_ULTIMO_ACCESO, ahora)
+  }
+
+  return nuevasNotificaciones
+}
+
+/**
+ * Solicita el permiso nativo de notificación al navegador mediante acción explícita del usuario.
  */
 export async function solicitarPermisoNotificacion(): Promise<EstadoPermisoNotificacion> {
   if (!notificacionesSoportadas()) {
@@ -290,6 +421,12 @@ export async function solicitarPermisoNotificacion(): Promise<EstadoPermisoNotif
 
   try {
     const res = await Notification.requestPermission()
+    if (res === 'granted') {
+      const reg = await obtenerRegistroServiceWorker()
+      if (reg) {
+        void sincronizarSuscripcionWebPush(reg)
+      }
+    }
     return res as EstadoPermisoNotificacion
   } catch (err) {
     console.error('Error al solicitar permiso de notificación:', err)
@@ -300,7 +437,7 @@ export async function solicitarPermisoNotificacion(): Promise<EstadoPermisoNotif
 /**
  * Emite una notificación nativa visible en el sistema operativo o celular.
  */
-async function emitirNotificacion(
+export async function emitirNotificacion(
   titulo: string,
   opciones?: NotificationOptions,
 ): Promise<boolean> {
@@ -315,12 +452,10 @@ async function emitirNotificacion(
   }
 
   try {
-    if ('serviceWorker' in navigator) {
-      const registro = await navigator.serviceWorker.getRegistration()
-      if (registro && 'showNotification' in registro) {
-        await registro.showNotification(titulo, configCompleta)
-        return true
-      }
+    const registro = await obtenerRegistroServiceWorker()
+    if (registro && 'showNotification' in registro) {
+      await registro.showNotification(titulo, configCompleta)
+      return true
     }
 
     new Notification(titulo, configCompleta)
