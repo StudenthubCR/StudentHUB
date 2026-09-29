@@ -12,12 +12,46 @@ import { LoginPage } from '@/features/auth/LoginPage'
 import { RutaProtegida } from '@/features/auth/RutaProtegida'
 import { ExpoLandingPage } from '@/features/expo/ExpoLandingPage'
 
+import {
+  AdminLayout,
+  AdminRutaProtegida,
+  AdminDashboardPage,
+  AdminAvisosPage,
+  AdminNoticiasPage,
+  AdminEstudiantesPage,
+  AdminAuditoriaPage,
+  AdminForbiddenPage,
+} from '@/features/admin'
+
 /**
  * `handle.titulo` alimenta el título del documento (ver `useTituloDeRuta`), y
  * `errorElement` se hace cargo tanto de las rutas que no existen como de
  * cualquier error de render.
  */
 export const router = createBrowserRouter([
+  // Panel de Control Administrativo (RBAC: Solo Administradores)
+  {
+    path: '/admin',
+    element: (
+      <AdminRutaProtegida>
+        <AdminLayout />
+      </AdminRutaProtegida>
+    ),
+    errorElement: <PaginaDeError />,
+    children: [
+      { index: true, element: <AdminDashboardPage />, handle: { titulo: 'Panel de Control · Student HUB' } },
+      { path: 'avisos', element: <AdminAvisosPage />, handle: { titulo: 'Gestor de Avisos · Admin' } },
+      { path: 'noticias', element: <AdminNoticiasPage />, handle: { titulo: 'Gestor de Noticias · Admin' } },
+      { path: 'estudiantes', element: <AdminEstudiantesPage />, handle: { titulo: 'Directorio Estudiantil · Admin' } },
+      { path: 'auditoria', element: <AdminAuditoriaPage />, handle: { titulo: 'Registro de Auditoría · Admin' } },
+    ],
+  },
+  {
+    path: '/admin/403',
+    element: <AdminForbiddenPage />,
+    handle: { titulo: '403 Acceso Denegado · Student HUB' },
+    errorElement: <PaginaDeError />,
+  },
   // Portal público de la Expotécnica
   {
     path: '/expo',

@@ -238,6 +238,116 @@ export async function eliminarAviso(id: string, correoUsuario: string): Promise<
   return true
 }
 
+export async function actualizarAviso(
+  id: string,
+  payload: Partial<NuevoAvisoPayload> & { active?: boolean; expires_at?: string | null },
+  correoUsuario: string,
+): Promise<{ ok: boolean; aviso?: InstitutionAlert; error?: string }> {
+  if (!esUsuarioAdmin(correoUsuario)) {
+    return { ok: false, error: 'Operación denegada: Solo el administrador puede modificar comunicados.' }
+  }
+
+  const actuales = cargarAvisosLocales()
+  const indice = actuales.findIndex((a) => a.id === id)
+  if (indice === -1) {
+    return { ok: false, error: 'Aviso no encontrado.' }
+  }
+
+  const avisoActualizado: InstitutionAlert = {
+    ...actuales[indice]!,
+    ...(payload.title !== undefined ? { title: payload.title.trim() } : {}),
+    ...(payload.message !== undefined ? { message: payload.message.trim() } : {}),
+    ...(payload.category !== undefined ? { category: payload.category } : {}),
+    ...(payload.priority !== undefined ? { priority: payload.priority } : {}),
+    ...(payload.target_type !== undefined ? { target_type: payload.target_type } : {}),
+    ...(payload.target_values !== undefined
+      ? { target_values: payload.target_type === 'all' ? [] : payload.target_values }
+      : {}),
+    ...(payload.expires_at !== undefined ? { expires_at: payload.expires_at } : {}),
+    ...(payload.active !== undefined ? { active: payload.active } : {}),
+  }
+
+  try {
+    await supabase
+      .from('institution_alerts')
+      .update({
+        title: avisoActualizado.title,
+        message: avisoActualizado.message,
+        category: avisoActualizado.category,
+        priority: avisoActualizado.priority,
+        target_type: avisoActualizado.target_type,
+        target_values: avisoActualizado.target_values,
+        expires_at: avisoActualizado.expires_at,
+        active: avisoActualizado.active,
+      })
+      .eq('id', id)
+  } catch {
+    // Si Supabase falla por red o modo local, continúa persistiendo en storage
+  }
+
+  if (typeof window !== 'undefined') {
+    actuales[indice] = avisoActualizado
+    localStorage.setItem(CLAVE_STORAGE, JSON.stringify(actuales))
+    window.dispatchEvent(new CustomEvent('studenthub:avisos-actualizados'))
+  }
+
+  return { ok: true, aviso: avisoActualizado }
+}
+
+export async function desactivarAviso(id: string, correoUsuario: string): Promise<boolean> {
+  if (!esUsuarioAdmin(correoUsuario)) return false
+  const res = await actualizarAviso(
+    id,
+    { active: false, expires_at: new Date().toISOString() },
+    correoUsuario,
+  )
+  return res.ok
+}
+
+export async function duplicarAviso(
+  id: string,
+  correoUsuario: string,
+): Promise<{ ok: boolean; aviso?: InstitutionAlert; error?: string }> {
+  if (!esUsuarioAdmin(correoUsuario)) {
+    return { ok: false, error: 'Operación denegada.' }
+  }
+  const actuales = cargarAvisosLocales()
+  const original = actuales.find((a) => a.id === id)
+  if (!original) return { ok: false, error: 'Aviso original no encontrado.' }
+
+  const payload: NuevoAvisoPayload = {
+    title: `${original.title} (Copia)`,
+    message: original.message,
+    category: original.category,
+    priority: original.priority,
+    target_type: original.target_type,
+    target_values: [...original.target_values],
+    expires_at: null,
+  }
+
+  return crearAviso(payload, correoUsuario)
+}
+
+export async function obtenerTodosLosAvisosAdmin(): Promise<InstitutionAlert[]> {
+  try {
+    const { data, error } = await supabase
+      .from('institution_alerts')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (!error && data && data.length > 0) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(CLAVE_STORAGE, JSON.stringify(data))
+      }
+      return data as InstitutionAlert[]
+    }
+  } catch {
+    // Fallback a almacenamiento local
+  }
+
+  return cargarAvisosLocales()
+}
+
 /**
  * Determina si un aviso aplica para el perfil del estudiante actual o si es administrador.
  */

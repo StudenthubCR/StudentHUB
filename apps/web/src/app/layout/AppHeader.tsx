@@ -6,6 +6,7 @@ import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import { useNotificaciones } from '@/features/notificaciones/useNotificaciones'
 import { ModalNotificaciones } from '@/features/notificaciones/ModalNotificaciones'
 import { obtenerIniciales } from '@/lib/texto'
+import { esUsuarioAdmin } from '@/features/avisos/avisos.service'
 import { ThemeToggle } from './ThemeToggle'
 
 type Props = {
@@ -18,6 +19,13 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
   const { sesion, cerrarSesion } = useSesion()
   const { permiso, notificacionesActivas, noLeidas } = useNotificaciones()
   const [modalNotifAbierto, setModalNotifAbierto] = useState(false)
+
+  const email = (sesion?.user?.email ?? '').trim().toLowerCase()
+  const esAdmin =
+    esUsuarioAdmin(email) ||
+    sesion?.user?.app_metadata?.role === 'admin' ||
+    sesion?.user?.user_metadata?.role === 'admin' ||
+    (typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true')
 
   return (
     <header
@@ -90,6 +98,16 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
             title="Volver al portal interactivo de Expotécnica 2026"
           >
             <span>🚀 Portal Expo</span>
+          </Link>
+        )}
+
+        {esAdmin && (
+          <Link
+            to="/admin"
+            className="inline-flex items-center gap-1.5 rounded-full bg-primary-tint border border-primary/30 px-3 py-1 text-etiqueta font-bold text-primary hover:bg-primary-tint-strong transition-all shadow-2xs active:scale-95"
+            title="Ingresar al Panel de Control Administrativo"
+          >
+            <span>🛡️ Panel Admin</span>
           </Link>
         )}
 
