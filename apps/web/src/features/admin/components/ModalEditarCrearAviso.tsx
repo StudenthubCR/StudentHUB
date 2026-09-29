@@ -2,6 +2,20 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/cn'
 import { ESPECIALIDADES_CTP, SECCIONES_CTP } from '@/features/avisos/avisos.service'
+import {
+  IconoMegafono,
+  IconoEditar,
+  IconoAlertaTriangulo,
+  IconoReloj,
+  IconoProfesorAusente,
+  IconoComedor,
+  IconoCalendario,
+  IconoColegio,
+  IconoBirrete,
+  IconoUsuarios,
+  IconoCerrar,
+  IconoCheck,
+} from '@/components/icons'
 import type {
   CategoriaAviso,
   InstitutionAlert,
@@ -21,17 +35,17 @@ type Props = {
 }
 
 const CATEGORIAS = [
-  { id: 'early_departure', etiqueta: 'Salida Anticipada', icono: '⏰' },
-  { id: 'absence', etiqueta: 'Ausencia Docente', icono: '👨‍🏫' },
-  { id: 'menu_change', etiqueta: 'Cambio de Menú', icono: '🍽️' },
-  { id: 'event', etiqueta: 'Evento / Actividad', icono: '📅' },
-  { id: 'general', etiqueta: 'Comunicado General', icono: '📢' },
+  { id: 'early_departure', etiqueta: 'Salida Anticipada', Icono: IconoReloj },
+  { id: 'absence', etiqueta: 'Ausencia Docente', Icono: IconoProfesorAusente },
+  { id: 'menu_change', etiqueta: 'Cambio de Menú', Icono: IconoComedor },
+  { id: 'event', etiqueta: 'Evento / Actividad', Icono: IconoCalendario },
+  { id: 'general', etiqueta: 'Comunicado General', Icono: IconoMegafono },
 ] as const
 
 const PRIORIDADES = [
   { id: 'info', etiqueta: 'Informativa', badge: 'Normal', color: 'border-blue-500/30 text-blue-600 bg-blue-500/10' },
   { id: 'warning', etiqueta: 'Importante', badge: 'Precaución', color: 'border-amber-500/30 text-amber-600 bg-amber-500/10' },
-  { id: 'urgent', etiqueta: 'Urgente', badge: 'Crítica / Inmediata', color: 'border-rose-500/30 text-rose-600 bg-rose-500/10' },
+  { id: 'urgent', etiqueta: 'Urgente', badge: 'Inmediata', color: 'border-rose-500/30 text-rose-600 bg-rose-500/10' },
 ] as const
 
 export function ModalEditarCrearAviso({
@@ -162,19 +176,25 @@ export function ModalEditarCrearAviso({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-100 flex items-center justify-center p-3.5 sm:p-5"
+      className="fixed inset-0 z-100 flex items-end sm:items-center justify-center p-0 sm:p-5"
     >
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
         onClick={() => !guardando && alCerrar()}
       />
 
-      <div className="relative flex max-h-[92vh] w-full max-w-xl flex-col animate-fade-in rounded-3xl border border-border bg-surface shadow-2xl overflow-hidden">
+      <div className="relative flex max-h-[95vh] sm:max-h-[90vh] w-full max-w-xl flex-col animate-slide-up sm:animate-fade-in rounded-t-3xl sm:rounded-3xl border border-border bg-surface shadow-2xl overflow-hidden">
         {/* Cabecera del Modal */}
         <div className="flex items-center justify-between border-b border-border px-5 py-4 sm:px-6">
-          <div className="flex items-center gap-2.5">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary-tint text-primary border border-primary/20 text-lg">
-              {esAlertaUrgenteRapida ? '🚨' : avisoAEditar ? '✏️' : '📢'}
+          <div className="flex items-center gap-3">
+            <span className="flex size-10 items-center justify-center rounded-xl bg-primary-tint text-primary border border-primary/20">
+              {esAlertaUrgenteRapida ? (
+                <IconoAlertaTriangulo className="size-5 text-rose-600" />
+              ) : avisoAEditar ? (
+                <IconoEditar className="size-5 text-primary" />
+              ) : (
+                <IconoMegafono className="size-5 text-primary" />
+              )}
             </span>
             <div>
               <h2 className="text-dato font-bold text-text sm:text-cuerpo">
@@ -187,7 +207,7 @@ export function ModalEditarCrearAviso({
               <p className="text-micro text-text-muted">
                 {avisoAEditar
                   ? 'Modificá los detalles y el alcance de este aviso publicado'
-                  : 'Difusión en tiempo real hacia los estudiantes'}
+                  : 'Difusión en tiempo real hacia la comunidad estudiantil'}
               </p>
             </div>
           </div>
@@ -195,48 +215,53 @@ export function ModalEditarCrearAviso({
             type="button"
             onClick={alCerrar}
             disabled={guardando}
-            className="flex size-8 cursor-pointer items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-alt hover:text-text"
+            aria-label="Cerrar ventana"
+            className="flex size-11 cursor-pointer items-center justify-center rounded-xl text-text-muted transition-colors hover:bg-surface-alt hover:text-text min-h-[44px]"
           >
-            ✕
+            <IconoCerrar className="size-5" />
           </button>
         </div>
 
-        {/* Formulario */}
-        <form onSubmit={manejarEnvio} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">
+        {/* Formulario con scroll táctil */}
+        <form onSubmit={manejarEnvio} className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4.5">
           {errorValidacion && (
-            <div className="rounded-xl border border-rose-500/25 bg-rose-500/10 p-3 text-menuda font-medium text-rose-600 dark:text-rose-400">
-              ⚠️ {errorValidacion}
+            <div className="flex items-center gap-2 rounded-xl border border-rose-500/25 bg-rose-500/10 p-3 text-menuda font-medium text-rose-600 dark:text-rose-400">
+              <IconoAlertaTriangulo className="size-4 shrink-0" />
+              <span>{errorValidacion}</span>
             </div>
           )}
 
           {/* Categoría */}
           <div>
-            <label className="block text-etiqueta font-bold uppercase tracking-wider text-text-muted mb-1.5">
+            <label className="block text-micro font-bold uppercase tracking-wider text-text-muted mb-1.5">
               Categoría del Aviso
             </label>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {CATEGORIAS.map((cat) => (
-                <button
-                  type="button"
-                  key={cat.id}
-                  onClick={() => setCategoria(cat.id)}
-                  className={cn(
-                    'flex items-center gap-2 rounded-xl border p-2 text-left text-menuda font-medium transition-all cursor-pointer',
-                    categoria === cat.id
-                      ? 'border-primary bg-primary-tint text-primary font-bold shadow-2xs'
-                      : 'border-border bg-surface text-text hover:border-border-strong hover:bg-surface-alt',
-                  )}
-                >
-                  <span className="text-base">{cat.icono}</span>
-                  <span className="truncate">{cat.etiqueta}</span>
-                </button>
-              ))}
+              {CATEGORIAS.map((cat) => {
+                const esActiva = categoria === cat.id
+                return (
+                  <button
+                    type="button"
+                    key={cat.id}
+                    onClick={() => setCategoria(cat.id)}
+                    className={cn(
+                      'flex items-center gap-2.5 rounded-xl border p-2.5 text-left text-menuda font-medium transition-all cursor-pointer min-h-[44px]',
+                      esActiva
+                        ? 'border-primary bg-primary-tint text-primary font-bold shadow-2xs'
+                        : 'border-border bg-surface text-text hover:border-border-strong hover:bg-surface-alt',
+                    )}
+                  >
+                    <cat.Icono className="size-4 shrink-0" />
+                    <span className="truncate">{cat.etiqueta}</span>
+                  </button>
+                )
+              })}
             </div>
           </div>
 
           {/* Prioridad */}
           <div>
-            <label className="block text-etiqueta font-bold uppercase tracking-wider text-text-muted mb-1.5">
+            <label className="block text-micro font-bold uppercase tracking-wider text-text-muted mb-1.5">
               Nivel de Prioridad
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -246,7 +271,7 @@ export function ModalEditarCrearAviso({
                   key={prio.id}
                   onClick={() => setPrioridad(prio.id)}
                   className={cn(
-                    'flex flex-col items-center justify-center rounded-xl border p-2 text-center transition-all cursor-pointer',
+                    'flex flex-col items-center justify-center rounded-xl border p-2 text-center transition-all cursor-pointer min-h-[44px]',
                     prioridad === prio.id
                       ? 'border-primary ring-2 ring-primary/20 font-bold bg-primary-tint/30 text-text'
                       : 'border-border bg-surface text-text-muted hover:border-border-strong hover:bg-surface-alt',
@@ -263,7 +288,7 @@ export function ModalEditarCrearAviso({
 
           {/* Título */}
           <div>
-            <label htmlFor="aviso-titulo" className="block text-etiqueta font-bold uppercase tracking-wider text-text-muted mb-1">
+            <label htmlFor="aviso-titulo" className="block text-micro font-bold uppercase tracking-wider text-text-muted mb-1">
               Título del Aviso
             </label>
             <input
@@ -272,14 +297,14 @@ export function ModalEditarCrearAviso({
               required
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
-              placeholder="Ej. Salida anticipada a la 1:30 PM por reunión docente"
-              className="w-full rounded-xl border border-border bg-surface px-3.5 py-2.5 text-cuerpo text-text outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
+              placeholder="Ej. Salida anticipada a las 1:30 PM por reunión docente"
+              className="w-full rounded-xl border border-border bg-surface px-3.5 py-3 text-cuerpo text-text outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15 min-h-[44px]"
             />
           </div>
 
           {/* Mensaje */}
           <div>
-            <label htmlFor="aviso-mensaje" className="block text-etiqueta font-bold uppercase tracking-wider text-text-muted mb-1">
+            <label htmlFor="aviso-mensaje" className="block text-micro font-bold uppercase tracking-wider text-text-muted mb-1">
               Descripción o Instrucciones
             </label>
             <textarea
@@ -288,14 +313,14 @@ export function ModalEditarCrearAviso({
               required
               value={mensaje}
               onChange={(e) => setMensaje(e.target.value)}
-              placeholder="Escribí los detalles completos que verán los estudiantes en el banner y en sus notificaciones..."
+              placeholder="Escribí los detalles completos que verán los estudiantes en la plataforma..."
               className="w-full resize-none rounded-xl border border-border bg-surface px-3.5 py-2.5 text-menor text-text outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/15"
             />
           </div>
 
           {/* Alcance y Destinatarios */}
           <div>
-            <label className="block text-etiqueta font-bold uppercase tracking-wider text-text-muted mb-1.5">
+            <label className="block text-micro font-bold uppercase tracking-wider text-text-muted mb-1.5">
               Destinatarios / Segmentación
             </label>
             <div className="grid grid-cols-3 gap-2">
@@ -306,13 +331,14 @@ export function ModalEditarCrearAviso({
                   setValoresSeleccionados([])
                 }}
                 className={cn(
-                  'rounded-xl border p-2 text-center text-menuda font-semibold cursor-pointer transition-all',
+                  'flex items-center justify-center gap-1.5 rounded-xl border p-2 text-center text-menuda font-semibold cursor-pointer transition-all min-h-[44px]',
                   tipoAlcance === 'all'
                     ? 'border-primary bg-primary text-white shadow-xs'
                     : 'border-border bg-surface text-text hover:bg-surface-alt',
                 )}
               >
-                🏫 Todo el Colegio
+                <IconoColegio className="size-4 shrink-0" />
+                <span className="hidden sm:inline">Todo el</span> Colegio
               </button>
               <button
                 type="button"
@@ -321,13 +347,14 @@ export function ModalEditarCrearAviso({
                   setValoresSeleccionados([])
                 }}
                 className={cn(
-                  'rounded-xl border p-2 text-center text-menuda font-semibold cursor-pointer transition-all',
+                  'flex items-center justify-center gap-1.5 rounded-xl border p-2 text-center text-menuda font-semibold cursor-pointer transition-all min-h-[44px]',
                   tipoAlcance === 'specialty'
                     ? 'border-primary bg-primary text-white shadow-xs'
                     : 'border-border bg-surface text-text hover:bg-surface-alt',
                 )}
               >
-                🎓 Especialidad
+                <IconoBirrete className="size-4 shrink-0" />
+                <span>Especialidad</span>
               </button>
               <button
                 type="button"
@@ -336,13 +363,14 @@ export function ModalEditarCrearAviso({
                   setValoresSeleccionados([])
                 }}
                 className={cn(
-                  'rounded-xl border p-2 text-center text-menuda font-semibold cursor-pointer transition-all',
+                  'flex items-center justify-center gap-1.5 rounded-xl border p-2 text-center text-menuda font-semibold cursor-pointer transition-all min-h-[44px]',
                   tipoAlcance === 'section'
                     ? 'border-primary bg-primary text-white shadow-xs'
                     : 'border-border bg-surface text-text hover:bg-surface-alt',
                 )}
               >
-                👥 Por Sección
+                <IconoUsuarios className="size-4 shrink-0" />
+                <span>Por Sección</span>
               </button>
             </div>
 
@@ -357,14 +385,14 @@ export function ModalEditarCrearAviso({
                       key={esp}
                       onClick={() => alternarSeleccion(esp)}
                       className={cn(
-                        'cursor-pointer rounded-lg px-2.5 py-1 text-micro font-bold transition-all border',
+                        'flex items-center gap-1 cursor-pointer rounded-lg px-3 py-1.5 text-micro font-bold transition-all border min-h-[36px]',
                         sel
                           ? 'border-primary bg-primary text-white'
                           : 'border-border bg-surface text-text-muted hover:border-border-strong',
                       )}
                     >
-                      {sel ? '✓ ' : '+ '}
-                      {esp}
+                      {sel && <IconoCheck className="size-3" />}
+                      <span>{esp}</span>
                     </button>
                   )
                 })}
@@ -381,14 +409,14 @@ export function ModalEditarCrearAviso({
                       key={sec}
                       onClick={() => alternarSeleccion(sec)}
                       className={cn(
-                        'cursor-pointer rounded-lg px-2.5 py-1 text-micro font-bold transition-all border',
+                        'flex items-center gap-1 cursor-pointer rounded-lg px-3 py-1.5 text-micro font-bold transition-all border min-h-[36px]',
                         sel
                           ? 'border-primary bg-primary text-white'
                           : 'border-border bg-surface text-text-muted hover:border-border-strong',
                       )}
                     >
-                      {sel ? '✓ ' : '+ '}
-                      {sec}
+                      {sel && <IconoCheck className="size-3" />}
+                      <span>Sección {sec}</span>
                     </button>
                   )
                 })}
@@ -396,10 +424,10 @@ export function ModalEditarCrearAviso({
             )}
           </div>
 
-          {/* Opciones Avanzadas: Expiración y Estado Activo */}
+          {/* Opciones Avanzadas */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <div>
-              <label htmlFor="aviso-expiracion" className="block text-etiqueta font-bold uppercase tracking-wider text-text-muted mb-1">
+              <label htmlFor="aviso-expiracion" className="block text-micro font-bold uppercase tracking-wider text-text-muted mb-1">
                 Fecha de Expiración (Opcional)
               </label>
               <input
@@ -407,18 +435,18 @@ export function ModalEditarCrearAviso({
                 type="datetime-local"
                 value={fechaExpiracion}
                 onChange={(e) => setFechaExpiracion(e.target.value)}
-                className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-menuda text-text outline-none focus:border-primary"
+                className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-menuda text-text outline-none focus:border-primary min-h-[44px]"
               />
             </div>
 
             {avisoAEditar && (
               <div className="flex flex-col justify-end">
-                <label className="flex items-center gap-2 cursor-pointer rounded-xl border border-border bg-surface p-2 hover:bg-surface-alt">
+                <label className="flex items-center gap-2.5 cursor-pointer rounded-xl border border-border bg-surface p-2.5 hover:bg-surface-alt min-h-[44px]">
                   <input
                     type="checkbox"
                     checked={activo}
                     onChange={(e) => setActivo(e.target.checked)}
-                    className="size-4 text-primary rounded"
+                    className="size-4.5 text-primary rounded"
                   />
                   <span className="text-menuda font-semibold text-text">
                     Comunicado Activo / Vigente
@@ -428,20 +456,20 @@ export function ModalEditarCrearAviso({
             )}
           </div>
 
-          {/* Pie de acción */}
-          <div className="flex items-center justify-end gap-2.5 border-t border-border pt-4">
+          {/* Pie de acción adaptado a pantallas táctiles */}
+          <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-2.5 border-t border-border pt-4">
             <button
               type="button"
               disabled={guardando}
               onClick={alCerrar}
-              className="cursor-pointer rounded-xl border border-border bg-surface px-4 py-2 text-menor font-semibold text-text-muted hover:bg-surface-alt hover:text-text"
+              className="w-full sm:w-auto cursor-pointer rounded-xl border border-border bg-surface px-5 py-2.5 text-menor font-semibold text-text-muted hover:bg-surface-alt hover:text-text min-h-[44px]"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={guardando}
-              className="cursor-pointer rounded-xl bg-primary px-5 py-2 text-menor font-bold text-white shadow-xs transition-all hover:bg-primary-dark active:scale-98 disabled:opacity-50"
+              className="w-full sm:w-auto cursor-pointer rounded-xl bg-primary px-6 py-2.5 text-menor font-bold text-white shadow-xs transition-all hover:bg-primary-dark active:scale-98 disabled:opacity-50 min-h-[44px]"
             >
               {guardando
                 ? 'Guardando...'

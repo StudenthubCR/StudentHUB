@@ -3,11 +3,20 @@ import {
   obtenerEstudiantesDirectorio,
   actualizarEstudianteDirectorio,
 } from '../services/admin.service'
+import { useAdminAuth } from '../hooks/useAdminAuth'
 import { ESPECIALIDADES_CTP, SECCIONES_CTP } from '@/features/avisos/avisos.service'
-import { SkeletonTableRow } from '../components/Skeletons'
+import { SkeletonTableRow, SkeletonCard } from '../components/Skeletons'
+import {
+  IconoUsuarios,
+  IconoBuscar,
+  IconoBirrete,
+  IconoEditar,
+  IconoCerrar,
+} from '@/components/icons'
 import type { EstudianteDirectorio } from '../services/admin.types'
 
 export function AdminEstudiantesPage() {
+  const { email } = useAdminAuth()
   const [estudiantes, setEstudiantes] = useState<EstudianteDirectorio[]>([])
   const [cargando, setCargando] = useState(true)
 
@@ -81,11 +90,15 @@ export function AdminEstudiantesPage() {
 
     setGuardando(true)
     try {
-      const res = await actualizarEstudianteDirectorio(estudianteAEditar.id, {
-        seccion: nuevaSeccion,
-        especialidad: nuevaEspecialidad,
-        estado: nuevoEstado,
-      })
+      const res = await actualizarEstudianteDirectorio(
+        estudianteAEditar.id,
+        {
+          seccion: nuevaSeccion,
+          especialidad: nuevaEspecialidad,
+          estado: nuevoEstado,
+        },
+        email,
+      )
 
       if (res.ok) {
         setEstudianteAEditar(null)
@@ -113,8 +126,9 @@ export function AdminEstudiantesPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="rounded-xl border border-primary/20 bg-primary-tint px-3 py-2 text-menuda font-bold text-primary">
-            👥 {estudiantes.length} Estudiantes Registrados
+          <span className="inline-flex items-center gap-2 rounded-xl border border-primary/20 bg-primary-tint px-3 py-2 text-menuda font-bold text-primary">
+            <IconoUsuarios className="size-4" />
+            {estudiantes.length} Estudiantes Registrados
           </span>
         </div>
       </div>
@@ -125,13 +139,16 @@ export function AdminEstudiantesPage() {
           <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1">
             Buscar estudiante
           </label>
-          <input
-            type="text"
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-            placeholder="Por nombre, cédula o código..."
-            className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-menor text-text outline-none focus:border-primary"
-          />
+          <div className="relative">
+            <IconoBuscar className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-text-muted pointer-events-none" />
+            <input
+              type="text"
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              placeholder="Por nombre, cédula o código..."
+              className="w-full rounded-xl border border-border bg-surface pl-9 pr-3 py-2 text-menor text-text outline-none focus:border-primary min-h-[44px]"
+            />
+          </div>
         </div>
 
         <div>
@@ -141,7 +158,7 @@ export function AdminEstudiantesPage() {
           <select
             value={filtroEspecialidad}
             onChange={(e) => setFiltroEspecialidad(e.target.value)}
-            className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-menor text-text outline-none focus:border-primary"
+            className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-menor text-text outline-none focus:border-primary min-h-[44px]"
           >
             <option value="todas">Todas las especialidades</option>
             {ESPECIALIDADES_CTP.map((esp) => (
@@ -159,7 +176,7 @@ export function AdminEstudiantesPage() {
           <select
             value={filtroSeccion}
             onChange={(e) => setFiltroSeccion(e.target.value)}
-            className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-menor text-text outline-none focus:border-primary"
+            className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-menor text-text outline-none focus:border-primary min-h-[44px]"
           >
             <option value="todas">Todas las secciones</option>
             {SECCIONES_CTP.map((sec) => (
@@ -177,17 +194,93 @@ export function AdminEstudiantesPage() {
           <select
             value={filtroEstado}
             onChange={(e) => setFiltroEstado(e.target.value as 'todos' | 'activo' | 'inactivo')}
-            className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-menor text-text outline-none focus:border-primary"
+            className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-menor text-text outline-none focus:border-primary min-h-[44px]"
           >
             <option value="todos">Todos los estados</option>
-            <option value="activo">🟢 Activos</option>
-            <option value="inactivo">⚪ Inactivos / Trasladados</option>
+            <option value="activo">Activos</option>
+            <option value="inactivo">Inactivos / Trasladados</option>
           </select>
         </div>
       </div>
 
-      {/* Tabla del Directorio */}
-      <div className="rounded-2xl border border-border bg-surface shadow-sm overflow-hidden">
+      {/* Vista Móvil: Tarjetas apiladas (< md) */}
+      <div className="md:hidden space-y-3">
+        {cargando ? (
+          <>
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </>
+        ) : estudiantesFiltrados.length === 0 ? (
+          <div className="rounded-2xl border border-border bg-surface p-8 text-center text-text-muted">
+            <div className="flex flex-col items-center gap-2">
+              <IconoUsuarios className="size-10 text-text-muted/60" />
+              <p className="font-bold text-text">No se encontraron estudiantes</p>
+              <p className="text-menuda">
+                {busqueda || filtroEspecialidad !== 'todas' || filtroSeccion !== 'todas' || filtroEstado !== 'todos'
+                  ? 'Probá ajustando los filtros de búsqueda.'
+                  : 'No hay registros disponibles en la base de datos.'}
+              </p>
+            </div>
+          </div>
+        ) : (
+          estudiantesFiltrados.map((est) => (
+            <div
+              key={est.id}
+              className="rounded-2xl border border-border bg-surface p-4 shadow-xs space-y-3"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <div>
+                  <h3 className="font-bold text-text text-base">{est.nombre}</h3>
+                  <p className="text-menuda text-text-muted">{est.correo}</p>
+                </div>
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-micro font-bold shrink-0 ${
+                    est.estado === 'activo'
+                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                      : 'bg-zinc-500/10 text-zinc-500 border border-zinc-500/20'
+                  }`}
+                >
+                  <span
+                    className={`size-1.5 rounded-full ${est.estado === 'activo' ? 'bg-emerald-500' : 'bg-zinc-400'}`}
+                  />
+                  {est.estado === 'activo' ? 'Activo' : 'Inactivo'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-menuda pt-1">
+                <div className="rounded-xl border border-border bg-surface-alt/40 p-2">
+                  <span className="block text-micro font-semibold uppercase text-text-muted">Cédula / Carnet</span>
+                  <span className="font-mono font-bold text-text">{est.cedula || est.codigo}</span>
+                </div>
+                <div className="rounded-xl border border-border bg-surface-alt/40 p-2">
+                  <span className="block text-micro font-semibold uppercase text-text-muted">Sección</span>
+                  <span className="font-bold text-primary">{est.seccion}</span>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-border bg-surface-alt/20 p-2 text-menuda flex items-center gap-2">
+                <IconoBirrete className="size-4 text-primary shrink-0" />
+                <span className="font-medium text-text truncate">{est.especialidad}</span>
+              </div>
+
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => abrirEdicion(est)}
+                  className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-menor font-bold text-primary hover:bg-primary hover:text-white transition-all active:scale-98"
+                >
+                  <IconoEditar className="size-4" />
+                  <span>Reasignar Grupo / Estado</span>
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Vista Escritorio: Tabla del Directorio (md: en adelante) */}
+      <div className="hidden md:block rounded-2xl border border-border bg-surface shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-menor border-collapse">
             <thead>
@@ -210,8 +303,16 @@ export function AdminEstudiantesPage() {
                 </>
               ) : estudiantesFiltrados.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-5 py-10 text-center text-text-muted">
-                    No se encontraron estudiantes con los criterios indicados.
+                  <td colSpan={6} className="px-5 py-12 text-center text-text-muted">
+                    <div className="flex flex-col items-center gap-2">
+                      <IconoUsuarios className="size-10 text-text-muted/60" />
+                      <p className="font-bold text-text">No se encontraron estudiantes</p>
+                      <p className="text-menuda">
+                        {busqueda || filtroEspecialidad !== 'todas' || filtroSeccion !== 'todas' || filtroEstado !== 'todos'
+                          ? 'Probá ajustando los filtros de búsqueda.'
+                          : 'No hay registros disponibles en la base de datos.'}
+                      </p>
+                    </div>
                   </td>
                 </tr>
               ) : (
@@ -225,7 +326,8 @@ export function AdminEstudiantesPage() {
                       {est.cedula || est.codigo}
                     </td>
                     <td className="px-4 py-3.5 text-menuda">
-                      <span className="rounded-md border border-border bg-surface px-2 py-0.5 font-medium text-text">
+                      <span className="inline-flex items-center gap-1 rounded-md border border-border bg-surface px-2 py-0.5 font-medium text-text">
+                        <IconoBirrete className="size-3 text-primary" />
                         {est.especialidad}
                       </span>
                     </td>
@@ -263,11 +365,14 @@ export function AdminEstudiantesPage() {
         </div>
       </div>
 
-      {/* Modal Reasignar Estudiante */}
+      {/* Modal Reasignar Estudiante (Mobile Bottom Sheet / Centered Desktop) */}
       {estudianteAEditar && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-xs" onClick={() => setEstudianteAEditar(null)} />
-          <div className="relative w-full max-w-md animate-fade-in rounded-3xl border border-border bg-surface p-6 shadow-2xl">
+        <div className="fixed inset-0 z-100 flex items-end justify-center sm:items-center p-0 sm:p-4">
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
+            onClick={() => setEstudianteAEditar(null)}
+          />
+          <div className="relative w-full max-w-md animate-fade-in rounded-t-3xl sm:rounded-3xl border border-border bg-surface p-6 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
               <div>
                 <h3 className="text-dato font-bold text-text">Reubicación de Estudiante</h3>
@@ -276,9 +381,10 @@ export function AdminEstudiantesPage() {
               <button
                 type="button"
                 onClick={() => setEstudianteAEditar(null)}
-                className="flex size-7 items-center justify-center rounded-lg text-text-muted hover:bg-surface-alt"
+                className="flex size-9 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl text-text-muted hover:bg-surface-alt transition-colors"
+                aria-label="Cerrar modal"
               >
-                ✕
+                <IconoCerrar className="size-5" />
               </button>
             </div>
 
@@ -290,7 +396,7 @@ export function AdminEstudiantesPage() {
                 <select
                   value={nuevaSeccion}
                   onChange={(e) => setNuevaSeccion(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-menor text-text outline-none focus:border-primary"
+                  className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-menor text-text outline-none focus:border-primary min-h-[44px]"
                 >
                   {SECCIONES_CTP.map((sec) => (
                     <option key={sec} value={sec}>
@@ -307,7 +413,7 @@ export function AdminEstudiantesPage() {
                 <select
                   value={nuevaEspecialidad}
                   onChange={(e) => setNuevaEspecialidad(e.target.value)}
-                  className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-menor text-text outline-none focus:border-primary"
+                  className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-menor text-text outline-none focus:border-primary min-h-[44px]"
                 >
                   {ESPECIALIDADES_CTP.map((esp) => (
                     <option key={esp} value={esp}>
@@ -325,24 +431,26 @@ export function AdminEstudiantesPage() {
                   <button
                     type="button"
                     onClick={() => setNuevoEstado('activo')}
-                    className={`rounded-xl border p-2 text-menuda font-bold cursor-pointer transition-all ${
+                    className={`flex min-h-[44px] items-center justify-center gap-2 rounded-xl border p-2 text-menuda font-bold cursor-pointer transition-all ${
                       nuevoEstado === 'activo'
                         ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                         : 'border-border text-text-muted'
                     }`}
                   >
-                    🟢 Activo
+                    <span className="size-2 rounded-full bg-emerald-500" />
+                    <span>Activo</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setNuevoEstado('inactivo')}
-                    className={`rounded-xl border p-2 text-menuda font-bold cursor-pointer transition-all ${
+                    className={`flex min-h-[44px] items-center justify-center gap-2 rounded-xl border p-2 text-menuda font-bold cursor-pointer transition-all ${
                       nuevoEstado === 'inactivo'
                         ? 'border-zinc-500 bg-zinc-500/10 text-zinc-600'
                         : 'border-border text-text-muted'
                     }`}
                   >
-                    ⚪ Inactivo / Trasladado
+                    <span className="size-2 rounded-full bg-zinc-400" />
+                    <span>Inactivo / Traslado</span>
                   </button>
                 </div>
               </div>
@@ -351,14 +459,14 @@ export function AdminEstudiantesPage() {
                 <button
                   type="button"
                   onClick={() => setEstudianteAEditar(null)}
-                  className="cursor-pointer rounded-xl border border-border bg-surface px-4 py-2 text-menor font-semibold text-text-muted hover:bg-surface-alt"
+                  className="min-h-[44px] cursor-pointer rounded-xl border border-border bg-surface px-4 py-2 text-menor font-semibold text-text-muted hover:bg-surface-alt transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={guardando}
-                  className="cursor-pointer rounded-xl bg-primary px-5 py-2 text-menor font-bold text-white shadow-xs transition-all hover:bg-primary-dark active:scale-98 disabled:opacity-50"
+                  className="min-h-[44px] cursor-pointer rounded-xl bg-primary px-5 py-2 text-menor font-bold text-white shadow-xs transition-all hover:bg-primary-dark active:scale-98 disabled:opacity-50"
                 >
                   {guardando ? 'Guardando...' : 'Aplicar Reubicación'}
                 </button>

@@ -1,9 +1,7 @@
 import { format, isSameDay, parseISO, differenceInCalendarDays } from 'date-fns'
 import { es } from 'date-fns/locale'
 import type { EventoAgenda, ResumenAgendaDia, TipoEventoAgenda } from './agenda.types'
-
-export const STORAGE_KEY_AGENDA = 'studenthub_agenda_eventos'
-
+const STORAGE_KEY_AGENDA = 'studenthub_agenda_eventos'
 /**
  * Genera una lista inicial de eventos realistas para que el estudiante
  * pueda experimentar la agenda de inmediato sin empezar en blanco.
@@ -215,13 +213,11 @@ export function reiniciarEventosEjemplo(): EventoAgenda[] {
   return muestras
 }
 
-/** Obtiene los eventos para una fecha específica (formato YYYY-MM-DD) */
-export function obtenerEventosPorFecha(fechaIso: string, lista: EventoAgenda[] = obtenerEventos()): EventoAgenda[] {
+function obtenerEventosPorFecha(fechaIso: string, lista: EventoAgenda[] = obtenerEventos()): EventoAgenda[] {
   return lista.filter((e) => e.fecha === fechaIso)
 }
 
-/** Obtiene eventos que coincidan con un objeto Date */
-export function obtenerEventosDelDia(fecha: Date, lista: EventoAgenda[] = obtenerEventos()): EventoAgenda[] {
+function obtenerEventosDelDia(fecha: Date, lista: EventoAgenda[] = obtenerEventos()): EventoAgenda[] {
   return lista.filter((e) => {
     try {
       const fechaEvento = parseISO(e.fecha)

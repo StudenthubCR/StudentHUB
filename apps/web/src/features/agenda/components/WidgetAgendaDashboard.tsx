@@ -74,20 +74,23 @@ export function WidgetAgendaDashboard() {
           proximos.filter((e) => e.tipo === 'ausencia_profesor').length > 0) && (
           <div className="mb-2.5 flex flex-wrap items-center gap-1.5 text-micro">
             {resumenHoy.tareasPendientes.length > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-primary-tint px-2.5 py-1 font-bold text-primary">
-                <span>📝 {resumenHoy.tareasPendientes.length} para hoy</span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-primary-tint px-2.5 py-1 font-bold text-primary">
+                <IconoAgenda className="size-3.5" />
+                <span>{resumenHoy.tareasPendientes.length} para hoy</span>
               </span>
             )}
 
             {proximos.filter((e) => e.tipo === 'examen').length > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-rose-500/10 px-2.5 py-1 font-bold text-rose-600 dark:text-rose-400">
-                <span>🎯 {proximos.filter((e) => e.tipo === 'examen').length} {proximos.filter((e) => e.tipo === 'examen').length === 1 ? 'examen' : 'exámenes'}</span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-rose-500/10 px-2.5 py-1 font-bold text-rose-600 dark:text-rose-400">
+                <IconoExamen className="size-3.5" />
+                <span>{proximos.filter((e) => e.tipo === 'examen').length} {proximos.filter((e) => e.tipo === 'examen').length === 1 ? 'examen' : 'exámenes'}</span>
               </span>
             )}
 
             {proximos.filter((e) => e.tipo === 'ausencia_profesor').length > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-lg bg-amber-500/10 px-2.5 py-1 font-bold text-amber-600 dark:text-amber-400">
-                <span>⚠️ {proximos.filter((e) => e.tipo === 'ausencia_profesor').length} ausencias</span>
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-2.5 py-1 font-bold text-amber-600 dark:text-amber-400">
+                <IconoProfesorAusente className="size-3.5" />
+                <span>{proximos.filter((e) => e.tipo === 'ausencia_profesor').length} ausencias</span>
               </span>
             )}
           </div>

@@ -12,8 +12,9 @@ export function useAdminAuth() {
   const userRole = sesion?.user?.user_metadata?.role
   const tieneRolMetadata = appRole === 'admin' || userRole === 'admin'
 
-  // Modo Demo / Prueba interactiva
-  const esDemo = typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true'
+  // Modo Demo / Prueba interactiva (restringido estrictamente al entorno de desarrollo local)
+  const esDev = import.meta.env.DEV
+  const esDemo = esDev && typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true'
   const esAdminDemo = esDemo && (typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_admin') === 'true' || email === CORREO_ADMIN_UNICO)
 
   const esAdmin = esCorreoMaestro || tieneRolMetadata || esAdminDemo

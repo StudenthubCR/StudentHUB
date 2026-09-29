@@ -114,7 +114,7 @@ export function esFinDeSemana(fecha: Date): boolean {
 }
 
 /** Índice de los menús por fecha, para no recorrer el arreglo en cada día. */
-export function indexarMenus(menus: MenuDia[]): Map<string, MenuDia> {
+function indexarMenus(menus: MenuDia[]): Map<string, MenuDia> {
   return new Map(menus.map((menu) => [menu.fecha, menu]))
 }
 

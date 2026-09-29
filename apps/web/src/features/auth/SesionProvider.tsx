@@ -4,7 +4,7 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import { SesionContext } from './sesion-context'
 
-export const SESION_DEMO: Session = {
+const SESION_DEMO: Session = {
   access_token: 'demo-token',
   refresh_token: 'demo-refresh-token',
   expires_in: 3600,

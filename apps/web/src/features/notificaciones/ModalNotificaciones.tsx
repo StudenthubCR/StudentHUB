@@ -16,6 +16,11 @@ import {
   IconoCerrar,
   IconoCampana,
   IconoCalendario,
+  IconoComedor,
+  IconoAlertaTriangulo,
+  IconoPeriodico,
+  IconoReloj,
+  IconoMegafono,
 } from '@/components/icons'
 import {
   type CategoriaNotificacion,
@@ -69,7 +74,7 @@ export function ModalNotificaciones({ abierto, alCerrar }: Props) {
   const dispararPrueba = async (tipo: CategoriaNotificacion) => {
     const ok = await probarNotificacion(tipo)
     if (ok) {
-      setMensajeToast('¡Alerta de prueba emitida y agregada a tu bandeja! 🔔')
+      setMensajeToast('¡Alerta de prueba emitida y agregada a tu bandeja!')
       setTimeout(() => setMensajeToast(null), 3500)
     }
   }
@@ -194,9 +199,9 @@ export function ModalNotificaciones({ abierto, alCerrar }: Props) {
                     [
                       { id: 'todas', label: 'Todas' },
                       { id: 'no_leidas', label: `No leídas (${noLeidas})` },
-                      { id: 'comedor', label: 'Comedor 🍲' },
-                      { id: 'ausencias', label: 'Ausencias ⚠️' },
-                      { id: 'agenda', label: 'Agenda 📝' },
+                      { id: 'comedor', label: 'Comedor' },
+                      { id: 'ausencias', label: 'Ausencias' },
+                      { id: 'agenda', label: 'Agenda' },
                     ] as const
                   ).map((f) => (
                     <button
@@ -241,7 +246,7 @@ export function ModalNotificaciones({ abierto, alCerrar }: Props) {
               {/* Lista de Notificaciones */}
               {notificacionesFiltradas.length === 0 ? (
                 <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-surface-alt/40 px-6 py-12 text-center">
-                  <span className="text-4xl mb-3">🎉</span>
+                  <IconoCampana className="size-10 text-text-muted/60 mb-3" />
                   <p className="text-dato font-bold text-text">
                     {filtro === 'no_leidas'
                       ? '¡No tienes notificaciones pendientes!'
@@ -289,15 +294,17 @@ export function ModalNotificaciones({ abierto, alCerrar }: Props) {
                         <div
                           className={`flex size-10 shrink-0 items-center justify-center rounded-xl border text-base shadow-xs ${estiloCategoria}`}
                         >
-                          {item.categoria === 'comedor'
-                            ? '🍲'
-                            : item.categoria === 'ausencias'
-                              ? '⚠️'
-                              : item.categoria === 'agenda'
-                                ? '📝'
-                                : item.categoria === 'horarios'
-                                  ? '⏰'
-                                  : '📢'}
+                          {item.categoria === 'comedor' ? (
+                            <IconoComedor className="size-5" />
+                          ) : item.categoria === 'ausencias' ? (
+                            <IconoAlertaTriangulo className="size-5" />
+                          ) : item.categoria === 'agenda' ? (
+                            <IconoPeriodico className="size-5" />
+                          ) : item.categoria === 'horarios' ? (
+                            <IconoReloj className="size-5" />
+                          ) : (
+                            <IconoMegafono className="size-5" />
+                          )}
                         </div>
 
                         {/* Contenido */}
@@ -357,16 +364,18 @@ export function ModalNotificaciones({ abierto, alCerrar }: Props) {
             <div className="flex flex-col gap-6">
               {/* Estado del permiso nativo */}
               {!soportado ? (
-                <div className="rounded-2xl border border-border bg-surface-alt p-4 text-menuda text-text-muted">
-                  ⚠️ Tu navegador actual no soporta la API de notificaciones web. Te sugerimos instalar la app o usar Chrome / Edge / Safari.
+                <div className="flex items-center gap-2 rounded-2xl border border-border bg-surface-alt p-4 text-menuda text-text-muted">
+                  <IconoAlertaTriangulo className="size-4 shrink-0 text-amber-500" />
+                  <span>Tu navegador actual no soporta la API de notificaciones web. Te sugerimos instalar la app o usar Chrome / Edge / Safari.</span>
                 </div>
               ) : permiso === 'denied' ? (
                 <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4.5 text-menuda text-red-600 dark:text-red-400">
                   <p className="font-bold flex items-center gap-1.5">
-                    <span>⚠️ Permiso bloqueado en tu navegador</span>
+                    <IconoAlertaTriangulo className="size-4 shrink-0 text-rose-500" />
+                    <span>Permiso bloqueado en tu navegador</span>
                   </p>
                   <p className="text-micro mt-1.5 leading-relaxed">
-                    Las notificaciones están bloqueadas en la configuración de este sitio. Hacé clic en el ícono de candado 🔒 junto a la barra de dirección del navegador y activá &quot;Permitir notificaciones&quot;.
+                    Las notificaciones están bloqueadas en la configuración de este sitio. Hacé clic en el ícono de permisos junto a la barra de dirección del navegador y activá &quot;Permitir notificaciones&quot;.
                   </p>
                 </div>
               ) : !notificacionesActivas ? (
@@ -381,7 +390,7 @@ export function ModalNotificaciones({ abierto, alCerrar }: Props) {
                     type="button"
                     onClick={() => void solicitarPermiso()}
                     disabled={cargando}
-                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-menor font-bold text-white shadow-xs transition-all hover:bg-primary-dark active:scale-95 disabled:opacity-50"
+                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-menor font-bold text-white shadow-xs transition-all hover:bg-primary-dark active:scale-95 disabled:opacity-50 min-h-[44px]"
                   >
                     <IconoCampana className="size-4" />
                     <span>{cargando ? 'Solicitando...' : 'Activar Notificaciones en este Dispositivo'}</span>
@@ -408,8 +417,8 @@ export function ModalNotificaciones({ abierto, alCerrar }: Props) {
                 {/* Comedor */}
                 <div className="flex items-center justify-between rounded-2xl border border-border bg-surface-alt/70 p-3.5">
                   <div className="flex items-center gap-3">
-                    <span className="flex size-9 items-center justify-center rounded-xl bg-amber-500/15 text-lg">
-                      🍲
+                    <span className="flex size-9 items-center justify-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                      <IconoComedor className="size-5" />
                     </span>
                     <div>
                       <p className="text-menor font-bold text-text">Menú del Comedor</p>
@@ -436,8 +445,8 @@ export function ModalNotificaciones({ abierto, alCerrar }: Props) {
                 {/* Ausencias de Profesores */}
                 <div className="flex items-center justify-between rounded-2xl border border-border bg-surface-alt/70 p-3.5">
                   <div className="flex items-center gap-3">
-                    <span className="flex size-9 items-center justify-center rounded-xl bg-rose-500/15 text-lg">
-                      ⚠️
+                    <span className="flex size-9 items-center justify-center rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400">
+                      <IconoAlertaTriangulo className="size-5" />
                     </span>
                     <div>
                       <p className="text-menor font-bold text-text">Ausencias de Profesores</p>
@@ -492,8 +501,8 @@ export function ModalNotificaciones({ abierto, alCerrar }: Props) {
                 {/* Agenda */}
                 <div className="flex items-center justify-between rounded-2xl border border-border bg-surface-alt/70 p-3.5">
                   <div className="flex items-center gap-3">
-                    <span className="flex size-9 items-center justify-center rounded-xl bg-indigo-500/15 text-lg">
-                      📝
+                    <span className="flex size-9 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400">
+                      <IconoPeriodico className="size-5" />
                     </span>
                     <div>
                       <p className="text-menor font-bold text-text">Agenda y Evaluaciones</p>
@@ -520,8 +529,8 @@ export function ModalNotificaciones({ abierto, alCerrar }: Props) {
                 {/* Noticias */}
                 <div className="flex items-center justify-between rounded-2xl border border-border bg-surface-alt/70 p-3.5">
                   <div className="flex items-center gap-3">
-                    <span className="flex size-9 items-center justify-center rounded-xl bg-purple-500/15 text-lg">
-                      📢
+                    <span className="flex size-9 items-center justify-center rounded-xl bg-purple-500/15 text-purple-600 dark:text-purple-400">
+                      <IconoMegafono className="size-5" />
                     </span>
                     <div>
                       <p className="text-menor font-bold text-text">Comunicados del CTP</p>
@@ -549,7 +558,7 @@ export function ModalNotificaciones({ abierto, alCerrar }: Props) {
               {/* Simulador de Pruebas */}
               <div className="rounded-2xl border border-border bg-surface-alt/40 p-4">
                 <p className="text-menor font-bold text-text mb-1">
-                  🧪 Simulador de Alertas en Vivo
+                  Simulador de Alertas en Vivo
                 </p>
                 <p className="text-micro text-text-muted mb-3">
                   Prueba cómo se visualizan las alertas nativas y cómo se archivan en tu bandeja:
@@ -558,30 +567,34 @@ export function ModalNotificaciones({ abierto, alCerrar }: Props) {
                   <button
                     type="button"
                     onClick={() => void dispararPrueba('comedor')}
-                    className="cursor-pointer rounded-lg border border-border bg-surface px-3 py-1.5 text-micro font-bold text-text hover:border-primary hover:text-primary transition-colors active:scale-95 shadow-2xs"
+                    className="flex min-h-[44px] items-center gap-1.5 cursor-pointer rounded-lg border border-border bg-surface px-3 py-1.5 text-micro font-bold text-text hover:border-primary hover:text-primary transition-colors active:scale-95 shadow-2xs"
                   >
-                    🍲 Probar Comedor
+                    <IconoComedor className="size-3.5" />
+                    <span>Probar Comedor</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => void dispararPrueba('ausencias')}
-                    className="cursor-pointer rounded-lg border border-border bg-surface px-3 py-1.5 text-micro font-bold text-text hover:border-rose-500 hover:text-rose-500 transition-colors active:scale-95 shadow-2xs"
+                    className="flex min-h-[44px] items-center gap-1.5 cursor-pointer rounded-lg border border-border bg-surface px-3 py-1.5 text-micro font-bold text-text hover:border-rose-500 hover:text-rose-500 transition-colors active:scale-95 shadow-2xs"
                   >
-                    ⚠️ Probar Ausencia Docente
+                    <IconoAlertaTriangulo className="size-3.5" />
+                    <span>Probar Ausencia Docente</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => void dispararPrueba('horarios')}
-                    className="cursor-pointer rounded-lg border border-border bg-surface px-3 py-1.5 text-micro font-bold text-text hover:border-blue-500 hover:text-blue-500 transition-colors active:scale-95 shadow-2xs"
+                    className="flex min-h-[44px] items-center gap-1.5 cursor-pointer rounded-lg border border-border bg-surface px-3 py-1.5 text-micro font-bold text-text hover:border-blue-500 hover:text-blue-500 transition-colors active:scale-95 shadow-2xs"
                   >
-                    ⏰ Probar Clase
+                    <IconoReloj className="size-3.5" />
+                    <span>Probar Clase</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => void dispararPrueba('agenda')}
-                    className="cursor-pointer rounded-lg border border-border bg-surface px-3 py-1.5 text-micro font-bold text-text hover:border-indigo-500 hover:text-indigo-500 transition-colors active:scale-95 shadow-2xs"
+                    className="flex min-h-[44px] items-center gap-1.5 cursor-pointer rounded-lg border border-border bg-surface px-3 py-1.5 text-micro font-bold text-text hover:border-indigo-500 hover:text-indigo-500 transition-colors active:scale-95 shadow-2xs"
                   >
-                    📝 Probar Agenda
+                    <IconoPeriodico className="size-3.5" />
+                    <span>Probar Agenda</span>
                   </button>
                 </div>
               </div>

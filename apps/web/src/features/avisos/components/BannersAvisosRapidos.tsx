@@ -1,36 +1,39 @@
 import { useState } from 'react'
-import { IconoChevron, IconoCerrar } from '@/components/icons'
+import {
+  IconoChevron,
+  IconoCerrar,
+  IconoAlertaTriangulo,
+  IconoInfo,
+  IconoReloj,
+  IconoBirrete,
+  IconoComedor,
+  IconoCalendario,
+  IconoMegafono,
+  IconoUsuarios,
+  IconoColegio,
+  IconoEliminar,
+} from '@/components/icons'
 import { cn } from '@/lib/cn'
 import { formatearTiempoAviso } from '../avisos.service'
 import type { InstitutionAlert, PrioridadAviso } from '../avisos.types'
 import { ModalCrearAviso } from './ModalCrearAviso'
 import { useAvisos } from '../useAvisos'
 
-const ESTILOS_PRIORIDAD: Record<
-  PrioridadAviso,
-  {
-    borde: string
-    fondo: string
-    textoBadge: string
-    badgeBg: string
-    icono: string
-    labelPrioridad: string
-  }
-> = {
+const ESTILOS_PRIORIDAD = {
   urgent: {
     borde: 'border-rose-500/40 dark:border-rose-500/50',
     fondo: 'bg-rose-500/10 dark:bg-rose-950/25',
     textoBadge: 'text-rose-700 dark:text-rose-300',
     badgeBg: 'bg-rose-500/20 border-rose-500/30',
-    icono: '🚨',
+    Icono: IconoAlertaTriangulo,
     labelPrioridad: 'Urgente',
   },
   warning: {
-    borde: 'border-amber-500/40 dark:border-amber-500/50',
+    borde: 'border-amber-500/35 dark:border-amber-500/45',
     fondo: 'bg-amber-500/10 dark:bg-amber-950/25',
     textoBadge: 'text-amber-700 dark:text-amber-300',
     badgeBg: 'bg-amber-500/20 border-amber-500/30',
-    icono: '⚠️',
+    Icono: IconoAlertaTriangulo,
     labelPrioridad: 'Importante',
   },
   info: {
@@ -38,18 +41,18 @@ const ESTILOS_PRIORIDAD: Record<
     fondo: 'bg-blue-500/10 dark:bg-blue-950/20',
     textoBadge: 'text-blue-700 dark:text-blue-300',
     badgeBg: 'bg-blue-500/20 border-blue-500/30',
-    icono: 'ℹ️',
+    Icono: IconoInfo,
     labelPrioridad: 'Aviso',
   },
-}
+} as const
 
-const ETIQUETAS_CATEGORIA: Record<string, { icono: string; label: string }> = {
-  early_departure: { icono: '⏰', label: 'Salida Anticipada' },
-  absence: { icono: '👨‍🏫', label: 'Ausencia Docente' },
-  menu_change: { icono: '🍽️', label: 'Cambio de Menú' },
-  event: { icono: '📅', label: 'Actividad' },
-  general: { icono: '📢', label: 'Comunicado' },
-}
+const ETIQUETAS_CATEGORIA = {
+  early_departure: { Icono: IconoReloj, label: 'Salida Anticipada' },
+  absence: { Icono: IconoBirrete, label: 'Ausencia Docente' },
+  menu_change: { Icono: IconoComedor, label: 'Cambio de Menú' },
+  event: { Icono: IconoCalendario, label: 'Actividad' },
+  general: { Icono: IconoMegafono, label: 'Comunicado' },
+} as const
 
 export function BannersAvisosRapidos() {
   const {
@@ -75,7 +78,7 @@ export function BannersAvisosRapidos() {
         <>
           <div className="mb-3.5 flex items-center justify-between gap-3 rounded-2xl border border-dashed border-primary/30 bg-primary-tint/30 p-2.5 sm:px-3.5">
             <div className="flex items-center gap-2">
-              <span className="text-base">📢</span>
+              <IconoMegafono className="size-4 text-primary" />
               <p className="text-micro font-bold text-text">
                 Panel Administrador: No hay comunicados activos en este momento.
               </p>
@@ -100,11 +103,13 @@ export function BannersAvisosRapidos() {
     return null
   }
 
-  const estilo = ESTILOS_PRIORIDAD[avisoActual.priority] ?? ESTILOS_PRIORIDAD.info
-  const cat = ETIQUETAS_CATEGORIA[avisoActual.category] ?? {
-    icono: '📢',
+  const estilo = ESTILOS_PRIORIDAD[avisoActual.priority as PrioridadAviso] ?? ESTILOS_PRIORIDAD.info
+  const cat = ETIQUETAS_CATEGORIA[avisoActual.category as keyof typeof ETIQUETAS_CATEGORIA] ?? {
+    Icono: IconoMegafono,
     label: 'Comunicado',
   }
+  const IconoPrioridad = estilo.Icono
+  const IconoCat = cat.Icono
 
   const siguiente = () => setIndiceActual((prev) => (prev + 1) % total)
   const anterior = () => setIndiceActual((prev) => (prev - 1 + total) % total)
@@ -130,30 +135,33 @@ export function BannersAvisosRapidos() {
                 estilo.textoBadge,
               )}
             >
-              <span>{estilo.icono}</span>
+              <IconoPrioridad className="size-3" />
               <span>{estilo.labelPrioridad}</span>
             </span>
 
             {/* Badge de Categoría */}
             <span className="inline-flex items-center gap-1 rounded-md bg-surface/80 border border-border/60 px-2 py-0.5 text-[10.5px] font-bold text-text-muted">
-              <span>{cat.icono}</span>
+              <IconoCat className="size-3 text-primary" />
               <span>{cat.label}</span>
             </span>
 
             {/* Badge de Audiencia Destinataria */}
             {avisoActual.target_type === 'section' && (
-              <span className="inline-flex items-center rounded-md bg-surface/80 border border-border/60 px-1.5 py-0.5 text-[10px] font-bold text-text-muted">
-                👥 Sección: {avisoActual.target_values.join(', ')}
+              <span className="inline-flex items-center gap-1 rounded-md bg-surface/80 border border-border/60 px-1.5 py-0.5 text-[10px] font-bold text-text-muted">
+                <IconoUsuarios className="size-3 text-primary" />
+                <span>Sección: {avisoActual.target_values.join(', ')}</span>
               </span>
             )}
             {avisoActual.target_type === 'specialty' && (
-              <span className="inline-flex items-center rounded-md bg-surface/80 border border-border/60 px-1.5 py-0.5 text-[10px] font-bold text-text-muted truncate max-w-[200px]">
-                🛠️ {avisoActual.target_values.join(', ')}
+              <span className="inline-flex items-center gap-1 rounded-md bg-surface/80 border border-border/60 px-1.5 py-0.5 text-[10px] font-bold text-text-muted truncate max-w-[200px]">
+                <IconoBirrete className="size-3 text-primary" />
+                <span>{avisoActual.target_values.join(', ')}</span>
               </span>
             )}
             {avisoActual.target_type === 'all' && (
-              <span className="hidden sm:inline-flex items-center rounded-md bg-surface/80 border border-border/60 px-1.5 py-0.5 text-[10px] font-medium text-text-muted">
-                🌐 Toda la Institución
+              <span className="hidden sm:inline-flex items-center gap-1 rounded-md bg-surface/80 border border-border/60 px-1.5 py-0.5 text-[10px] font-medium text-text-muted">
+                <IconoColegio className="size-3 text-primary" />
+                <span>Toda la Institución</span>
               </span>
             )}
 
@@ -211,7 +219,7 @@ export function BannersAvisosRapidos() {
                 title="Eliminar este aviso (Solo Administrador)"
                 className="flex size-6 cursor-pointer items-center justify-center rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 hover:bg-rose-500/25 transition-colors"
               >
-                🗑️
+                <IconoEliminar className="size-3.5" />
               </button>
             )}
 

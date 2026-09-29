@@ -6,7 +6,16 @@ import { AppNav } from './AppNav'
 import { AvisoSinConexion } from './AvisoSinConexion'
 import { usePwaInstall } from '@/features/pwa/usePwaInstall'
 import { ModalInstalarApp } from '@/features/pwa/ModalInstalarApp'
-import { IconoDescargar } from '@/components/icons'
+import {
+  IconoDescargar,
+  IconoBirrete,
+  IconoVolver,
+  IconoCarnet,
+  IconoPeriodico,
+  IconoCalendario,
+  IconoComedor,
+  IconoInicio,
+} from '@/components/icons'
 
 export function AppLayout({ children }: { children?: ReactNode }) {
   useTituloDeRuta()
@@ -50,7 +59,7 @@ export function AppLayout({ children }: { children?: ReactNode }) {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2.5 border-b border-border/60">
               <div className="flex items-center gap-2.5">
                 <span className="flex size-7.5 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-light text-white text-nota font-bold shadow-xs">
-                  🎓
+                  <IconoBirrete className="size-4 text-white" />
                 </span>
                 <div>
                   <div className="flex items-center gap-2">
@@ -70,7 +79,8 @@ export function AppLayout({ children }: { children?: ReactNode }) {
                 href="/expo"
                 className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-3.5 py-1.5 text-micro font-bold text-white shadow-xs hover:bg-primary-dark transition-all active:scale-95 shrink-0"
               >
-                <span>← Volver al Portal de Jueces</span>
+                <IconoVolver className="size-3.5" />
+                <span>Volver al Portal de Jueces</span>
               </a>
             </div>
 
@@ -78,33 +88,38 @@ export function AppLayout({ children }: { children?: ReactNode }) {
             <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
               <a
                 href="/carnet"
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
               >
-                <span>🪪 Carnet 3D & SOS</span>
+                <IconoCarnet className="size-3.5" />
+                <span>Carnet 3D & SOS</span>
               </a>
               <a
                 href="/agenda"
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
               >
-                <span>📝 Agenda & Ausencias</span>
+                <IconoPeriodico className="size-3.5" />
+                <span>Agenda & Ausencias</span>
               </a>
               <a
                 href="/horarios"
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
               >
-                <span>📅 Horarios por Sección</span>
+                <IconoCalendario className="size-3.5" />
+                <span>Horarios por Sección</span>
               </a>
               <a
                 href="/comedor"
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
               >
-                <span>🍽️ Menú & Pase Comedor</span>
+                <IconoComedor className="size-3.5" />
+                <span>Menú & Pase Comedor</span>
               </a>
               <a
                 href="/"
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
               >
-                <span>🏠 Dashboard Inicio</span>
+                <IconoInicio className="size-3.5" />
+                <span>Dashboard Inicio</span>
               </a>
             </div>
           </div>

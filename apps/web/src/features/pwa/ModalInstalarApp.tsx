@@ -6,6 +6,7 @@ import {
   IconoDescargar,
   IconoCarnet,
   IconoCalendario,
+  IconoRayo,
 } from '@/components/icons'
 import { usePwaInstall } from './usePwaInstall'
 
@@ -98,7 +99,7 @@ export function ModalInstalarApp({ abierto, alCerrar }: Props) {
           </div>
           <span className="h-6 w-px bg-border" />
           <div className="flex flex-col items-center gap-1">
-            <span className="text-xs">⚡</span>
+            <IconoRayo className="size-4 text-primary" />
             <span className="text-micro font-semibold text-text">Sin Descargas</span>
           </div>
         </div>

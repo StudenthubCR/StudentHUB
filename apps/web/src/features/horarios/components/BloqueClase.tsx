@@ -1,4 +1,5 @@
 import { cn } from '@/lib/cn'
+import { IconoComedor, IconoBirrete } from '@/components/icons'
 import type { Bloque } from '../horario.types'
 
 export type Marca = 'ahora' | 'siguiente' | null
@@ -95,7 +96,7 @@ export function BloqueClase({ bloque, indice, marca, pasado }: Props) {
               esReceso ? 'text-amber-900 italic dark:text-amber-300' : 'text-text',
             )}
           >
-            {esReceso && <span className="mr-1.5 not-italic">🍽️</span>}
+            {esReceso && <IconoComedor className="mr-1.5 size-4 inline text-amber-600 dark:text-amber-400 not-italic" />}
             {bloque.materia}
           </h4>
           {marca && <Etiqueta marca={marca} />}
@@ -104,7 +105,7 @@ export function BloqueClase({ bloque, indice, marca, pasado }: Props) {
         <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-menuda text-text-muted">
           {bloque.docente && !esReceso && (
             <span className="flex items-center gap-1">
-              <span className="opacity-70">👨‍🏫</span>
+              <IconoBirrete className="size-3.5 opacity-70" />
               <span>
                 <strong className="font-medium text-text">Prof.</strong> {bloque.docente}
               </span>

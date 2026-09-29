@@ -513,9 +513,226 @@ export function IconoProfesorAusente(props: Props) {
   )
 }
 
+/** Dashboard / Métricas: gráfico de barras */
+export function IconoDashboard(props: Props) {
+  return (
+    <Base {...props}>
+      <rect width="7" height="9" x="3" y="3" rx="1" />
+      <rect width="7" height="5" x="14" y="3" rx="1" />
+      <rect width="7" height="9" x="14" y="12" rx="1" />
+      <rect width="7" height="5" x="3" y="16" rx="1" />
+    </Base>
+  )
+}
+
+/** Megáfono / Avisos */
+export function IconoMegafono(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="m3 11 18-5v12L3 14v-3z" />
+      <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" />
+    </Base>
+  )
+}
+
+/** Periódico / Noticias */
+export function IconoPeriodico(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
+      <path d="M18 14h-8" />
+      <path d="M15 18h-5" />
+      <path d="M10 6h8v4h-8V6Z" />
+    </Base>
+  )
+}
+
+/** Birrete / Estudiantes */
+export function IconoBirrete(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z" />
+      <path d="M22 10v6" />
+      <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5" />
+    </Base>
+  )
+}
+
+/** Usuarios / Grupo */
+export function IconoUsuarios(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </Base>
+  )
+}
+
+/** Usuario individual */
+export function IconoUsuario(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </Base>
+  )
+}
+
+/** Editar / Lápiz */
+export function IconoEditar(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+      <path d="m15 5 4 4" />
+    </Base>
+  )
+}
+
+/** Eliminar / Papelera */
+export function IconoEliminar(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="M3 6h18" />
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+      <line x1="10" x2="10" y1="11" y2="17" />
+      <line x1="14" x2="14" y1="11" y2="17" />
+    </Base>
+  )
+}
+
+/** Duplicar / Copiar */
+export function IconoDuplicar(props: Props) {
+  return (
+    <Base {...props}>
+      <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+    </Base>
+  )
+}
+
+/** Detener / Desactivar */
+export function IconoDetener(props: Props) {
+  return (
+    <Base {...props}>
+      <circle cx="12" cy="12" r="10" />
+      <rect width="6" height="6" x="9" y="9" rx="1" />
+    </Base>
+  )
+}
+
+/** Alerta / Advertencia (Triángulo) */
+export function IconoAlertaTriangulo(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+      <line x1="12" x2="12" y1="9" y2="13" />
+      <line x1="12" x2="12.01" y1="17" y2="17" />
+    </Base>
+  )
+}
+
+/** Info (Círculo i) */
+export function IconoInfo(props: Props) {
+  return (
+    <Base {...props}>
+      <circle cx="12" cy="12" r="10" />
+      <path d="M12 16v-4" />
+      <path d="M12 8h.01" />
+    </Base>
+  )
+}
+
+/** Estrella */
+export function IconoEstrella(props: Props) {
+  return (
+    <Base {...props}>
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </Base>
+  )
+}
+
+/** Más / Agregar */
+export function IconoMas(props: Props) {
+  return (
+    <Base {...props}>
+      <line x1="12" x2="12" y1="5" y2="19" />
+      <line x1="5" x2="19" y1="12" y2="12" />
+    </Base>
+  )
+}
+
+/** Buscar / Lupa */
+export function IconoBuscar(props: Props) {
+  return (
+    <Base {...props}>
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" x2="16.65" y1="21" y2="16.65" />
+    </Base>
+  )
+}
+
+/** Check / Verificación */
+export function IconoCheck(props: Props) {
+  return (
+    <Base {...props}>
+      <polyline points="20 6 9 17 4 12" />
+    </Base>
+  )
+}
+
+/** Menú Hamburguesa */
+export function IconoMenu(props: Props) {
+  return (
+    <Base {...props}>
+      <line x1="4" x2="20" y1="12" y2="12" />
+      <line x1="4" x2="20" y1="6" y2="6" />
+      <line x1="4" x2="20" y1="18" y2="18" />
+    </Base>
+  )
+}
+
+/** Volver / Flecha izquierda */
+export function IconoVolver(props: Props) {
+  return (
+    <Base {...props}>
+      <line x1="19" x2="5" y1="12" y2="12" />
+      <polyline points="12 19 5 12 12 5" />
+    </Base>
+  )
+}
+
+/** Rayo / Actividad */
+export function IconoRayo(props: Props) {
+  return (
+    <Base {...props}>
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+    </Base>
+  )
+}
+
+/** Colegio / Institución */
+export function IconoColegio(props: Props) {
+  return (
+    <Base {...props}>
+      <path d="m4 6 8-4 8 4" />
+      <path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2" />
+      <path d="M14 22v-4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v4" />
+      <path d="M18 5v17" />
+      <path d="M6 5v17" />
+      <circle cx="12" cy="9" r="2" />
+    </Base>
+  )
+}
+
+
+
 /**
  * Colección de iconos animados con física de resortes de Iconimate (https://iconimate.app/).
  */
 export * from './iconimate'
+
 
 

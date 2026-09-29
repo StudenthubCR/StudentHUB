@@ -10,6 +10,8 @@ import {
   IconoEscudo,
   IconoFlechaDerecha,
   IconoDescargar,
+  IconoRayo,
+  IconoVolver,
 } from '@/components/icons'
 import { ThemeToggle } from '@/app/layout/ThemeToggle'
 import { usePwaInstall } from '@/features/pwa/usePwaInstall'
@@ -152,8 +154,9 @@ export function LoginPage() {
         }
 
         // Navegación limpia de recarga para garantizar sincronización completa de la sesión
-        const destino = (location.state as { desde?: { pathname?: string } })?.desde?.pathname || '/'
-        window.location.href = destino
+        const rutaDestino = (location.state as { desde?: { pathname?: string } })?.desde?.pathname || '/'
+        const destinoSeguro = rutaDestino.startsWith('/') && !rutaDestino.startsWith('//') ? rutaDestino : '/'
+        window.location.href = destinoSeguro
       } catch (err) {
         setEnviando(false)
         setError('Error al conectar con el servidor de autenticación.')
@@ -217,8 +220,9 @@ export function LoginPage() {
         }
 
         // 4. Redirigir de manera atómica con recarga completa para evitar rebotes de RutaProtegida
-        const destino = (location.state as { desde?: { pathname?: string } })?.desde?.pathname || '/'
-        window.location.href = destino
+        const rutaDestino = (location.state as { desde?: { pathname?: string } })?.desde?.pathname || '/'
+        const destinoSeguro = rutaDestino.startsWith('/') && !rutaDestino.startsWith('//') ? rutaDestino : '/'
+        window.location.href = destinoSeguro
       } catch (err) {
         setEnviando(false)
         setError('Error inesperado al verificar el código.')
@@ -247,7 +251,8 @@ export function LoginPage() {
             className="flex cursor-pointer items-center gap-1.5 rounded-full border border-primary/30 bg-primary-tint px-3 py-1.5 text-etiqueta font-bold text-primary shadow-xs transition-all duration-200 hover:bg-primary-tint-strong active:scale-95"
             title="Ver portal interactivo para la Expotécnica 2026"
           >
-            <span>🚀 Expotécnica</span>
+            <IconoRayo className="size-3.5" />
+            <span>Expotécnica</span>
           </Link>
           {!esModoInstalado && (
             <button
@@ -428,7 +433,7 @@ export function LoginPage() {
                         setContrasenaAdmin(e.target.value)
                         if (error) setError(null)
                       }}
-                      placeholder="Contraseña institucional (ej. StudentHub2026*)"
+                      placeholder="••••••••••••"
                       className={CAMPO}
                     />
                   </div>
@@ -506,9 +511,10 @@ export function LoginPage() {
                         setModoAdminPassword(true)
                         setError(null)
                       }}
-                      className="text-center text-micro font-semibold text-primary hover:underline cursor-pointer py-1"
+                      className="inline-flex items-center justify-center gap-1.5 text-center text-micro font-semibold text-primary hover:underline cursor-pointer py-1"
                     >
-                      🛡️ Acceso Oficial Administrador (studenthub.cr@gmail.com)
+                      <IconoEscudo className="size-3.5" />
+                      <span>Acceso Oficial Administrador (studenthub.cr@gmail.com)</span>
                     </button>
                   ) : (
                     <button
@@ -519,9 +525,10 @@ export function LoginPage() {
                         setContrasenaAdmin('')
                         setError(null)
                       }}
-                      className="text-center text-micro font-semibold text-text-muted hover:underline cursor-pointer py-1"
+                      className="inline-flex items-center justify-center gap-1.5 text-center text-micro font-semibold text-text-muted hover:underline cursor-pointer py-1"
                     >
-                      ← Volver al acceso para estudiantes
+                      <IconoVolver className="size-3.5" />
+                      <span>Volver al acceso para estudiantes</span>
                     </button>
                   )}
                 </div>

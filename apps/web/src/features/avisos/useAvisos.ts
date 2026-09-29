@@ -3,7 +3,6 @@ import { supabase } from '@/lib/supabase'
 import { useSesion } from '@/features/auth/useSesion'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import {
-  CORREO_ADMIN_UNICO,
   aplicaAvisoAEstudiante,
   convertirAvisoANotificacion,
   crearAviso,
@@ -114,13 +113,13 @@ export function useAvisos() {
       if (!esAdmin) {
         throw new Error('Operación denegada: Ningún estudiante tiene permisos para publicar comunicados.')
       }
-      const res = await crearAviso(payload, CORREO_ADMIN_UNICO)
+      const res = await crearAviso(payload, emailActual)
       if (res.ok && res.aviso) {
         setAvisos((prev) => [res.aviso!, ...prev])
       }
       return res
     },
-    [esAdmin],
+    [esAdmin, emailActual],
   )
 
   const borrarAviso = useCallback(
@@ -128,12 +127,12 @@ export function useAvisos() {
       if (!esAdmin) {
         throw new Error('Operación denegada: Ningún estudiante tiene permisos para eliminar comunicados.')
       }
-      const ok = await eliminarAviso(id, CORREO_ADMIN_UNICO)
+      const ok = await eliminarAviso(id, emailActual)
       if (ok) {
         setAvisos((prev) => prev.filter((a) => a.id !== id))
       }
     },
-    [esAdmin],
+    [esAdmin, emailActual],
   )
 
   return {

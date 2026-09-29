@@ -52,7 +52,7 @@ export function SelectorPersonalizacionCarnet({
               : 'text-text-muted hover:text-text',
           )}
         >
-          🎨 Color y 3D
+          Color y 3D
         </button>
         <button
           type="button"
@@ -64,7 +64,7 @@ export function SelectorPersonalizacionCarnet({
               : 'text-text-muted hover:text-text',
           )}
         >
-          ⭐ Insignia y Lema
+          Insignia y Lema
         </button>
         <button
           type="button"
@@ -76,7 +76,7 @@ export function SelectorPersonalizacionCarnet({
               : 'text-text-muted hover:text-text',
           )}
         >
-          📇 Reverso y Salud
+          Reverso y Salud
         </button>
       </div>
 

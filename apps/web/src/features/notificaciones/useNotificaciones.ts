@@ -69,7 +69,7 @@ export function useNotificaciones() {
     if (nuevoEstado === 'granted') {
       agregarNotificacion(
         {
-          titulo: '¡Notificaciones activadas! 🔔',
+          titulo: '¡Notificaciones activadas!',
           mensaje: 'A partir de ahora recibirás alertas del comedor, ausencias de profesores y horarios en tiempo real.',
           categoria: 'noticias',
           importante: true,
@@ -140,28 +140,28 @@ export function useNotificaciones() {
         { titulo: string; mensaje: string; enlace?: string; importante?: boolean }
       > = {
         comedor: {
-          titulo: '🍲 Menú del Comedor de Hoy',
+          titulo: 'Menú del Comedor de Hoy',
           mensaje: 'Pollo en salsa criolla con arroz, frijoles y ensalada rusa. ¡Almuerzo a las 11:30 AM!',
           enlace: '/comedor',
         },
         horarios: {
-          titulo: '⏰ Recordatorio de Clases',
+          titulo: 'Recordatorio de Clases',
           mensaje: 'Tu próxima lección de Programación comienza en 10 minutos (Aula 12).',
           enlace: '/horarios',
         },
         ausencias: {
-          titulo: '⚠️ Ausencia Docente',
+          titulo: 'Ausencia Docente',
           mensaje: 'El profesor de Física Matemática se ausenta hoy. Se asignó trabajo independiente.',
           enlace: '/agenda',
           importante: true,
         },
         agenda: {
-          titulo: '📝 Tarea Pendiente en Agenda',
+          titulo: 'Tarea Pendiente en Agenda',
           mensaje: 'Recordatorio: Recuerda entregar la práctica de Electrotecnia antes del receso.',
           enlace: '/agenda',
         },
         noticias: {
-          titulo: '📰 Nueva Noticia del CTP',
+          titulo: 'Nueva Noticia del CTP',
           mensaje: 'Feria Científica 2026: Inscripciones abiertas para todos los niveles.',
           enlace: '/expo',
         },

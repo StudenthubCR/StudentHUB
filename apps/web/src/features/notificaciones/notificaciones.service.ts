@@ -41,8 +41,8 @@ export interface NotificacionItem {
 }
 
 /** Claves de almacenamiento en localStorage */
-export const CLAVE_STORAGE_CANALES = 'studenthub_notif_canales'
-export const CLAVE_STORAGE_INBOX = 'studenthub_notif_inbox'
+const CLAVE_STORAGE_CANALES = 'studenthub_notif_canales'
+const CLAVE_STORAGE_INBOX = 'studenthub_notif_inbox'
 
 /** Configuración por defecto: todos los canales activos al otorgar permiso */
 export const CANALES_POR_DEFECTO: CanalesNotificacion = {
@@ -54,10 +54,10 @@ export const CANALES_POR_DEFECTO: CanalesNotificacion = {
 }
 
 /** Notificaciones iniciales de bienvenida y contexto para nuevos usuarios */
-export const NOTIFICACIONES_SEMILLA: NotificacionItem[] = [
+const NOTIFICACIONES_SEMILLA: NotificacionItem[] = [
   {
     id: 'notif-comedor-hoy',
-    titulo: '🍲 Menú del Comedor de Hoy',
+    titulo: 'Menú del Comedor de Hoy',
     mensaje: 'Casado tradicional con pollo en salsa criolla, frijoles y ensalada rusa. ¡Almuerzo a las 11:30 AM!',
     categoria: 'comedor',
     fechaIso: new Date(Date.now() - 1000 * 60 * 35).toISOString(), // hace 35 min
@@ -66,7 +66,7 @@ export const NOTIFICACIONES_SEMILLA: NotificacionItem[] = [
   },
   {
     id: 'notif-ausencia-hoy',
-    titulo: '⚠️ Ausencia Docente Reportada',
+    titulo: 'Ausencia Docente Reportada',
     mensaje: 'El profesor de Redes y Telecomunicaciones no asiste hoy por capacitación institucional del MEP.',
     categoria: 'ausencias',
     fechaIso: new Date(Date.now() - 1000 * 60 * 95).toISOString(), // hace 1.5 horas
@@ -76,7 +76,7 @@ export const NOTIFICACIONES_SEMILLA: NotificacionItem[] = [
   },
   {
     id: 'notif-agenda-proxima',
-    titulo: '📝 Examen Próximo en Agenda',
+    titulo: 'Examen Próximo en Agenda',
     mensaje: 'Recordatorio: Tienes programada la entrega y evaluación de Programación Web para esta semana.',
     categoria: 'agenda',
     fechaIso: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // hace 5 horas
@@ -85,7 +85,7 @@ export const NOTIFICACIONES_SEMILLA: NotificacionItem[] = [
   },
   {
     id: 'notif-expo-2026',
-    titulo: '🚀 Portal ExpoTÉCNICA 2026',
+    titulo: 'Portal ExpoTÉCNICA 2026',
     mensaje: 'Conoce los proyectos estudiantiles y la guía de evaluación para jurados en el módulo especial.',
     categoria: 'noticias',
     fechaIso: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // ayer
@@ -300,7 +300,7 @@ export async function solicitarPermisoNotificacion(): Promise<EstadoPermisoNotif
 /**
  * Emite una notificación nativa visible en el sistema operativo o celular.
  */
-export async function emitirNotificacion(
+async function emitirNotificacion(
   titulo: string,
   opciones?: NotificationOptions,
 ): Promise<boolean> {

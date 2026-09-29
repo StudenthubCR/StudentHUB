@@ -1,6 +1,16 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { IconoCerrar } from '@/components/icons'
+import {
+  IconoCerrar,
+  IconoMegafono,
+  IconoReloj,
+  IconoBirrete,
+  IconoComedor,
+  IconoCalendario,
+  IconoAlertaTriangulo,
+  IconoCampana,
+  IconoCheck,
+} from '@/components/icons'
 import { cn } from '@/lib/cn'
 import { ESPECIALIDADES_CTP, SECCIONES_CTP } from '../avisos.service'
 import type { CategoriaAviso, NuevoAvisoPayload, PrioridadAviso, TipoAlcance } from '../avisos.types'
@@ -12,11 +22,11 @@ type Props = {
 }
 
 const CATEGORIAS = [
-  { id: 'early_departure', etiqueta: 'Salida Anticipada', icono: '⏰' },
-  { id: 'absence', etiqueta: 'Ausencia Docente', icono: '👨‍🏫' },
-  { id: 'menu_change', etiqueta: 'Cambio de Menú', icono: '🍽️' },
-  { id: 'event', etiqueta: 'Evento / Actividad', icono: '📅' },
-  { id: 'general', etiqueta: 'Comunicado General', icono: '📢' },
+  { id: 'early_departure', etiqueta: 'Salida Anticipada', Icono: IconoReloj },
+  { id: 'absence', etiqueta: 'Ausencia Docente', Icono: IconoBirrete },
+  { id: 'menu_change', etiqueta: 'Cambio de Menú', Icono: IconoComedor },
+  { id: 'event', etiqueta: 'Evento / Actividad', Icono: IconoCalendario },
+  { id: 'general', etiqueta: 'Comunicado General', Icono: IconoMegafono },
 ] as const
 
 const PRIORIDADES = [
@@ -63,22 +73,27 @@ export function ModalCrearAviso({ abierto, alCerrar, alGuardar }: Props) {
     e.preventDefault()
     setErrorValidacion(null)
 
-    if (!titulo.trim() || !mensaje.trim()) {
-      setErrorValidacion('Por favor completá el título y la descripción del aviso.')
+    if (!titulo.trim()) {
+      setErrorValidacion('Por favor ingresá un título para el aviso.')
       return
     }
-
+    if (!mensaje.trim()) {
+      setErrorValidacion('Por favor redactá el mensaje del comunicado.')
+      return
+    }
     if (tipoAlcance !== 'all' && valoresSeleccionados.length === 0) {
       setErrorValidacion(
         tipoAlcance === 'specialty'
-          ? 'Seleccioná al menos una especialidad técnica para segmentar.'
-          : 'Seleccioná al menos una sección específica para segmentar.',
+          ? 'Seleccioná al menos una especialidad de destino.'
+          : 'Seleccioná al menos una sección de destino.',
       )
       return
     }
 
     setGuardando(true)
     try {
+      const duracionHoras = prioridad === 'urgent' ? 24 : 72
+      const expires_at = new Date(Date.now() + duracionHoras * 3600 * 1000).toISOString()
       const res = await alGuardar({
         title: titulo.trim(),
         message: mensaje.trim(),
@@ -86,19 +101,18 @@ export function ModalCrearAviso({ abierto, alCerrar, alGuardar }: Props) {
         priority: prioridad,
         target_type: tipoAlcance,
         target_values: tipoAlcance === 'all' ? [] : valoresSeleccionados,
+        expires_at,
       })
 
       if (res.ok) {
         setTitulo('')
         setMensaje('')
         setValoresSeleccionados([])
-        setTipoAlcance('all')
+        setErrorValidacion(null)
         alCerrar()
       } else {
-        setErrorValidacion('No se pudo guardar el aviso.')
+        setErrorValidacion('Ocurrió un error al guardar el aviso. Intentá de nuevo.')
       }
-    } catch {
-      setErrorValidacion('Error al conectar con la base de datos.')
     } finally {
       setGuardando(false)
     }
@@ -119,8 +133,8 @@ export function ModalCrearAviso({ abierto, alCerrar, alGuardar }: Props) {
       <div className="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-3xl border border-border bg-surface p-4 sm:p-6 shadow-2xl animate-scale-in">
         <div className="flex items-center justify-between gap-3 mb-4 pb-3 border-b border-border/60">
           <div className="flex items-center gap-2.5">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary-tint border border-primary/25 text-lg">
-              📢
+            <span className="flex size-9 items-center justify-center rounded-xl bg-primary-tint border border-primary/25 text-primary">
+              <IconoMegafono className="size-5" />
             </span>
             <div>
               <h2
@@ -147,8 +161,9 @@ export function ModalCrearAviso({ abierto, alCerrar, alGuardar }: Props) {
         </div>
 
         {errorValidacion && (
-          <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-micro font-bold text-rose-600 dark:text-rose-400">
-            ⚠️ {errorValidacion}
+          <div className="mb-4 flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-micro font-bold text-rose-600 dark:text-rose-400">
+            <IconoAlertaTriangulo className="size-4 shrink-0" />
+            <span>{errorValidacion}</span>
           </div>
         )}
 
@@ -159,22 +174,25 @@ export function ModalCrearAviso({ abierto, alCerrar, alGuardar }: Props) {
               1. Categoría
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {CATEGORIAS.map((cat) => (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setCategoria(cat.id)}
-                  className={cn(
-                    'flex items-center gap-2 p-2 rounded-xl border text-left cursor-pointer transition-all',
-                    categoria === cat.id
-                      ? 'border-primary bg-primary-tint/60 text-primary font-bold shadow-2xs'
-                      : 'border-border bg-surface-alt/60 text-text-muted hover:text-text',
-                  )}
-                >
-                  <span className="text-base">{cat.icono}</span>
-                  <span className="text-micro font-semibold truncate">{cat.etiqueta}</span>
-                </button>
-              ))}
+              {CATEGORIAS.map((cat) => {
+                const Icono = cat.Icono
+                return (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setCategoria(cat.id)}
+                    className={cn(
+                      'flex items-center gap-2 p-2 rounded-xl border text-left cursor-pointer transition-all',
+                      categoria === cat.id
+                        ? 'border-primary bg-primary-tint/60 text-primary font-bold shadow-2xs'
+                        : 'border-border bg-surface-alt/60 text-text-muted hover:text-text',
+                    )}
+                  >
+                    <Icono className="size-4 shrink-0" />
+                    <span className="text-micro font-semibold truncate">{cat.etiqueta}</span>
+                  </button>
+                )
+              })}
             </div>
           </div>
 
@@ -220,92 +238,109 @@ export function ModalCrearAviso({ abierto, alCerrar, alGuardar }: Props) {
 
           <div>
             <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1.5">
-              4. Contenido Descriptivo
+              4. Mensaje Completo
             </label>
             <textarea
               rows={3}
               value={mensaje}
               onChange={(e) => setMensaje(e.target.value)}
-              placeholder="Describí con claridad la indicación, horarios, justificaciones o detalles operativos..."
+              placeholder="Detallá los motivos, horarios, instrucciones y recomendaciones para los alumnos..."
               maxLength={400}
-              className="w-full rounded-xl border border-border bg-surface px-3 py-2 text-dato text-text focus:border-primary focus:outline-none resize-none"
+              className="w-full resize-none rounded-xl border border-border bg-surface px-3 py-2 text-dato text-text focus:border-primary focus:outline-none"
             />
           </div>
 
-          {/* Segmentación de Audiencia */}
+          {/* Audiencia / Segmentación */}
           <div>
             <label className="block text-[11px] font-bold uppercase tracking-wider text-text-muted mb-1.5">
               5. Audiencia Destinataria
             </label>
             <div className="grid grid-cols-3 gap-2 mb-2.5">
-              {(['all', 'specialty', 'section'] as const).map((tipo) => (
-                <button
-                  key={tipo}
-                  type="button"
-                  onClick={() => {
-                    setTipoAlcance(tipo)
-                    setValoresSeleccionados([])
-                  }}
-                  className={cn(
-                    'p-2 rounded-xl border text-center cursor-pointer transition-all text-micro font-bold',
-                    tipoAlcance === tipo
-                      ? 'border-primary bg-primary-tint text-primary'
-                      : 'border-border bg-surface-alt/40 text-text-muted',
-                  )}
-                >
-                  {tipo === 'all'
-                    ? 'Toda la Institución'
-                    : tipo === 'specialty'
-                      ? 'Por Especialidad'
-                      : 'Por Secciones'}
-                </button>
-              ))}
+              <button
+                type="button"
+                onClick={() => {
+                  setTipoAlcance('all')
+                  setValoresSeleccionados([])
+                }}
+                className={cn(
+                  'p-2 rounded-xl border text-micro font-bold text-center cursor-pointer transition-all',
+                  tipoAlcance === 'all'
+                    ? 'border-primary bg-primary text-white shadow-2xs'
+                    : 'border-border bg-surface-alt/50 text-text-muted hover:text-text',
+                )}
+              >
+                Toda la Institución
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setTipoAlcance('specialty')
+                  setValoresSeleccionados([])
+                }}
+                className={cn(
+                  'p-2 rounded-xl border text-micro font-bold text-center cursor-pointer transition-all',
+                  tipoAlcance === 'specialty'
+                    ? 'border-primary bg-primary text-white shadow-2xs'
+                    : 'border-border bg-surface-alt/50 text-text-muted hover:text-text',
+                )}
+              >
+                Por Especialidad
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setTipoAlcance('section')
+                  setValoresSeleccionados([])
+                }}
+                className={cn(
+                  'p-2 rounded-xl border text-micro font-bold text-center cursor-pointer transition-all',
+                  tipoAlcance === 'section'
+                    ? 'border-primary bg-primary text-white shadow-2xs'
+                    : 'border-border bg-surface-alt/50 text-text-muted hover:text-text',
+                )}
+              >
+                Por Sección
+              </button>
             </div>
 
-            {tipoAlcance === 'all' && (
-              <p className="rounded-xl bg-surface-alt/50 border border-border/60 p-2.5 text-[11px] text-text-muted flex items-center gap-2">
-                <span>🌐</span>
-                <span>Este aviso se mostrará a todos los estudiantes y docentes matriculados.</span>
-              </p>
-            )}
-
+            {/* Sub-selector según el alcance */}
             {tipoAlcance === 'specialty' && (
-              <div className="rounded-xl bg-surface-alt/40 border border-border/60 p-2.5 flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1.5 rounded-xl border border-border bg-surface-alt/30 p-2.5 max-h-36 overflow-y-auto">
                 {ESPECIALIDADES_CTP.map((esp) => (
                   <button
                     key={esp}
                     type="button"
                     onClick={() => alternarSeleccion(esp)}
                     className={cn(
-                      'rounded-lg px-2.5 py-1 text-[11px] font-bold cursor-pointer transition-all border',
+                      'inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-micro font-medium cursor-pointer transition-all border',
                       valoresSeleccionados.includes(esp)
                         ? 'border-primary bg-primary text-white shadow-2xs'
                         : 'border-border bg-surface text-text-muted hover:text-text',
                     )}
                   >
-                    {valoresSeleccionados.includes(esp) ? '✓ ' : '+ '}
-                    {esp}
+                    {valoresSeleccionados.includes(esp) && <IconoCheck className="size-3" />}
+                    <span>{esp}</span>
                   </button>
                 ))}
               </div>
             )}
 
             {tipoAlcance === 'section' && (
-              <div className="rounded-xl bg-surface-alt/40 border border-border/60 p-2.5 flex flex-wrap gap-1.5">
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-1.5 rounded-xl border border-border bg-surface-alt/30 p-2.5 max-h-36 overflow-y-auto">
                 {SECCIONES_CTP.map((sec) => (
                   <button
                     key={sec}
                     type="button"
                     onClick={() => alternarSeleccion(sec)}
                     className={cn(
-                      'rounded-lg px-3 py-1 text-micro font-bold cursor-pointer transition-all border',
+                      'inline-flex items-center justify-center gap-1 rounded-lg px-2 py-1 text-micro font-bold cursor-pointer transition-all border',
                       valoresSeleccionados.includes(sec)
                         ? 'border-primary bg-primary text-white shadow-2xs'
                         : 'border-border bg-surface text-text-muted hover:text-text',
                     )}
                   >
-                    {valoresSeleccionados.includes(sec) ? '✓ ' : ''}
-                    {sec}
+                    {valoresSeleccionados.includes(sec) && <IconoCheck className="size-3" />}
+                    <span>{sec}</span>
                   </button>
                 ))}
               </div>
@@ -315,7 +350,7 @@ export function ModalCrearAviso({ abierto, alCerrar, alGuardar }: Props) {
           {/* Notificación automática inmediata a estudiantes */}
           <div className="rounded-xl border border-primary/25 bg-primary-tint/50 p-3 text-menuda text-text">
             <div className="flex items-center gap-2 font-bold text-primary text-micro">
-              <span>🔔</span>
+              <IconoCampana className="size-4" />
               <span>Notificación automática estudiantil</span>
             </div>
             <p className="mt-0.5 text-[11px] text-text-muted leading-relaxed">

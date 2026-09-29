@@ -71,5 +71,3 @@ export type NoticiaAdmin = {
   periodo: string
   autor: string
 }
-
-export type AdminTab = 'dashboard' | 'avisos' | 'noticias' | 'estudiantes' | 'auditoria'

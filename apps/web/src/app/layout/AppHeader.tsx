@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { IconoSalir, IconoDescargar, IconoCampana } from '@/components/icons'
+import { IconoSalir, IconoDescargar, IconoCampana, IconoRayo, IconoEscudo } from '@/components/icons'
 import { useSesion } from '@/features/auth/useSesion'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import { useNotificaciones } from '@/features/notificaciones/useNotificaciones'
@@ -97,7 +97,8 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
             className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-primary-tint border border-primary/30 px-3 py-1 text-etiqueta font-bold text-primary hover:bg-primary-tint-strong transition-all shadow-2xs active:scale-95"
             title="Volver al portal interactivo de Expotécnica 2026"
           >
-            <span>🚀 Portal Expo</span>
+            <IconoRayo className="size-3.5" />
+            <span>Portal Expo</span>
           </Link>
         )}
 
@@ -107,7 +108,8 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
             className="inline-flex items-center gap-1.5 rounded-full bg-primary-tint border border-primary/30 px-3 py-1 text-etiqueta font-bold text-primary hover:bg-primary-tint-strong transition-all shadow-2xs active:scale-95"
             title="Ingresar al Panel de Control Administrativo"
           >
-            <span>🛡️ Panel Admin</span>
+            <IconoEscudo className="size-3.5" />
+            <span>Panel Admin</span>
           </Link>
         )}
 

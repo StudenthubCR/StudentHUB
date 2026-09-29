@@ -110,7 +110,10 @@ export function HorarioDelGrupo({
                     : 'text-text-muted hover:text-text',
                 )}
               >
-                📅 Por Día
+                <span className="inline-flex items-center gap-1">
+                  <IconoCalendario className="size-3.5" />
+                  <span>Por Día</span>
+                </span>
               </button>
               <button
                 type="button"
@@ -122,7 +125,10 @@ export function HorarioDelGrupo({
                     : 'text-text-muted hover:text-text',
                 )}
               >
-                🗓️ Semana
+                <span className="inline-flex items-center gap-1">
+                  <IconoCalendario className="size-3.5" />
+                  <span>Semana</span>
+                </span>
               </button>
             </div>
           )}

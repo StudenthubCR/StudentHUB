@@ -45,52 +45,6 @@ export const SECCIONES_CTP = [
   '12-2',
   '12-3',
 ] as const
-
-export const AVISOS_SEMILLAS: InstitutionAlert[] = [
-  {
-    id: 'aviso-urgente-salida',
-    title: 'Salida anticipada este viernes a las 2:00 PM',
-    message:
-      'Por motivo de Consejo General de Profesores y capacitación técnica, la jornada diurna finalizará a las 2:00 PM para todas las especialidades.',
-    category: 'early_departure',
-    priority: 'warning',
-    target_type: 'all',
-    target_values: [],
-    created_by: CORREO_ADMIN_UNICO,
-    created_at: new Date(Date.now() - 1000 * 60 * 25).toISOString(),
-    expires_at: null,
-    active: true,
-  },
-  {
-    id: 'aviso-ausencia-web',
-    title: 'Ausencia docente: Programación Web (Sección 11-1)',
-    message:
-      'El docente a cargo se encuentra en comisión oficial. La sección 11-1 tendrá horas de estudio y práctica libre en biblioteca y laboratorios.',
-    category: 'absence',
-    priority: 'urgent',
-    target_type: 'section',
-    target_values: ['11-1'],
-    created_by: CORREO_ADMIN_UNICO,
-    created_at: new Date(Date.now() - 1000 * 60 * 65).toISOString(),
-    expires_at: null,
-    active: true,
-  },
-  {
-    id: 'aviso-comedor-menu',
-    title: 'Menú especial: Picadillo de papa con carne mechada',
-    message:
-      'Por recepción de ingredientes frescos en cocina estudiantil, hoy se servirá picadillo de papa con carne mechada y fresco natural de cas.',
-    category: 'menu_change',
-    priority: 'info',
-    target_type: 'all',
-    target_values: [],
-    created_by: 'cocina@mep.go.cr',
-    created_at: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-    expires_at: null,
-    active: true,
-  },
-]
-
 export async function obtenerAvisos(): Promise<InstitutionAlert[]> {
   try {
     const { data, error } = await supabase
@@ -112,17 +66,14 @@ export async function obtenerAvisos(): Promise<InstitutionAlert[]> {
   return cargarAvisosLocales()
 }
 
-export function cargarAvisosLocales(): InstitutionAlert[] {
-  if (typeof window === 'undefined') return AVISOS_SEMILLAS
+function cargarAvisosLocales(): InstitutionAlert[] {
+  if (typeof window === 'undefined') return []
   try {
     const guardados = localStorage.getItem(CLAVE_STORAGE)
-    if (!guardados) {
-      localStorage.setItem(CLAVE_STORAGE, JSON.stringify(AVISOS_SEMILLAS))
-      return AVISOS_SEMILLAS
-    }
+    if (!guardados) return []
     return JSON.parse(guardados) as InstitutionAlert[]
   } catch {
-    return AVISOS_SEMILLAS
+    return []
   }
 }
 
@@ -152,7 +103,7 @@ export async function crearAviso(
     priority: payload.priority,
     target_type: payload.target_type,
     target_values: payload.target_type === 'all' ? [] : payload.target_values,
-    created_by: CORREO_ADMIN_UNICO,
+    created_by: correoCreador.trim().toLowerCase(),
     created_at: new Date().toISOString(),
     expires_at: payload.expires_at || null,
     active: true,
@@ -399,7 +350,7 @@ export function filtrarAvisosParaEstudiante(
 /**
  * Mapea la categoría de un aviso institucional a una categoría del sistema de notificaciones.
  */
-export function mapearCategoriaAvisoANotificacion(categoria: CategoriaAviso): CategoriaNotificacion {
+function mapearCategoriaAvisoANotificacion(categoria: CategoriaAviso): CategoriaNotificacion {
   switch (categoria) {
     case 'absence':
       return 'ausencias'
@@ -415,32 +366,12 @@ export function mapearCategoriaAvisoANotificacion(categoria: CategoriaAviso): Ca
 }
 
 /**
- * Icono visual según el tipo de aviso institucional.
- */
-export function obtenerIconoCategoriaAviso(categoria: CategoriaAviso): string {
-  switch (categoria) {
-    case 'early_departure':
-      return '⏰'
-    case 'absence':
-      return '⚠️'
-    case 'menu_change':
-      return '🍲'
-    case 'event':
-      return '📅'
-    case 'general':
-    default:
-      return '📢'
-  }
-}
-
-/**
  * Convierte un aviso institucional en una notificación lista para el buzón del estudiante.
  */
 export function convertirAvisoANotificacion(aviso: InstitutionAlert): NotificacionItem {
-  const icono = obtenerIconoCategoriaAviso(aviso.category)
   return {
     id: `notif-aviso-${aviso.id}`,
-    titulo: `${icono} ${aviso.title}`,
+    titulo: aviso.title,
     mensaje: aviso.message,
     categoria: mapearCategoriaAvisoANotificacion(aviso.category),
     fechaIso: aviso.created_at,

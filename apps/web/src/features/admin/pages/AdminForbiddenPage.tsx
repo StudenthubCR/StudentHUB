@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useSesion } from '@/features/auth/useSesion'
+import { IconoVolver, IconoCandado } from '@/components/icons'
 
 export function AdminForbiddenPage() {
   const { sesion, cerrarSesion } = useSesion()
@@ -9,19 +10,7 @@ export function AdminForbiddenPage() {
       <div className="flex w-full max-w-md flex-col items-center text-center">
         {/* Badge de seguridad */}
         <div className="relative mb-6 flex size-20 items-center justify-center rounded-3xl border border-rose-500/25 bg-rose-500/10 text-rose-600 shadow-md">
-          <svg
-            className="size-10"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-            />
-          </svg>
+          <IconoCandado className="size-10" />
           <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-black text-white">
             !
           </span>
@@ -49,14 +38,15 @@ export function AdminForbiddenPage() {
         <div className="mt-8 flex w-full flex-col gap-2.5 sm:flex-row">
           <Link
             to="/"
-            className="flex flex-1 items-center justify-center rounded-xl bg-primary px-4 py-2.5 text-menor font-bold text-white shadow-xs transition-all hover:bg-primary-dark active:scale-98"
+            className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-menor font-bold text-white shadow-xs transition-all hover:bg-primary-dark active:scale-98"
           >
-            ← Volver a la App Estudiantil
+            <IconoVolver className="size-4" />
+            <span>Volver a la App Estudiantil</span>
           </Link>
           <button
             type="button"
             onClick={() => void cerrarSesion()}
-            className="flex cursor-pointer items-center justify-center rounded-xl border border-border bg-surface px-4 py-2.5 text-menor font-semibold text-text-muted transition-all hover:border-border-strong hover:bg-surface-alt hover:text-text active:scale-98"
+            className="flex min-h-[44px] cursor-pointer items-center justify-center rounded-xl border border-border bg-surface px-4 py-2.5 text-menor font-semibold text-text-muted transition-all hover:border-border-strong hover:bg-surface-alt hover:text-text active:scale-98"
           >
             Cambiar de cuenta
           </button>

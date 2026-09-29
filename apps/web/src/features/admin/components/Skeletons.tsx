@@ -29,17 +29,3 @@ export function SkeletonTableRow({ columnas = 6 }: { columnas?: number }) {
     </tr>
   )
 }
-
-export function SkeletonBanner() {
-  return (
-    <div className="animate-pulse rounded-2xl border border-border bg-surface p-6">
-      <div className="flex items-center gap-4">
-        <div className="size-12 rounded-2xl bg-border/60" />
-        <div className="space-y-2 flex-1">
-          <div className="h-5 w-48 rounded bg-border/70" />
-          <div className="h-3.5 w-72 rounded bg-border/40" />
-        </div>
-      </div>
-    </div>
-  )
-}

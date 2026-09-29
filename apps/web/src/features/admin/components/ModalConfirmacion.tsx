@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { cn } from '@/lib/cn'
+import { IconoEliminar, IconoAlertaTriangulo, IconoInfo } from '@/components/icons'
 
 type Props = {
   abierto: boolean
@@ -62,7 +63,7 @@ export function ModalConfirmacion({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-100 flex items-center justify-center p-4"
+      className="fixed inset-0 z-100 flex items-end sm:items-center justify-center p-0 sm:p-4"
     >
       {/* Fondo desenfocado */}
       <div
@@ -70,18 +71,18 @@ export function ModalConfirmacion({
         onClick={() => !procesando && alCerrar()}
       />
 
-      {/* Ventana Modal */}
-      <div className="relative w-full max-w-md animate-fade-in rounded-2xl border border-border bg-surface p-6 shadow-xl">
+      {/* Ventana Modal / Bottom Sheet en móvil */}
+      <div className="relative w-full max-w-md animate-slide-up sm:animate-fade-in rounded-t-3xl sm:rounded-2xl border border-border bg-surface p-5 sm:p-6 shadow-xl">
         <div className="flex items-start gap-4">
           <div
             className={cn(
-              'flex size-12 shrink-0 items-center justify-center rounded-2xl border text-xl shadow-xs',
+              'flex size-12 shrink-0 items-center justify-center rounded-2xl border shadow-xs',
               colores.iconoBg,
             )}
           >
-            {variante === 'danger' && '🗑️'}
-            {variante === 'warning' && '⚠️'}
-            {variante === 'info' && 'ℹ️'}
+            {variante === 'danger' && <IconoEliminar className="size-6" />}
+            {variante === 'warning' && <IconoAlertaTriangulo className="size-6" />}
+            {variante === 'info' && <IconoInfo className="size-6" />}
           </div>
 
           <div className="flex-1">
@@ -90,12 +91,12 @@ export function ModalConfirmacion({
           </div>
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-2.5">
+        <div className="mt-6 flex flex-col-reverse sm:flex-row items-center justify-end gap-2.5">
           <button
             type="button"
             disabled={procesando}
             onClick={alCerrar}
-            className="cursor-pointer rounded-xl border border-border bg-surface px-4 py-2 text-menor font-semibold text-text-muted transition-all hover:bg-surface-alt hover:text-text active:scale-98 disabled:opacity-50"
+            className="w-full sm:w-auto cursor-pointer rounded-xl border border-border bg-surface px-4 py-2.5 text-menor font-semibold text-text-muted transition-all hover:bg-surface-alt hover:text-text active:scale-98 disabled:opacity-50 min-h-[44px]"
           >
             {textoCancelar}
           </button>
@@ -104,7 +105,7 @@ export function ModalConfirmacion({
             disabled={procesando}
             onClick={() => void alConfirmar()}
             className={cn(
-              'cursor-pointer rounded-xl px-4 py-2 text-menor font-bold shadow-xs transition-all active:scale-98 disabled:opacity-50',
+              'w-full sm:w-auto cursor-pointer rounded-xl px-4 py-2.5 text-menor font-bold shadow-xs transition-all active:scale-98 disabled:opacity-50 min-h-[44px]',
               colores.boton,
             )}
           >

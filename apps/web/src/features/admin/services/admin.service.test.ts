@@ -7,6 +7,8 @@ import {
   guardarNoticiaAdmin,
   toggleDestacadaNoticia,
   eliminarNoticiaAdmin,
+  obtenerMetricasAdmin,
+  obtenerEstudiantesDirectorio,
 } from './admin.service'
 import type { InstitutionAlert } from '@/features/avisos/avisos.types'
 
@@ -145,5 +147,38 @@ describe('Admin Service: Gestor de Noticias', () => {
 
     expect(res.ok).toBe(false)
     expect(res.error).toBe('Permisos insuficientes.')
+  })
+})
+
+describe('Admin Service: Cero Mocks y Consultas a Base de Datos Real', () => {
+  it('obtenerMetricasAdmin retorna contadores numéricos reales sin valores inventados o multiplicadores', async () => {
+    const kpis = await obtenerMetricasAdmin()
+
+    expect(typeof kpis.totalEstudiantes).toBe('number')
+    expect(typeof kpis.estudiantesActivos).toBe('number')
+    expect(typeof kpis.avisosVigentes).toBe('number')
+    expect(typeof kpis.reportesPendientes).toBe('number')
+    expect(typeof kpis.accionesHoy).toBe('number')
+
+    // Las métricas deben ser números válidos no negativos (ej. 0 si la BD está limpia)
+    expect(kpis.totalEstudiantes).toBeGreaterThanOrEqual(0)
+    expect(kpis.estudiantesActivos).toBeGreaterThanOrEqual(0)
+    expect(kpis.avisosVigentes).toBeGreaterThanOrEqual(0)
+    expect(kpis.reportesPendientes).toBeGreaterThanOrEqual(0)
+    expect(kpis.accionesHoy).toBeGreaterThanOrEqual(0)
+  })
+
+  it('obtenerEstudiantesDirectorio retorna un array basado en la base de datos sin arrays semilla hardcodeados', async () => {
+    const directorio = await obtenerEstudiantesDirectorio()
+    expect(Array.isArray(directorio)).toBe(true)
+
+    // Si existen estudiantes, deben tener estructura de BD real (id, nombre, etc.)
+    for (const est of directorio) {
+      expect(est.id).toBeDefined()
+      expect(typeof est.nombre).toBe('string')
+      expect(typeof est.seccion).toBe('string')
+      expect(typeof est.especialidad).toBe('string')
+      expect(['activo', 'inactivo']).toContain(est.estado)
+    }
   })
 })

@@ -34,8 +34,8 @@ export function dominioPermitido(correo: string, dominio: string | null): boolea
  * del servidor, pero la longitud por defecto esperada en la interfaz es 8.
  */
 export const LARGO_CODIGO = 8
-export const LARGO_MINIMO = 6
-export const LARGO_MAXIMO = 8
+const LARGO_MINIMO = 6
+const LARGO_MAXIMO = 8
 
 export function soloDigitos(codigo: string): string {
   return codigo.replace(/\D/g, '').slice(0, LARGO_MAXIMO)
