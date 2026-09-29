@@ -45,9 +45,10 @@ export function WidgetMetricasComedor({ totalEstudiantesPadrone = 0 }: Props) {
   useEffect(() => {
     void cargarMetricas()
 
-    // 1. Suscripción Supabase Realtime a cambios en confirmaciones_comedor
+    // 1. Suscripción Supabase Realtime a cambios en confirmaciones_comedor con ID único
+    const canalId = `realtime-comedor-admin-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
     const canal = supabase
-      .channel('realtime:confirmaciones_comedor_admin')
+      .channel(canalId)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'confirmaciones_comedor' },
@@ -55,7 +56,11 @@ export function WidgetMetricasComedor({ totalEstudiantesPadrone = 0 }: Props) {
           void cargarMetricas()
         },
       )
-      .subscribe()
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR') {
+          console.warn(`Error al suscribir canal realtime ${canalId}`)
+        }
+      })
 
     // 2. Escuchar evento de actualización local
     const alActualizar = () => {

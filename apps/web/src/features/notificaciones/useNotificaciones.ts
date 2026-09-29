@@ -78,12 +78,16 @@ export function useNotificaciones() {
   // 1. Sincronización resiliente con Supabase tras reconexión o reapertura de app
   useEffect(() => {
     void sincronizarNotificacionesDesdeUltimoAcceso(estudiante, esAdmin)
-  }, [estudiante, esAdmin])
+  }, [estudiante?.id, estudiante?.especialidad, estudiante?.grupo, estudiante?.seccion, esAdmin])
 
   // 2. Escucha activa en tiempo real mediante canales Supabase Realtime (notificaciones-in-app)
   useEffect(() => {
+    if (!sesion?.user) return
+
+    // Generar un identificador de canal único por ciclo para evitar colisiones en Supabase SDK
+    const canalId = `notif-in-app-${sesion.user.id}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
     const canal = supabase
-      .channel('notificaciones-in-app')
+      .channel(canalId)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'institution_alerts' },
@@ -114,7 +118,7 @@ export function useNotificaciones() {
               }
             }
           } catch (err) {
-            console.error('[StudentHUB Realtime Alerta Error]:', err)
+            console.warn('[Realtime Notification Error Captured]:', err)
           }
         },
       )
@@ -131,15 +135,19 @@ export function useNotificaciones() {
             }
           }
         } catch (err) {
-          console.error('[StudentHUB Broadcast Alerta Error]:', err)
+          console.warn('[Realtime Broadcast Error Captured]:', err)
         }
       })
-      .subscribe()
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR') {
+          console.warn(`Error al suscribir canal realtime ${canalId}`)
+        }
+      })
 
     return () => {
       void supabase.removeChannel(canal)
     }
-  }, [estudiante, esAdmin])
+  }, [sesion?.user?.id, estudiante?.id, estudiante?.especialidad, estudiante?.grupo, estudiante?.seccion, esAdmin])
 
   /**
    * Solicita el permiso nativo al navegador. Si es concedido,

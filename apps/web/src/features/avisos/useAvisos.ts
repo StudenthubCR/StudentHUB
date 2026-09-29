@@ -54,28 +54,29 @@ export function useAvisos() {
     window.addEventListener('studenthub:avisos-actualizados', alActualizar)
     window.addEventListener('storage', alActualizar)
 
-    // Suscripción en Tiempo Real (Supabase Realtime) a la tabla institution_alerts
+    // Suscripción en Tiempo Real (Supabase Realtime) a la tabla institution_alerts con ID único
+    const canalId = `realtime-alerts-${sesion?.user?.id ?? 'anon'}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
     const canal = supabase
-      .channel('realtime:institution_alerts')
+      .channel(canalId)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'institution_alerts' },
         (payload) => {
-          const nuevoAviso = payload.new as InstitutionAlert
-          if (!nuevoAviso || !nuevoAviso.active) return
+          try {
+            const nuevoAviso = payload.new as InstitutionAlert
+            if (!nuevoAviso || !nuevoAviso.active) return
 
-          // Comprobar si el aviso corresponde a toda la institución o a la sección/especialidad del estudiante
-          if (aplicaAvisoAEstudiante(nuevoAviso, estudiante, esAdmin)) {
-            setAvisos((prev) => [nuevoAviso, ...prev.filter((a) => a.id !== nuevoAviso.id)])
+            // Comprobar si el aviso corresponde a toda la institución o a la sección/especialidad del estudiante
+            if (aplicaAvisoAEstudiante(nuevoAviso, estudiante, esAdmin)) {
+              setAvisos((prev) => [nuevoAviso, ...prev.filter((a) => a.id !== nuevoAviso.id)])
 
-            // Emitir notificación visual nativa y registrar en la bandeja
-            try {
+              // Emitir notificación visual nativa y registrar en la bandeja
               const notif = convertirAvisoANotificacion(nuevoAviso)
               agregarNotificacion(notif, true)
               window.dispatchEvent(new Event('studenthub:notificaciones-actualizadas'))
-            } catch (err) {
-              console.warn('Error al despachar notificación en tiempo real:', err)
             }
+          } catch (err) {
+            console.warn('[Realtime Avisos Error]:', err)
           }
         },
       )
@@ -83,20 +84,28 @@ export function useAvisos() {
         'postgres_changes',
         { event: 'DELETE', schema: 'public', table: 'institution_alerts' },
         (payload) => {
-          const idBorrado = (payload.old as { id?: string })?.id
-          if (idBorrado) {
-            setAvisos((prev) => prev.filter((a) => a.id !== idBorrado))
+          try {
+            const idBorrado = (payload.old as { id?: string })?.id
+            if (idBorrado) {
+              setAvisos((prev) => prev.filter((a) => a.id !== idBorrado))
+            }
+          } catch (err) {
+            console.warn('[Realtime Avisos Delete Error]:', err)
           }
         },
       )
-      .subscribe()
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR') {
+          console.warn(`Error al suscribir canal realtime ${canalId}`)
+        }
+      })
 
     return () => {
       window.removeEventListener('studenthub:avisos-actualizados', alActualizar)
       window.removeEventListener('storage', alActualizar)
       void supabase.removeChannel(canal)
     }
-  }, [refrescar, estudiante, esAdmin])
+  }, [refrescar, sesion?.user?.id, estudiante?.id, estudiante?.especialidad, estudiante?.grupo, estudiante?.seccion, esAdmin])
 
   // Filtrado de avisos según si es Administrador o Estudiante
   const avisosFiltrados = useMemo(() => {
