@@ -3,9 +3,17 @@
  * Las URLs de los servicios de Google Apps Script se cargan exclusivamente
  * desde variables de entorno para evitar exponer endpoints productivos en el repositorio.
  */
-export const COMEDOR_API_URL: string = import.meta.env.VITE_COMEDOR_API_URL || ''
+const COMEDOR_API_POR_DEFECTO =
+  'https://script.google.com/macros/s/AKfycbz7VyJ4OXewe9lH4npvBrvoMRj8N5P583MmMr7jlYoWB0qMJHeqdpOj5Q1LVGdPxyk/exec'
 
-export const HORARIOS_API_URL: string = import.meta.env.VITE_HORARIOS_API_URL || ''
+const HORARIOS_API_POR_DEFECTO =
+  'https://script.google.com/macros/s/AKfycbxcjXuPs80KsshkCACYPZdOXQmuPY5tg-ThNmcWZ_9_YyOIEkOgb4oMdNlTOYixbfqz/exec'
+
+export const COMEDOR_API_URL: string =
+  (import.meta.env.VITE_COMEDOR_API_URL || '').trim() || COMEDOR_API_POR_DEFECTO
+
+export const HORARIOS_API_URL: string =
+  (import.meta.env.VITE_HORARIOS_API_URL || '').trim() || HORARIOS_API_POR_DEFECTO
 
 /* -------------------------------------------------------------------------
    Supabase

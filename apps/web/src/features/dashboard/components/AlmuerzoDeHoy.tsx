@@ -76,7 +76,12 @@ export function AlmuerzoDeHoy({ estado, cargando, hayError }: Props) {
           <span className="block h-3 w-[55%] rounded-full bg-surface-alt" />
         </span>
       ) : hayError ? (
-        <p className="text-subtitulo font-bold">No pudimos cargar el menú</p>
+        <div>
+          <p className="text-subtitulo font-bold text-text">No pudimos cargar el menú</p>
+          <p className="mt-1 text-menor text-text-muted">
+            Problema temporal de conexión con la hoja institucional. Tocá para reintentar.
+          </p>
+        </div>
       ) : (
         <Texto estado={estado} />
       )}

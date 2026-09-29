@@ -56,25 +56,28 @@ export function etiquetaDeGrado(grado: Grado): string {
 /** El grado al que pertenece un grupo ('11-1' o '11-2' → 11vo), para enlazar al horario. */
 export function buscarGradoPorGrupo(grupo: string | null): Grado | null {
   if (!grupo) return null
-  const directo = GRADOS.find((grado) => grado.grupo === grupo)
+  const limpio = grupo.trim().replace('_', '-').replace(/\s+/g, '-')
+  const directo = GRADOS.find(
+    (grado) => grado.grupo === limpio || (Array.isArray(grado.grupos) && grado.grupos.includes(limpio)),
+  )
   if (directo) return directo
 
-  if (grupo.startsWith('10-') || grupo === '10mo') {
+  if (limpio.startsWith('10-') || limpio.startsWith('10') || limpio === '10mo') {
     return GRADOS.find((g) => g.id === '10mo') ?? null
   }
-  if (grupo.startsWith('11-') || grupo === '11vo') {
+  if (limpio.startsWith('11-') || limpio.startsWith('11') || limpio === '11vo') {
     return GRADOS.find((g) => g.id === '11vo') ?? null
   }
-  if (grupo.startsWith('12-') || grupo === '12vo') {
+  if (limpio.startsWith('12-') || limpio.startsWith('12') || limpio === '12vo') {
     return GRADOS.find((g) => g.id === '12vo') ?? null
   }
-  if (grupo.startsWith('7-') || grupo === '7mo') {
+  if (limpio.startsWith('7-') || limpio === '7mo') {
     return GRADOS.find((g) => g.id === '7mo') ?? null
   }
-  if (grupo.startsWith('8-') || grupo === '8vo') {
+  if (limpio.startsWith('8-') || limpio === '8vo') {
     return GRADOS.find((g) => g.id === '8vo') ?? null
   }
-  if (grupo.startsWith('9-') || grupo === '9no') {
+  if (limpio.startsWith('9-') || limpio === '9no') {
     return GRADOS.find((g) => g.id === '9no') ?? null
   }
   return null

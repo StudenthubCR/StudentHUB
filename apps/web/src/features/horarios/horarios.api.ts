@@ -52,6 +52,35 @@ async function pedir(consulta: string, signal?: AbortSignal): Promise<FilaHorari
   })
 }
 
+const CLAVE_CACHE_HORARIO_PREFIJO = 'studenthub_cache_horario_'
+
+function recuperarCacheHorario(grupo: string): FilaHorario[] | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(`${CLAVE_CACHE_HORARIO_PREFIJO}${grupo.trim().toLowerCase()}`)
+    if (!raw) return null
+    const parseado = JSON.parse(raw)
+    if (Array.isArray(parseado) && parseado.length > 0) {
+      return parseado.filter(esFila)
+    }
+  } catch {
+    // ignorar error de lectura de cache
+  }
+  return null
+}
+
+function guardarCacheHorario(grupo: string, filas: FilaHorario[]): void {
+  if (typeof window === 'undefined' || filas.length === 0) return
+  try {
+    localStorage.setItem(
+      `${CLAVE_CACHE_HORARIO_PREFIJO}${grupo.trim().toLowerCase()}`,
+      JSON.stringify(filas),
+    )
+  } catch {
+    // ignorar error de cuota
+  }
+}
+
 /**
  * Trae el horario de un grupo.
  *
@@ -61,11 +90,27 @@ async function pedir(consulta: string, signal?: AbortSignal): Promise<FilaHorari
  * Script no encuentra nada y sin este respaldo la pantalla queda vacía.
  */
 export async function obtenerHorario(grupo: string, signal?: AbortSignal): Promise<FilaHorario[]> {
-  const filas = await pedir(`?grupo=${encodeURIComponent(grupo)}`, signal)
+  try {
+    const filas = await pedir(`?grupo=${encodeURIComponent(grupo)}`, signal)
 
-  const sirve = filas.length > 0 && filas.some((fila) => esGrupoValido(fila.grupo))
-  if (sirve) return filas
+    const sirve = filas.length > 0 && filas.some((fila) => esGrupoValido(fila.grupo))
+    if (sirve) {
+      guardarCacheHorario(grupo, filas)
+      return filas
+    }
 
-  const todas = await pedir('', signal)
-  return filtrarPorGrupo(todas, grupo)
+    const todas = await pedir('', signal)
+    const filtradas = filtrarPorGrupo(todas, grupo)
+    if (filtradas.length > 0) {
+      guardarCacheHorario(grupo, filtradas)
+    }
+    return filtradas
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') throw error
+    const enCache = recuperarCacheHorario(grupo)
+    if (enCache && enCache.length > 0) {
+      return enCache
+    }
+    throw error
+  }
 }

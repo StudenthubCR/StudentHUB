@@ -107,7 +107,12 @@ export function ClaseAhora({ dia, ahora, cargando, hayError, aHorario }: Props) 
       )}
 
       {estado.tipo === 'error' && (
-        <p className="text-subtitulo font-bold text-text">No pudimos cargar el horario</p>
+        <div>
+          <p className="text-subtitulo font-bold text-text">No pudimos cargar el horario</p>
+          <p className="mt-1 text-menor text-text-muted">
+            Problema temporal de conexión con los horarios institucionales. Tocá para revisar.
+          </p>
+        </div>
       )}
 
       {estado.tipo === 'sin-clases' && (
