@@ -6,10 +6,7 @@ import { AppNav } from './AppNav'
 import { AvisoSinConexion } from './AvisoSinConexion'
 import { usePwaInstall } from '@/features/pwa/usePwaInstall'
 import { ModalInstalarApp } from '@/features/pwa/ModalInstalarApp'
-<<<<<<< HEAD
 import { Chatbot } from '@/features/chatbot/Chatbot'
-import { IconoDescargar } from '@/components/icons'
-=======
 import { ToastNotificacionFlotante } from '@/features/notificaciones/components/ToastNotificacionFlotante'
 import {
   IconoDescargar,
@@ -21,7 +18,7 @@ import {
   IconoComedor,
   IconoInicio,
 } from '@/components/icons'
->>>>>>> f394bdcf8b530e3da6644e98fe2d97182ca67451
+
 
 export function AppLayout({ children }: { children?: ReactNode }) {
   useTituloDeRuta()
@@ -172,12 +169,12 @@ export function AppLayout({ children }: { children?: ReactNode }) {
         alCerrar={() => setModalInstalarAbierto(false)}
       />
 
-<<<<<<< HEAD
+      {/* Notificación Toast Flotante */}
+      <ToastNotificacionFlotante />
+
       {/* Asistente Virtual Inteligente de Student HUB */}
       <Chatbot />
-=======
-      <ToastNotificacionFlotante />
->>>>>>> f394bdcf8b530e3da6644e98fe2d97182ca67451
+
 
       {/* Sin esto el scroll se queda donde estaba: al pasar de un Comedor
 

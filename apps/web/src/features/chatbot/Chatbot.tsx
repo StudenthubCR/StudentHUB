@@ -186,12 +186,12 @@ export function Chatbot() {
           className={
             'fixed z-[1050] flex flex-col overflow-hidden rounded-3xl border border-border ' +
             'bg-surface shadow-2xl transition-all animate-slide-up ' +
-            'w-[calc(100vw-32px)] max-w-[390px] h-[540px] max-h-[calc(100vh-170px)] ' +
-            'right-4 bottom-[calc(150px_+_env(safe-area-inset-bottom))] lg:right-7 lg:bottom-24'
+            'w-[calc(100vw-24px)] max-w-[390px] h-[min(520px,calc(100dvh-95px))] ' +
+            'right-3 bottom-[calc(78px_+_env(safe-area-inset-bottom))] lg:right-7 lg:bottom-24'
           }
         >
-          {/* Cabecera del chat */}
-          <div className="flex items-center justify-between border-b border-border bg-primary px-4.5 py-3 text-white">
+          {/* Cabecera del chat (shrink-0 para que nunca se aplaste) */}
+          <div className="flex shrink-0 items-center justify-between border-b border-border bg-primary px-4 py-2.5 sm:px-4.5 sm:py-3 text-white">
             <div className="flex items-center gap-3">
               <div className="flex size-9 items-center justify-center rounded-xl bg-white/20 text-lg shadow-inner">
                 🤖
@@ -214,8 +214,8 @@ export function Chatbot() {
             </button>
           </div>
 
-          {/* Área de mensajes con scroll */}
-          <div className="flex-1 space-y-3.5 overflow-y-auto p-4 bg-surface-alt/40">
+          {/* Área de mensajes con scroll (min-h-0 es clave para que flex no empuje el pie fuera de pantalla) */}
+          <div className="flex-1 min-h-0 space-y-3.5 overflow-y-auto p-3.5 sm:p-4 bg-surface-alt/40">
             {mensajes.map((msg) => (
               <div
                 key={msg.id}
@@ -257,38 +257,38 @@ export function Chatbot() {
             <div ref={finalMensajesRef} />
           </div>
 
-          {/* Píldoras de sugerencias rápidas */}
-          <div className="flex items-center gap-2 overflow-x-auto border-t border-border/60 bg-surface px-3 py-2 scrollbar-none">
+          {/* Píldoras de sugerencias rápidas (shrink-0) */}
+          <div className="flex shrink-0 items-center gap-1.5 overflow-x-auto border-t border-border/60 bg-surface px-3 py-1.5 scrollbar-none">
             <button
               type="button"
-              onClick={() => void manejarEnvio('¿Qué hay de almuerzo hoy?')}
-              className="shrink-0 cursor-pointer rounded-full border border-border bg-surface-alt px-3 py-1 text-micro font-medium text-text-muted transition-colors hover:border-primary hover:text-primary active:scale-95"
+              onClick={() => void manejarEnvio('¿Qué hay de almuerzo mañana?')}
+              className="shrink-0 cursor-pointer rounded-full border border-border bg-surface-alt px-2.5 py-1 text-micro font-medium text-text-muted transition-colors hover:border-primary hover:text-primary active:scale-95"
             >
-              🍲 Almuerzo hoy
+              🍲 Almuerzo mañana
             </button>
             <button
               type="button"
-              onClick={() => void manejarEnvio('¿Qué clases tengo hoy?')}
-              className="shrink-0 cursor-pointer rounded-full border border-border bg-surface-alt px-3 py-1 text-micro font-medium text-text-muted transition-colors hover:border-primary hover:text-primary active:scale-95"
+              onClick={() => void manejarEnvio('¿Qué clases tengo mañana?')}
+              className="shrink-0 cursor-pointer rounded-full border border-border bg-surface-alt px-2.5 py-1 text-micro font-medium text-text-muted transition-colors hover:border-primary hover:text-primary active:scale-95"
             >
-              ⏰ Mis clases
+              ⏰ Clases mañana
             </button>
             <button
               type="button"
               onClick={() => void manejarEnvio('¿Qué eventos hay en el colegio?')}
-              className="shrink-0 cursor-pointer rounded-full border border-border bg-surface-alt px-3 py-1 text-micro font-medium text-text-muted transition-colors hover:border-primary hover:text-primary active:scale-95"
+              className="shrink-0 cursor-pointer rounded-full border border-border bg-surface-alt px-2.5 py-1 text-micro font-medium text-text-muted transition-colors hover:border-primary hover:text-primary active:scale-95"
             >
               📰 Eventos
             </button>
           </div>
 
-          {/* Barra de entrada de texto */}
+          {/* Barra de entrada de texto fija al pie del modal */}
           <form
             onSubmit={(e) => {
               e.preventDefault()
               void manejarEnvio()
             }}
-            className="flex items-center gap-2 border-t border-border bg-surface p-3"
+            className="flex shrink-0 items-center gap-2 border-t border-border bg-surface p-2.5 sm:p-3"
           >
             <input
               ref={inputRef}
@@ -297,19 +297,20 @@ export function Chatbot() {
               onChange={(e) => setTextoEntrada(e.target.value)}
               placeholder="Escribe tu duda..."
               maxLength={250}
-              className="flex-1 rounded-full border border-border bg-surface-alt px-4 py-2 text-menor text-text placeholder:text-text-muted/70 focus:border-primary focus:outline-none"
+              className="min-w-0 flex-1 rounded-full border border-border bg-surface-alt px-3.5 py-1.5 sm:px-4 sm:py-2 text-menor text-text placeholder:text-text-muted/70 focus:border-primary focus:outline-none"
             />
             <button
               type="submit"
               disabled={!textoEntrada.trim() || escribiendo}
               aria-label="Enviar mensaje"
-              className="flex size-9 cursor-pointer items-center justify-center rounded-full bg-primary text-white shadow-xs transition-all hover:bg-primary-dark disabled:opacity-40 active:scale-95"
+              className="flex shrink-0 size-9 cursor-pointer items-center justify-center rounded-full bg-primary text-white shadow-xs transition-all hover:bg-primary-dark disabled:opacity-40 active:scale-95"
             >
               <IconoEnviar className="size-4" />
             </button>
           </form>
         </div>
       )}
+
     </>
   )
 }

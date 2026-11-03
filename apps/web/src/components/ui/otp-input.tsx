@@ -240,7 +240,7 @@ export function OtpInput({
       {...props}
     >
       <motion.div
-        onFocus={(event) => {
+        onFocus={(event: React.FocusEvent<HTMLDivElement>) => {
           const index = inputs.current.indexOf(
             event.target as HTMLInputElement,
           )
@@ -248,11 +248,12 @@ export function OtpInput({
           setFocused(index)
           if (cell) setCaretX(cell.offsetLeft + cell.offsetWidth / 2)
         }}
-        onBlur={(event) => {
+        onBlur={(event: React.FocusEvent<HTMLDivElement>) => {
           if (!event.currentTarget.contains(event.relatedTarget as Node)) {
             setFocused(null)
           }
         }}
+
         animate={{
           x: status === 'error' && !reduceMotion ? SHAKE : 0,
         }}
