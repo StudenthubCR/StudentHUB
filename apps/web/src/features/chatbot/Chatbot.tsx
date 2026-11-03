@@ -155,28 +155,26 @@ export function Chatbot() {
 
   return (
     <>
-      {/* Botón flotante circular 💬 */}
-      <button
-        type="button"
-        onClick={() => setAbierto(!abierto)}
-        aria-label={abierto ? 'Cerrar asistente virtual' : 'Abrir asistente virtual'}
-        title="Asistente virtual de Student HUB"
-        className={
-          'fixed z-[1050] flex size-14 cursor-pointer items-center justify-center rounded-full ' +
-          'bg-primary text-white shadow-xl transition-all duration-300 ' +
-          'hover:bg-primary-dark hover:scale-105 active:scale-95 ' +
-          'right-4 bottom-[calc(86px_+_env(safe-area-inset-bottom))] lg:right-7 lg:bottom-7'
-        }
-      >
-        {abierto ? (
-          <IconoCerrar className="size-6 transition-transform duration-200" />
-        ) : (
+      {/* Botón flotante circular 💬 (se oculta cuando el chat está abierto para no estorbar) */}
+      {!abierto && (
+        <button
+          type="button"
+          onClick={() => setAbierto(true)}
+          aria-label="Abrir asistente virtual"
+          title="Asistente virtual de Student HUB"
+          className={
+            'fixed z-[1050] flex size-14 cursor-pointer items-center justify-center rounded-full ' +
+            'bg-primary text-white shadow-xl transition-all duration-300 ' +
+            'hover:bg-primary-dark hover:scale-105 active:scale-95 ' +
+            'right-4 bottom-[calc(86px_+_env(safe-area-inset-bottom))] lg:right-7 lg:bottom-7'
+          }
+        >
           <div className="relative flex items-center justify-center">
             <IconoMensaje className="size-6.5" />
             <span className="absolute -top-1 -right-1 size-3 rounded-full border-2 border-surface bg-emerald-500 animate-pulse" />
           </div>
-        )}
-      </button>
+        </button>
+      )}
 
       {/* Ventana de Conversación Flotante */}
       {abierto && (
@@ -186,8 +184,9 @@ export function Chatbot() {
           className={
             'fixed z-[1050] flex flex-col overflow-hidden rounded-3xl border border-border ' +
             'bg-surface shadow-2xl transition-all animate-slide-up ' +
-            'w-[calc(100vw-24px)] max-w-[390px] h-[min(520px,calc(100dvh-95px))] ' +
-            'right-3 bottom-[calc(78px_+_env(safe-area-inset-bottom))] lg:right-7 lg:bottom-24'
+            'left-3 right-3 sm:left-auto sm:right-7 w-auto sm:w-[380px] max-w-[400px] ' +
+            'h-[min(540px,calc(100dvh-95px))] ' +
+            'bottom-[calc(76px_+_env(safe-area-inset-bottom))] sm:bottom-24'
           }
         >
           {/* Cabecera del chat (shrink-0 para que nunca se aplaste) */}
@@ -208,7 +207,7 @@ export function Chatbot() {
               type="button"
               onClick={() => setAbierto(false)}
               aria-label="Cerrar chat"
-              className="flex size-8 cursor-pointer items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+              className="flex size-8 cursor-pointer items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 active:scale-95"
             >
               <IconoCerrar className="size-4" />
             </button>
@@ -282,34 +281,37 @@ export function Chatbot() {
             </button>
           </div>
 
-          {/* Barra de entrada de texto fija al pie del modal */}
+          {/* Barra de entrada de texto: botón de enviar incrustado dentro de la cápsula */}
           <form
             onSubmit={(e) => {
               e.preventDefault()
               void manejarEnvio()
             }}
-            className="flex shrink-0 items-center gap-2 border-t border-border bg-surface p-2.5 sm:p-3"
+            className="flex shrink-0 items-center border-t border-border bg-surface p-2.5 sm:p-3"
           >
-            <input
-              ref={inputRef}
-              type="text"
-              value={textoEntrada}
-              onChange={(e) => setTextoEntrada(e.target.value)}
-              placeholder="Escribe tu duda..."
-              maxLength={250}
-              className="min-w-0 flex-1 rounded-full border border-border bg-surface-alt px-3.5 py-1.5 sm:px-4 sm:py-2 text-menor text-text placeholder:text-text-muted/70 focus:border-primary focus:outline-none"
-            />
-            <button
-              type="submit"
-              disabled={!textoEntrada.trim() || escribiendo}
-              aria-label="Enviar mensaje"
-              className="flex shrink-0 size-9 cursor-pointer items-center justify-center rounded-full bg-primary text-white shadow-xs transition-all hover:bg-primary-dark disabled:opacity-40 active:scale-95"
-            >
-              <IconoEnviar className="size-4" />
-            </button>
+            <div className="relative flex flex-1 items-center">
+              <input
+                ref={inputRef}
+                type="text"
+                value={textoEntrada}
+                onChange={(e) => setTextoEntrada(e.target.value)}
+                placeholder="Escribe tu duda..."
+                maxLength={250}
+                className="w-full rounded-full border border-border bg-surface-alt py-2 pl-3.5 pr-11 text-menor text-text placeholder:text-text-muted/70 focus:border-primary focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={!textoEntrada.trim() || escribiendo}
+                aria-label="Enviar mensaje"
+                className="absolute right-1 flex size-7.5 cursor-pointer items-center justify-center rounded-full bg-primary text-white shadow-xs transition-all hover:bg-primary-dark disabled:opacity-30 active:scale-90"
+              >
+                <IconoEnviar className="size-3.5" />
+              </button>
+            </div>
           </form>
         </div>
       )}
+
 
     </>
   )
