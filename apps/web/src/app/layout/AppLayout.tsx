@@ -6,6 +6,7 @@ import { AppNav } from './AppNav'
 import { AvisoSinConexion } from './AvisoSinConexion'
 import { usePwaInstall } from '@/features/pwa/usePwaInstall'
 import { ModalInstalarApp } from '@/features/pwa/ModalInstalarApp'
+import { Chatbot } from '@/features/chatbot/Chatbot'
 import { IconoDescargar } from '@/components/icons'
 
 export function AppLayout({ children }: { children?: ReactNode }) {
@@ -85,7 +86,11 @@ export function AppLayout({ children }: { children?: ReactNode }) {
         alCerrar={() => setModalInstalarAbierto(false)}
       />
 
+      {/* Asistente Virtual Inteligente de Student HUB */}
+      <Chatbot />
+
       {/* Sin esto el scroll se queda donde estaba: al pasar de un Comedor
+
           scrolleado a otra sección se caía a media página. Además restaura la
           posición al volver con el botón de atrás. */}
       <ScrollRestoration />
