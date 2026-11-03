@@ -1,7 +1,7 @@
 -- =========================================================================
--- IMPORTACIÓN DEL PADRÓN DE ESTUDIANTES BETA TESTERS CTP 2026
--- Generado a partir de Lista estudiantes beta testers.xlsx
--- Total de estudiantes: 18
+-- IMPORTACIÓN DEL PADRÓN DE ESTUDIANTES (DATOS SINTÉTICOS DE MUESTRA)
+-- Plantilla de aprovisionamiento de padrón escolar
+-- Total de registros de muestra: 18
 -- =========================================================================
 
 -- 1. Asegurar la institución CTP
@@ -58,9 +58,9 @@ insert into grupos (institucion_id, codigo, nivel, jornada)
 select id, '12-3', '12vo', 'Diurna' from instituciones where slug = 'ctp'
 on conflict (institucion_id, codigo) do nothing;
 
--- 4. Insertar los 18 estudiantes beta testers del CTP
+-- 4. Insertar estudiantes de muestra (datos anonimizados sin PII real)
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '208700466', 'ethanmurillo05@gmail.com', 'Ethan Joshue Murillo Morera', 'Gestión de la Producción', g.id, 'activo'
+select i.id, '100000001', 'estudiante1@colegio.ed.cr', 'Estudiante Muestra 1', 'Gestión de la Producción', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '10-1'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -70,7 +70,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '208920002', 'estebanoses861@gmail.com', 'Daniel Esteban Oses Valenciano', 'Gestión de la Producción', g.id, 'activo'
+select i.id, '100000002', 'estudiante2@colegio.ed.cr', 'Estudiante Muestra 2', 'Gestión de la Producción', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '10-1'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -80,7 +80,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '119850208', 'dnramocr@gmail.com', 'Danna Vanessa Ramírez Ovares', 'Ejecutivo Comercial', g.id, 'activo'
+select i.id, '100000003', 'estudiante3@colegio.ed.cr', 'Estudiante Muestra 3', 'Ejecutivo Comercial', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '10-3'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -90,7 +90,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '208380866', 'fatyrojas03@gmail.com', 'Fátima Rojas Mendoza', 'Ejecutivo Comercial', g.id, 'activo'
+select i.id, '100000004', 'estudiante4@colegio.ed.cr', 'Estudiante Muestra 4', 'Ejecutivo Comercial', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '10-3'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -100,7 +100,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '208670826', 'vale04rojas@gmail.com', 'Valeria Rojas Vargas', 'Administración Logística', g.id, 'activo'
+select i.id, '100000005', 'estudiante5@colegio.ed.cr', 'Estudiante Muestra 5', 'Administración Logística', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '12-3'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -110,7 +110,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '207860617', 'alfaroprendas03@gmail.com', 'Lisseth Alfaro Prendas', 'Administración Logística', g.id, 'activo'
+select i.id, '100000006', 'estudiante6@colegio.ed.cr', 'Estudiante Muestra 6', 'Administración Logística', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '12-3'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -120,7 +120,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '703170933', 'carlosorozal01@gmail.com', 'Carlos Enoc Orozco Alvarado', 'Ciberseguridad', g.id, 'activo'
+select i.id, '100000007', 'estudiante7@colegio.ed.cr', 'Estudiante Muestra 7', 'Ciberseguridad', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '12-1'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -130,7 +130,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '208840697', 'varelakatherine3@gmail.com', 'Katherine Paola Varela González', 'Ciberseguridad', g.id, 'activo'
+select i.id, '100000008', 'estudiante8@colegio.ed.cr', 'Estudiante Muestra 8', 'Ciberseguridad', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '12-1'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -140,7 +140,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '208970239', 'brandondavila156@gmail.com', 'Brandon Dávila Bustos', 'Contabilidad y Control', g.id, 'activo'
+select i.id, '100000009', 'estudiante9@colegio.ed.cr', 'Estudiante Muestra 9', 'Contabilidad y Control', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '10-1'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -150,7 +150,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '207120314', 'porrasjoseline@gmail.com', 'Yoselyn Porras Hernández', 'Contabilidad y Control', g.id, 'activo'
+select i.id, '100000010', 'estudiante10@colegio.ed.cr', 'Estudiante Muestra 10', 'Contabilidad y Control', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '10-1'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -160,7 +160,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '1116310482', 'pablorsa.1995@gmail.com', 'Pablo Miranda Arroyo', 'Gestión de la Calidad', g.id, 'activo'
+select i.id, '100000011', 'estudiante11@colegio.ed.cr', 'Estudiante Muestra 11', 'Gestión de la Calidad', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '11-3'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -170,7 +170,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '208150884', 'jgutierrezprendas@gmail.com', 'Jonathan Gutiérrez Prendas', 'Gestión de la Calidad', g.id, 'activo'
+select i.id, '100000012', 'estudiante12@colegio.ed.cr', 'Estudiante Muestra 12', 'Gestión de la Calidad', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '11-3'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -180,7 +180,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '207960621', 'meylanreyes2509@gmail.com', 'Meylan Andrea Reyes Marín', 'Gestión de la Calidad', g.id, 'activo'
+select i.id, '100000013', 'estudiante13@colegio.ed.cr', 'Estudiante Muestra 13', 'Gestión de la Calidad', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '11-3'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -190,7 +190,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '114290560', 'paola.emily12@yahoo.com', 'Laura Paola Barboza Castillo', 'Soporte y Configuración de Redes', g.id, 'activo'
+select i.id, '100000014', 'estudiante14@colegio.ed.cr', 'Estudiante Muestra 14', 'Soporte y Configuración de Redes', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '10-2'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -200,7 +200,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '208510079', 'estivencalvo85@gmail.com', 'Estiven Eduardo Calvo Otárola', 'Soporte y Configuración de Redes', g.id, 'activo'
+select i.id, '100000015', 'estudiante15@colegio.ed.cr', 'Estudiante Muestra 15', 'Soporte y Configuración de Redes', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '10-2'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -210,7 +210,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '208520530', 'erickgarciab2134@gmail.com', 'Erick García Burgos', 'Desarrollo Web', g.id, 'activo'
+select i.id, '100000016', 'estudiante16@colegio.ed.cr', 'Estudiante Muestra 16', 'Desarrollo Web', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '11-1'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -220,7 +220,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '112090367', 'zobeidamadrigal@gmail.com', 'Zobeida Madrigal Ramírez', 'Desarrollo Web', g.id, 'activo'
+select i.id, '100000017', 'estudiante17@colegio.ed.cr', 'Estudiante Muestra 17', 'Desarrollo Web', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '11-1'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -230,7 +230,7 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id;
 
 insert into estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '208150605', 'froylansegura09@gmail.com', 'Froylan Steven Segura Durán', 'Desarrollo Web', g.id, 'activo'
+select i.id, '100000018', 'estudiante18@colegio.ed.cr', 'Estudiante Muestra 18', 'Desarrollo Web', g.id, 'activo'
 from instituciones i join grupos g on g.institucion_id = i.id and g.codigo = '11-1'
 where i.slug = 'ctp'
 on conflict (institucion_id, codigo) do update set
@@ -244,10 +244,3 @@ update public.estudiantes e
 set user_id = u.id
 from auth.users u
 where lower(e.correo) = lower(u.email);
-
--- 6. Vincular a Erick y administradores si entran con cuentas adicionales de desarrollo
-update public.estudiantes
-set user_id = u.id
-from auth.users u
-where codigo = '208520530'
-  and lower(u.email) in ('studenthub.cr@gmail.com', 'erickgarciab2134@gmail.com');

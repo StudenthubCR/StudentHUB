@@ -12,6 +12,7 @@ export function saludoSegunHora(fecha: Date): string {
 }
 
 /** 'Erick Martínez' → 'Erick' */
-export function primerNombre(nombre: string): string {
+export function primerNombre(nombre?: string | null): string {
+  if (!nombre) return ''
   return nombre.trim().split(/\s+/)[0] ?? nombre
 }

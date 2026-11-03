@@ -4,10 +4,24 @@ import { PaginaDeError } from './PaginaDeError'
 import { PaginaNoEncontrada } from './PaginaNoEncontrada'
 import { DashboardPage } from '@/features/dashboard/DashboardPage'
 import { CarnetPage } from '@/features/carnet/CarnetPage'
+import { AgendaPage } from '@/features/agenda/AgendaPage'
 import { HorariosPage } from '@/features/horarios/HorariosPage'
+import { HorarioGrupoPage } from '@/features/horarios/HorarioGrupoPage'
 import { ComedorPage } from '@/features/comedor/ComedorPage'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { RutaProtegida } from '@/features/auth/RutaProtegida'
+import { ExpoLandingPage } from '@/features/expo/ExpoLandingPage'
+
+import {
+  AdminLayout,
+  AdminRutaProtegida,
+  AdminDashboardPage,
+  AdminAvisosPage,
+  AdminNoticiasPage,
+  AdminEstudiantesPage,
+  AdminAuditoriaPage,
+  AdminForbiddenPage,
+} from '@/features/admin'
 
 /**
  * `handle.titulo` alimenta el título del documento (ver `useTituloDeRuta`), y
@@ -15,6 +29,40 @@ import { RutaProtegida } from '@/features/auth/RutaProtegida'
  * cualquier error de render.
  */
 export const router = createBrowserRouter([
+  // Panel de Control Administrativo (RBAC: Solo Administradores)
+  {
+    path: '/admin',
+    element: (
+      <AdminRutaProtegida>
+        <AdminLayout />
+      </AdminRutaProtegida>
+    ),
+    errorElement: <PaginaDeError />,
+    children: [
+      { index: true, element: <AdminDashboardPage />, handle: { titulo: 'Panel de Control · Student HUB' } },
+      { path: 'avisos', element: <AdminAvisosPage />, handle: { titulo: 'Gestor de Avisos · Admin' } },
+      { path: 'noticias', element: <AdminNoticiasPage />, handle: { titulo: 'Gestor de Noticias · Admin' } },
+      { path: 'estudiantes', element: <AdminEstudiantesPage />, handle: { titulo: 'Directorio Estudiantil · Admin' } },
+      { path: 'auditoria', element: <AdminAuditoriaPage />, handle: { titulo: 'Registro de Auditoría · Admin' } },
+    ],
+  },
+  {
+    path: '/admin/403',
+    element: <AdminForbiddenPage />,
+    handle: { titulo: '403 Acceso Denegado · Student HUB' },
+    errorElement: <PaginaDeError />,
+  },
+  // Portal público de la Expotécnica
+  {
+    path: '/expo',
+    element: <ExpoLandingPage />,
+    handle: { titulo: 'Expotécnica 2026 · Student HUB' },
+    errorElement: <PaginaDeError />,
+  },
+  {
+    path: '/landing',
+    element: <Navigate to="/expo" replace />,
+  },
   // El login va fuera del layout a propósito: sin barra de navegación ni
   // cabecera, para que no invite a irse a otro lado a mitad del ingreso.
   { path: '/entrar', element: <LoginPage />, errorElement: <PaginaDeError /> },
@@ -28,14 +76,17 @@ export const router = createBrowserRouter([
     errorElement: <PaginaDeError />,
     children: [
       { index: true, element: <DashboardPage />, handle: { titulo: 'Inicio' } },
+      { path: 'agenda', element: <AgendaPage />, handle: { titulo: 'Agenda' } },
       { path: 'carnet', element: <CarnetPage />, handle: { titulo: 'Carnet' } },
       { path: 'horarios', element: <HorariosPage />, handle: { titulo: 'Horarios' } },
       {
         path: 'horarios/:grado',
-        element: <Navigate to="/horarios" replace />,
+        element: <HorarioGrupoPage />,
+        handle: { titulo: 'Horario del Grado' },
       },
       { path: 'comedor', element: <ComedorPage />, handle: { titulo: 'Comedor' } },
       { path: '*', element: <PaginaNoEncontrada />, handle: { titulo: 'Página no encontrada' } },
     ],
+
   },
 ])

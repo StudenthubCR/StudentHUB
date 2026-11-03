@@ -5,6 +5,7 @@ import { useSesion } from '@/features/auth/useSesion'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import { useReloj } from '@/lib/useReloj'
 import { HorarioDelGrupo } from './components/HorarioDelGrupo'
+import { SelectorDeGrado } from './components/SelectorDeGrado'
 import { buscarGradoPorGrupo, etiquetaDeGrado } from './grados'
 import { ErrorHorarios } from './horarios.api'
 import { useHorario } from './useHorario'
@@ -69,6 +70,16 @@ function HorarioEstudiante({ grupo, ahora }: { grupo: string; ahora: Date }) {
         error={error ? mensajeDeError(error) : null}
         onReintentar={onReintentar}
       />
+
+      <div className="mt-8 border-t border-border pt-6">
+        <div className="mb-3">
+          <h3 className="text-dato font-bold text-text">Explorar otros grados y secciones</h3>
+          <p className="text-micro text-text-muted">
+            Consultá las materias y horarios de otros niveles del colegio técnico
+          </p>
+        </div>
+        <SelectorDeGrado />
+      </div>
     </PageSection>
   )
 }

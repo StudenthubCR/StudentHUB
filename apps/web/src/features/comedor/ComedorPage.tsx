@@ -1,7 +1,10 @@
 import { useCallback, useMemo } from 'react'
 import { PageSection } from '@/components/PageSection'
+import { IconoInfo } from '@/components/icons'
 import { MenuHoyCard } from './components/MenuHoyCard'
 import { MenuSemanaGrid } from './components/MenuSemanaGrid'
+import { ConfirmacionAsistenciaComedor } from './components/ConfirmacionAsistenciaComedor'
+import { SafeBoundary } from '@/components/SafeBoundary'
 import { ErrorComedor } from './comedor.api'
 import {
   claveDeFecha,
@@ -56,16 +59,38 @@ export function ComedorPage() {
 
   return (
     <PageSection titulo="Comedor Estudiantil">
-      <div className="mt-2.5 flex flex-col gap-7">
-        <MenuHoyCard estado={estado} hoy={hoy} onReintentar={onReintentar} />
-        <MenuSemanaGrid
-          dias={menusDeSemana(menus, dias)}
-          subtitulo={subtitulo}
-          claveDeHoy={claveDeFecha(hoy)}
-          cargando={cargando}
-          error={error ? mensajeDeError(error) : null}
-          onReintentar={onReintentar}
-        />
+      <div className="mt-2.5 flex flex-col gap-6">
+        {/* Descargo Logístico Institucional Visible */}
+        <div className="flex items-center gap-3 rounded-2xl border border-border/80 bg-surface-alt/70 px-4.5 py-3 text-menuda text-text-muted shadow-2xs">
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary-tint text-primary">
+            <IconoInfo className="size-4" />
+          </span>
+          <p className="leading-relaxed">
+            El menú del día está sujeto a cambios de última hora según la disponibilidad logística de insumos.
+          </p>
+        </div>
+
+        {/* Tarjeta del Menú de Hoy (Almuerzo / Cena) */}
+        <SafeBoundary nombre="Menú de Hoy">
+          <MenuHoyCard estado={estado} hoy={hoy} onReintentar={onReintentar} />
+        </SafeBoundary>
+
+        {/* Sistema de Confirmación de Asistencia ("Comeré hoy" / "No comeré hoy") */}
+        <SafeBoundary nombre="Confirmación de Comedor">
+          <ConfirmacionAsistenciaComedor fecha={hoy} />
+        </SafeBoundary>
+
+        {/* Parrilla Semanal */}
+        <SafeBoundary nombre="Menú Semanal">
+          <MenuSemanaGrid
+            dias={menusDeSemana(menus, dias)}
+            subtitulo={subtitulo}
+            claveDeHoy={claveDeFecha(hoy)}
+            cargando={cargando}
+            error={error ? mensajeDeError(error) : null}
+            onReintentar={onReintentar}
+          />
+        </SafeBoundary>
       </div>
     </PageSection>
   )

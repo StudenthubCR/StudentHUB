@@ -23,37 +23,36 @@ export function RestoDelDia({ dia, ahora }: { dia: DiaDeClases | null; ahora: Da
   const restantes = dia.bloques.length - (yaMostrado + 1) - pendientes.length
 
   return (
-    <section className="mt-3.5">
-      <h3 className="mb-2 pl-1 text-etiqueta font-bold tracking-[0.09em] text-text-muted uppercase">
-        Después
-      </h3>
+    <section className="mt-2.5">
+      <div className="flex items-center justify-between mb-1.5 px-1">
+        <span className="text-[11px] font-bold tracking-[0.08em] text-text-muted uppercase">
+          Próximas lecciones
+        </span>
+      </div>
 
-      <ul className="overflow-hidden rounded-md border border-border bg-surface elev-sm">
-        {pendientes.map((bloque, indice) => (
+      <ul className="divide-y divide-border/60 rounded-xl border border-border/70 bg-surface-alt/40">
+        {pendientes.map((bloque) => (
           <li
-            key={`${bloque.inicio}-${indice}`}
-            className={cn(
-              'flex items-center gap-3.5 px-4 py-2.5',
-              indice > 0 && 'border-t border-border',
-            )}
+            key={`${bloque.inicio}-${bloque.materia}`}
+            className="flex items-center justify-between gap-3 px-3.5 py-2 text-micro"
           >
-            <span className="min-w-[54px] shrink-0 text-nota font-bold tabular-nums">
-              {bloque.inicio}
-            </span>
             <span
               className={cn(
-                'min-w-0 truncate text-menor font-semibold',
+                'min-w-0 truncate font-medium',
                 bloque.esReceso ? 'text-text-muted italic' : 'text-text',
               )}
             >
               {bloque.materia}
             </span>
+            <span className="shrink-0 font-bold tabular-nums text-text-muted">
+              {bloque.inicio}
+            </span>
           </li>
         ))}
 
         {restantes > 0 && (
-          <li className="border-t border-border px-4 py-2 text-menuda text-text-muted">
-            y {restantes} {restantes === 1 ? 'bloque más' : 'bloques más'}
+          <li className="px-3.5 py-1.5 text-center text-[11px] font-medium text-text-muted">
+            + {restantes} {restantes === 1 ? 'lección más' : 'lecciones más'}
           </li>
         )}
       </ul>

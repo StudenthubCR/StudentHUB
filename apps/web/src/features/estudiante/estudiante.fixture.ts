@@ -12,6 +12,10 @@
  * tabla `estudiantes` filtrada por la sesión.
  */
 export type Estudiante = {
+  id?: string
+  user_id?: string
+  correo?: string
+  cedula?: string
   nombre: string
   /** Código interno del colegio, nunca la cédula (plan §10). */
   codigo: string
@@ -19,14 +23,19 @@ export type Estudiante = {
   institucion: string
   siglaInstitucion: string
   grupo: string
+  seccion?: string
   nivel: string
   jornada: string
   vigencia: string
   fotoUrl: string
   activo: boolean
+  genero?: string
+  rol?: string
+  esRespaldo?: boolean
 }
 
 export const ESTUDIANTE_DEMO: Estudiante = {
+  id: '00000000-0000-0000-0000-000000000001',
   nombre: 'Erick García Burgos',
   codigo: '208520530',
   especialidad: 'Desarrollo Web',

@@ -49,10 +49,10 @@ describe('dominioPermitido', () => {
 describe('soloDigitos y codigoCompleto', () => {
   it('filtra caracteres no numéricos y trunca al máximo permitido', () => {
     expect(soloDigitos(' 1a2-3.4 5 6 ')).toBe('123456')
-    expect(soloDigitos('12345678901234')).toBe('1234567890')
+    expect(soloDigitos('12345678901234')).toBe('12345678')
   })
 
-  it('valida que el código cumpla el largo mínimo', () => {
+  it('valida que el código cumpla el largo permitido', () => {
     expect(codigoCompleto('12345')).toBe(false)
     expect(codigoCompleto('123456')).toBe(true)
     expect(codigoCompleto('12345678')).toBe(true)

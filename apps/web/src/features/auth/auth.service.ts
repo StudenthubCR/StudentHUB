@@ -27,23 +27,23 @@ export function dominioPermitido(correo: string, dominio: string | null): boolea
 }
 
 /**
- * Largo del código.
+ * Largo del código de verificación OTP.
  *
- * Supabase lo genera según su propia configuración, y no siempre son 6: este
- * proyecto salió mandando 8. Si la app truncara a 6, el código llegaría por
- * correo y no se podría escribir — que fue justo lo que pasó en la primera
- * prueba real. Se acepta el rango que Supabase permite y se deja que sea el
- * servidor quien diga si el código es correcto.
+ * El proyecto de Supabase está configurado para emitir tokens de 8 dígitos.
+ * Permitimos validar códigos de 6 a 8 dígitos por si cambia la configuración
+ * del servidor, pero la longitud por defecto esperada en la interfaz es 8.
  */
-export const LARGO_MINIMO = 6
-export const LARGO_MAXIMO = 10
+export const LARGO_CODIGO = 8
+const LARGO_MINIMO = 6
+const LARGO_MAXIMO = 8
 
 export function soloDigitos(codigo: string): string {
   return codigo.replace(/\D/g, '').slice(0, LARGO_MAXIMO)
 }
 
 export function codigoCompleto(codigo: string): boolean {
-  return soloDigitos(codigo).length >= LARGO_MINIMO
+  const largo = soloDigitos(codigo).length
+  return largo >= LARGO_MINIMO && largo <= LARGO_MAXIMO
 }
 
 /**
@@ -53,6 +53,9 @@ export function traducirErrorAuth(mensaje: string): string {
   const m = mensaje.toLowerCase()
   if (m.includes('rate limit') || m.includes('rate_limit') || m.includes('over_email_send_rate_limit')) {
     return 'Se ha alcanzado el límite temporal de envío de correos de Supabase. Por favor, esperá unos minutos antes de solicitar un nuevo código (o revisá tu carpeta de Spam si ya habías pedido uno).'
+  }
+  if (m.includes('invalid login credentials') || m.includes('invalid credentials')) {
+    return 'Credenciales inválidas. Si estás accediendo como Administrador, verificá tu contraseña o asegurate de haber ejecutado el script SQL de aprovisionamiento en Supabase.'
   }
   if (m.includes('invalid') || m.includes('expired') || m.includes('token') || m.includes('otp')) {
     return 'El código ingresado no es correcto o ya venció. Por favor, solicitá uno nuevo.'

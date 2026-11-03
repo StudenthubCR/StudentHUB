@@ -58,7 +58,7 @@ export function MenuSemanaGrid({
 }: Props) {
   return (
     <section aria-busy={cargando}>
-      <h3 className="mb-1 text-subtitulo font-bold tracking-[-0.01em]">Menú Semanal de Almuerzos</h3>
+      <h3 className="mb-1 text-subtitulo font-bold tracking-[-0.01em]">Menú Semanal de Almuerzo / Cena</h3>
       <p className="mb-4.5 text-menor text-text-muted">{subtitulo}</p>
 
       {error ? (

@@ -2,3 +2,6 @@
 # El contenido real vive en .agents/skills y ese sí se versiona; estos enlaces
 # se recrean con `npx skills add` usando skills-lock.json.
 .claude/skills/
+
+# Material multimedia, presentaciones, brochures y video de ExpoTÉCNICA 2026
+multimedia presentacion expotecnica/

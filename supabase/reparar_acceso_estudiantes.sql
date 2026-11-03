@@ -1,4 +1,4 @@
-﻿-- =============================================================================
+-- =============================================================================
 -- StudentHUB: Reparación y Activación de Acceso para Estudiantes
 -- Casos reportados: estebanoses861@gmail.com y ethanmurillo05@gmail.com
 -- =============================================================================
@@ -17,10 +17,10 @@ from public.instituciones
 where slug = 'ctp'
 on conflict (institucion_id, codigo) do nothing;
 
--- 3. Insertar o actualizar a Ethan Murillo y Esteban Oses en la tabla estudiantes
--- Ethan Murillo
+-- 3. Insertar o actualizar estudiantes de muestra en la tabla estudiantes
+-- Estudiante de muestra 1
 insert into public.estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '208700466', 'ethanmurillo05@gmail.com', 'Ethan Joshue Murillo Morera', 'Gestión de la Producción', g.id, 'activo'
+select i.id, '100000001', 'estudiante1@colegio.ed.cr', 'Estudiante Muestra 1', 'Gestión de la Producción', g.id, 'activo'
 from public.instituciones i
 join public.grupos g on g.institucion_id = i.id and g.codigo = '10-1'
 where i.slug = 'ctp'
@@ -31,9 +31,9 @@ on conflict (institucion_id, codigo) do update set
   grupo_id = excluded.grupo_id,
   estado = 'activo';
 
--- Esteban Oses
+-- Estudiante de muestra 2
 insert into public.estudiantes (institucion_id, codigo, correo, nombre, especialidad, grupo_id, estado)
-select i.id, '208920002', 'estebanoses861@gmail.com', 'Daniel Esteban Oses Valenciano', 'Gestión de la Producción', g.id, 'activo'
+select i.id, '100000002', 'estudiante2@colegio.ed.cr', 'Estudiante Muestra 2', 'Gestión de la Producción', g.id, 'activo'
 from public.instituciones i
 join public.grupos g on g.institucion_id = i.id and g.codigo = '10-1'
 where i.slug = 'ctp'
@@ -102,7 +102,7 @@ $$;
 
 grant execute on function public.verificar_correo_padron(text) to anon, authenticated, service_role;
 
--- 7. Consulta de Diagnóstico Final: muestra el estado de ambos usuarios
+-- 7. Consulta de Diagnóstico Final: muestra el estado de usuarios
 select 
   lista.correo,
   case when u.id is not null then '✅ Registrado (' || u.id::text || ')' else '⏳ Sin cuenta creada aún' end as estado_auth_users,
@@ -112,8 +112,8 @@ select
   e.especialidad
 from (
   values 
-    ('estebanoses861@gmail.com'),
-    ('ethanmurillo05@gmail.com')
+    ('estudiante1@colegio.ed.cr'),
+    ('estudiante2@colegio.ed.cr')
 ) as lista(correo)
 left join auth.users u on lower(trim(u.email)) = lower(trim(lista.correo))
 left join public.estudiantes e on lower(trim(e.correo)) = lower(trim(lista.correo))

@@ -85,10 +85,47 @@ export function AppNav() {
 }
 
 function FichaLateral() {
-  const { estudiante } = useEstudiante()
-  const { cerrarSesion } = useSesion()
+  const { estudiante, cargando } = useEstudiante()
+  const { sesion, cerrarSesion } = useSesion()
+
+  if (cargando) {
+    return (
+      <div className="mt-auto hidden animate-pulse items-center gap-3 rounded-md border border-border p-2.5 lg:flex">
+        <div className="size-9 shrink-0 rounded-full bg-surface-alt" />
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <div className="h-3.5 w-24 rounded-sm bg-surface-alt" />
+          <div className="h-2.5 w-16 rounded-sm bg-surface-alt" />
+        </div>
+      </div>
+    )
+  }
 
   if (!estudiante) {
+    if (sesion) {
+      return (
+        <div className="mt-auto hidden flex-col gap-2 border-t border-border pt-3 lg:flex">
+          <div className="rounded-md border border-border bg-surface-alt p-2.5 text-menuda text-text-muted">
+            <span className="block font-semibold text-text truncate">
+              {sesion.user.email}
+            </span>
+            <span className="block text-micro">Sin ficha en padrón</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => void cerrarSesion()}
+            className={cn(
+              'flex cursor-pointer items-center justify-center gap-2 rounded-md border border-border',
+              'bg-surface px-3 py-2 text-menuda font-semibold text-text-muted transition-all duration-200',
+              'hover:border-border-strong hover:bg-surface-alt hover:text-text active:scale-98',
+            )}
+          >
+            <IconoSalir className="size-3.5" />
+            <span>Cerrar sesión</span>
+          </button>
+        </div>
+      )
+    }
+
     return (
       <NavLink
         to="/entrar"
@@ -123,14 +160,14 @@ function FichaLateral() {
           />
         ) : (
           <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-primary-solid text-micro font-bold text-white">
-            {obtenerIniciales(estudiante.nombre)}
+            {obtenerIniciales(estudiante.nombre ?? '')}
           </span>
         )}
         <span className="min-w-0 flex-1">
           <span className="block truncate text-menor font-semibold text-text">
-            {estudiante.nombre}
+            {estudiante.nombre ?? 'Estudiante'}
           </span>
-          <span className="block text-menuda text-text-muted">Grupo {estudiante.grupo}</span>
+          <span className="block text-menuda text-text-muted">Grupo {estudiante.grupo ?? '12-1'}</span>
         </span>
       </NavLink>
 

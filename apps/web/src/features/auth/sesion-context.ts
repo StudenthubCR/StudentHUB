@@ -6,6 +6,7 @@ export type EstadoSesion = {
   cargando: boolean
   sesion: Session | null
   cerrarSesion: () => Promise<void>
+  establecerSesion?: (nueva: Session | null) => void
 }
 
 export const SesionContext = createContext<EstadoSesion | null>(null)

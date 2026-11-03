@@ -60,14 +60,14 @@ export function AlmuerzoDeHoy({ estado, cargando, hayError }: Props) {
       to="/comedor"
       aria-busy={cargando}
       className={cn(
-        'group mt-3.5 block rounded-lg border border-border bg-surface px-5 py-5 elev-md',
+        'group block rounded-2xl border border-border bg-surface p-4.5 sm:p-5 md:p-6 elev-md',
         'transition-[transform,box-shadow,border-color] duration-250 ease-soft',
-        'hover:-translate-y-[3px] hover:border-primary-tint-strong hover:elev-lg md:px-6',
+        'hover:-translate-y-[2px] hover:border-primary-tint-strong hover:elev-lg',
       )}
     >
       <span className="mb-2.5 flex items-center gap-2 text-etiqueta font-bold tracking-[0.09em] text-text-muted uppercase">
         <IconoComedor className="size-3.5" />
-        Almuerzo de hoy
+        Almuerzo / Cena de hoy
       </span>
 
       {cargando ? (
@@ -76,7 +76,12 @@ export function AlmuerzoDeHoy({ estado, cargando, hayError }: Props) {
           <span className="block h-3 w-[55%] rounded-full bg-surface-alt" />
         </span>
       ) : hayError ? (
-        <p className="text-subtitulo font-bold">No pudimos cargar el menú</p>
+        <div>
+          <p className="text-subtitulo font-bold text-text">No pudimos cargar el menú</p>
+          <p className="mt-1 text-menor text-text-muted">
+            Problema temporal de conexión con la hoja institucional. Tocá para reintentar.
+          </p>
+        </div>
       ) : (
         <Texto estado={estado} />
       )}

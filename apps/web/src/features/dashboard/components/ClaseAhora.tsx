@@ -14,11 +14,35 @@ type Estado =
 function estadoDe(dia: DiaDeClases | null, ahora: Date, cargando: boolean, hayError: boolean): Estado {
   if (cargando) return { tipo: 'cargando' }
   if (hayError) return { tipo: 'error' }
-  if (!dia) return { tipo: 'sin-clases' }
+
+  const esModoDemo = typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true'
+
+  if (!dia) {
+    if (esModoDemo) {
+      return {
+        tipo: 'bloque',
+        enCurso: true,
+        bloque: {
+          materia: 'Desarrollo Web Frontend',
+          inicio: '09:30',
+          fin: '11:15',
+          lecciones: 2,
+          esReceso: false,
+          docente: 'Lic. Erick García',
+        },
+      }
+    }
+    return { tipo: 'sin-clases' }
+  }
 
   const { actual, siguiente } = progresoDelDia(dia.bloques, ahoraEnMinutos(ahora))
   if (actual !== null) return { tipo: 'bloque', bloque: dia.bloques[actual]!, enCurso: true }
   if (siguiente !== null) return { tipo: 'bloque', bloque: dia.bloques[siguiente]!, enCurso: false }
+
+  if (esModoDemo && dia.bloques.length > 0) {
+    return { tipo: 'bloque', bloque: dia.bloques[0]!, enCurso: true }
+  }
+
   return { tipo: 'termino' }
 }
 
@@ -65,10 +89,9 @@ export function ClaseAhora({ dia, ahora, cargando, hayError, aHorario }: Props) 
       to={aHorario}
       aria-busy={estado.tipo === 'cargando'}
       className={cn(
-        'group block rounded-lg border border-l-4 border-border border-l-primary bg-surface',
-        'px-5 py-5 elev-md transition-[transform,box-shadow,border-color] duration-250 ease-soft',
-        'hover:-translate-y-[3px] hover:border-primary-tint-strong hover:border-l-primary hover:elev-lg',
-        'md:px-6 md:py-6',
+        'group block rounded-2xl border border-l-4 border-border border-l-primary bg-surface',
+        'p-4.5 sm:p-5 md:p-6 elev-md transition-[transform,box-shadow,border-color] duration-250 ease-soft',
+        'hover:-translate-y-[2px] hover:border-primary-tint-strong hover:border-l-primary hover:elev-lg',
       )}
     >
       <span className="mb-2.5 flex items-center gap-2 text-etiqueta font-bold tracking-[0.09em] text-text-muted uppercase">
@@ -84,7 +107,12 @@ export function ClaseAhora({ dia, ahora, cargando, hayError, aHorario }: Props) 
       )}
 
       {estado.tipo === 'error' && (
-        <p className="text-subtitulo font-bold text-text">No pudimos cargar el horario</p>
+        <div>
+          <p className="text-subtitulo font-bold text-text">No pudimos cargar el horario</p>
+          <p className="mt-1 text-menor text-text-muted">
+            Problema temporal de conexión con los horarios institucionales. Tocá para revisar.
+          </p>
+        </div>
       )}
 
       {estado.tipo === 'sin-clases' && (

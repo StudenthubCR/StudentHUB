@@ -30,6 +30,7 @@ export function TarjetaCarnet({
   onToggleVoltear: onToggleExterna,
 }: Props) {
   const [volteadaInterna, setVolteadaInterna] = useState(false)
+  const [tilt, setTilt] = useState({ rotX: 0, rotY: 0, xPct: 50, yPct: 50, activo: false })
   const estaVolteada = volteadaExterna !== undefined ? volteadaExterna : volteadaInterna
   const alternarVoltear = () => {
     if (onToggleExterna) {
@@ -39,13 +40,46 @@ export function TarjetaCarnet({
     }
   }
 
+  const manejarMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!personalizacion.efecto3d) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const xPct = Math.max(0, Math.min(100, (x / rect.width) * 100))
+    const yPct = Math.max(0, Math.min(100, (y / rect.height) * 100))
+
+    // Rotación suave de +-10 grados
+    const rotY = ((x / rect.width) - 0.5) * 20
+    const rotX = -((y / rect.height) - 0.5) * 20
+
+    setTilt({ rotX, rotY, xPct, yPct, activo: true })
+  }
+
+  const manejarMouseLeave = () => {
+    setTilt({ rotX: 0, rotY: 0, xPct: 50, yPct: 50, activo: false })
+  }
+
   const tema = buscarTema(personalizacion.temaId)
-  const insignia = resolverInsignia(personalizacion.insigniaId, estudiante.especialidad)
-  const valorQR = `Nombre: ${estudiante.nombre}\nSección: ${estudiante.grupo}`
+  const insignia = resolverInsignia(personalizacion.insigniaId, estudiante?.especialidad ?? '')
+  const valorQR = `Nombre: ${estudiante?.nombre ?? 'Estudiante'}\nSección: ${estudiante?.grupo ?? '12-1'}`
 
   const tieneFotoReal = Boolean(
-    estudiante.fotoUrl && !estudiante.fotoUrl.includes('placeholder'),
+    estudiante?.fotoUrl && !estudiante.fotoUrl.includes('placeholder'),
   )
+
+  // Reflejo holográfico dinámico que sigue el cursor en 3D
+  const renderizarReflejo = () => {
+    if (!personalizacion.efecto3d || !tilt.activo) return null
+    return (
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-30 opacity-40 mix-blend-color-dodge transition-opacity duration-150"
+        style={{
+          background: `radial-gradient(circle at ${tilt.xPct}% ${tilt.yPct}%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 60%)`,
+        }}
+      />
+    )
+  }
 
   // Capa común de textura o patrón de fondo
   const renderizarPatron = () => {
@@ -89,6 +123,8 @@ export function TarjetaCarnet({
 
   return (
     <div
+      onMouseMove={manejarMouseMove}
+      onMouseLeave={manejarMouseLeave}
       className="relative w-full max-w-[350px] select-none"
       style={{ perspective: '1200px' }}
     >
@@ -105,12 +141,12 @@ export function TarjetaCarnet({
         <span>{estaVolteada ? 'Ver Frente' : 'Ver Reverso'}</span>
       </button>
 
-      {/* Contenedor con rotación 3D Flip estable */}
+      {/* Contenedor con rotación 3D Flip estable + Tilt dinámico */}
       <div
-        className="relative w-full transition-transform duration-500 ease-ui"
+        className="relative w-full transition-transform duration-300 ease-out"
         style={{
           transformStyle: 'preserve-3d',
-          transform: `rotateY(${estaVolteada ? 180 : 0}deg)`,
+          transform: `rotateY(${estaVolteada ? 180 : 0}deg) rotateX(${tilt.activo && personalizacion.efecto3d ? tilt.rotX : 0}deg) rotateY(${tilt.activo && personalizacion.efecto3d ? (estaVolteada ? -tilt.rotY : tilt.rotY) : 0}deg)`,
         }}
       >
         {/* ========================================================= */}
@@ -133,15 +169,16 @@ export function TarjetaCarnet({
           }
         >
           {renderizarPatron()}
+          {renderizarReflejo()}
 
           {/* Cabecera institucional + Insignia técnica */}
           <header className="relative z-10 flex items-center justify-between border-b border-white/15 bg-white/10 px-4.5 py-3.5 backdrop-blur-sm">
             <div className="flex items-center gap-2">
               <span className="rounded-[6px] border border-white/20 bg-white/15 px-2 py-0.5 text-nota font-extrabold tracking-[0.06em]">
-                {estudiante.siglaInstitucion}
+                {estudiante?.siglaInstitucion ?? 'CTP'}
               </span>
               <span className="text-menuda font-light tracking-[0.08em] uppercase opacity-90">
-                {estudiante.institucion}
+                {estudiante?.institucion ?? 'Colegio Técnico Profesional'}
               </span>
             </div>
             {/* Insignia de Especialidad (Idea 1) */}
@@ -166,13 +203,13 @@ export function TarjetaCarnet({
             >
               {tieneFotoReal ? (
                 <img
-                  src={estudiante.fotoUrl}
-                  alt={`Fotografía de ${estudiante.nombre}`}
+                  src={estudiante?.fotoUrl || ''}
+                  alt={`Fotografía de ${estudiante?.nombre ?? 'Estudiante'}`}
                   className="size-full rounded-full object-cover"
                 />
               ) : (
                 <span className="text-[2.2rem] font-extrabold tracking-wider text-white select-none drop-shadow-sm">
-                  {obtenerIniciales(estudiante.nombre)}
+                  {obtenerIniciales(estudiante?.nombre ?? '')}
                 </span>
               )}
 
@@ -184,13 +221,13 @@ export function TarjetaCarnet({
             </div>
 
             <h3 className="mb-0.5 text-titulo font-bold tracking-[-0.02em] text-white">
-              {estudiante.nombre}
+              {estudiante?.nombre ?? 'Estudiante'}
             </h3>
-            <p className="text-menor tracking-[0.04em] text-white/80">ID: {estudiante.codigo}</p>
-            <p className="mt-1 text-menor font-light text-white/95">{estudiante.especialidad}</p>
+            <p className="text-menor tracking-[0.04em] text-white/80">ID: {estudiante?.codigo ?? '0000'}</p>
+            <p className="mt-1 text-menor font-light text-white/95">{estudiante?.especialidad ?? ''}</p>
 
             <span className="mt-2.5 inline-block rounded-full border border-white/20 bg-white/15 px-3.5 py-1 text-menuda font-semibold backdrop-blur-xs">
-              Sección {estudiante.grupo} — {estudiante.jornada}
+              Sección {estudiante?.grupo ?? '12-1'} — {estudiante?.jornada ?? 'Nocturna'}
             </span>
 
             {/* Lema o frase personal (Idea 2) */}
@@ -211,7 +248,7 @@ export function TarjetaCarnet({
                 value={valorQR}
                 size={58}
                 level="M"
-                aria-label={`Código QR para ${estudiante.nombre}`}
+                aria-label={`Código QR para ${estudiante?.nombre ?? 'Estudiante'}`}
               />
             </div>
             <div className="min-w-0 flex-1 text-left">
@@ -228,7 +265,7 @@ export function TarjetaCarnet({
                 Validación de Identidad
               </p>
               <p className="mt-0.5 text-micro leading-snug text-slate-500">
-                Sección {estudiante.grupo} • Escaneo para asistencia y comedor
+                Sección {estudiante?.grupo ?? '12-1'} • Escaneo para asistencia y comedor
               </p>
             </div>
           </footer>
@@ -254,11 +291,12 @@ export function TarjetaCarnet({
           }
         >
           {renderizarPatron()}
+          {renderizarReflejo()}
 
           {/* Franja superior imitación banda magnética / institucional */}
           <div className="relative z-10 border-b border-white/10 bg-black/40 px-5 py-2.5">
             <div className="flex items-center justify-between text-menuda font-mono tracking-widest text-white/80 uppercase">
-              <span>{estudiante.siglaInstitucion} — REVERSO</span>
+              <span>{estudiante?.siglaInstitucion ?? 'CTP'} — REVERSO</span>
               <span className="font-bold text-white">CTP 2026</span>
             </div>
           </div>
@@ -325,7 +363,7 @@ export function TarjetaCarnet({
                 ))}
               </svg>
               <p className="mt-1 text-etiqueta font-mono tracking-widest text-slate-600">
-                *CR-{estudiante.codigo}-{estudiante.grupo}*
+                *CR-{estudiante?.codigo ?? '0000'}-{estudiante?.grupo ?? '12-1'}*
               </p>
             </div>
 
@@ -339,7 +377,7 @@ export function TarjetaCarnet({
           {/* Pie del Reverso */}
           <footer className="relative z-10 flex items-center justify-between border-t border-white/15 bg-black/25 px-5 py-3">
             <span className="text-etiqueta text-white/80 font-medium">
-              Vigencia: {estudiante.vigencia}
+              Vigencia: {estudiante?.vigencia ?? 'Ciclo Lectivo 2026'}
             </span>
             <button
               type="button"
