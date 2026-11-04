@@ -14,7 +14,7 @@ import {
   generarMensajeBienvenida,
   SUGERENCIAS_RAPIDAS,
 } from './chatbot.service'
-import { Chatbot } from './Chatbot'
+import { Chatbot, gestionarFocoChatbot } from './Chatbot'
 import { useChatbot } from './useChatbot'
 import type { MenuDia } from '@/features/comedor/menu.types'
 import type { DiaDeClases } from '@/features/horarios/horario.types'
@@ -474,6 +474,80 @@ describe('useChatbot Hook — Control de Concurrencia, Bloqueo y Cancelación (G
       expect(hook.mensajes[0].texto).toContain('Elena')
       expect(hook.error).toBeNull()
       expect(hook.escribiendo).toBe(false)
+    }
+  })
+
+  it('cerrarChat() aborta cualquier respuesta en vuelo, restablece escribiendo a false y permite envíos posteriores', async () => {
+    let hookResult: ReturnType<typeof useChatbot> | null = null
+
+    function Harness() {
+      hookResult = useChatbot({
+        primerNombre: 'Carlos',
+        grupoActivo: '11-1',
+        horariosDias: [],
+        menusComedor: [],
+        ahora: new Date(),
+      })
+      return null
+    }
+
+    renderToString(<Harness />)
+
+    if (hookResult) {
+      const hook = hookResult as ReturnType<typeof useChatbot>
+      // 1. Iniciar un mensaje en vuelo
+      const promesaEnvio = hook.enviarMensaje('¿Qué hay de almuerzo?')
+      expect(hook.escribiendo).toBe(true)
+
+      // 2. Invocar cerrarChat mientras la respuesta está en vuelo
+      hook.cerrarChat()
+
+      // 3. Comprobar que escribiendo se restablece inmediatamente a false
+      expect(hook.escribiendo).toBe(false)
+
+      // 4. La promesa en vuelo debe resolver en false (abortada sin error no controlado)
+      const resultado = await promesaEnvio
+      expect(resultado).toBe(false)
+
+      // 5. Un envío posterior debe funcionar normalmente sin quedar bloqueado por enviandoRef
+      const segundoEnvio = await hook.enviarMensaje('¿Cuáles son mis clases?')
+      expect(segundoEnvio).toBe(true)
+      expect(hook.escribiendo).toBe(false)
+    }
+  })
+
+  it('abrir y cerrar inmediatamente el Chatbot en <150ms ejecuta clearTimeout sin fugar temporizadores', () => {
+    vi.useFakeTimers()
+    const spyClearTimeout = vi.spyOn(globalThis, 'clearTimeout')
+
+    try {
+      const fakeFocus = vi.fn()
+      const fakeInput = { current: { focus: fakeFocus } }
+      const timerRef: { current: ReturnType<typeof setTimeout> | null } = { current: null }
+
+      // 1. Simular apertura: programa foco en 150ms
+      const cleanup = gestionarFocoChatbot(true, fakeInput, timerRef)
+      expect(timerRef.current).not.toBeNull()
+      expect(vi.getTimerCount()).toBe(1)
+
+      // 2. Simular cierre inmediato antes de 150ms (por ejemplo a los 50ms)
+      vi.advanceTimersByTime(50)
+      expect(fakeFocus).not.toHaveBeenCalled()
+
+      // Se ejecuta la limpieza del efecto al cerrarse
+      cleanup()
+      gestionarFocoChatbot(false, fakeInput, timerRef)
+
+      // El temporizador debe haber sido cancelado
+      expect(timerRef.current).toBeNull()
+      expect(spyClearTimeout).toHaveBeenCalled()
+
+      // 3. Avanzar el tiempo más allá de los 150ms para confirmar que focus NUNCA se ejecuta
+      vi.advanceTimersByTime(200)
+      expect(fakeFocus).not.toHaveBeenCalled()
+    } finally {
+      spyClearTimeout.mockRestore()
+      vi.useRealTimers()
     }
   })
 })

@@ -41,7 +41,8 @@ export function useChatbot({
   const mensajesRef = useRef<MensajeChat[]>([mensajeInicial])
   const [, setMensajes] = useState<MensajeChat[]>([mensajeInicial])
 
-  const [escribiendo, setEscribiendo] = useState<boolean>(false)
+  const escribiendoRef = useRef<boolean>(false)
+  const [, setEscribiendo] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const ultimoTextoEnviadoRef = useRef<string | null>(null)
   const [mostrarBotonBajar, setMostrarBotonBajar] = useState<boolean>(false)
@@ -49,8 +50,24 @@ export function useChatbot({
   // Semáforo de concurrencia y control de cancelación
   const enviandoRef = useRef<boolean>(false)
   const abortControllerRef = useRef<AbortController | null>(null)
+  const timerRespuestaRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const contenedorRef = useRef<HTMLDivElement>(null)
   const finalMensajesRef = useRef<HTMLDivElement>(null)
+
+  // Cancela operaciones en vuelo, limpia temporizadores y restablece el semáforo de concurrencia
+  const cerrarChat = useCallback(() => {
+    if (timerRespuestaRef.current) {
+      clearTimeout(timerRespuestaRef.current)
+      timerRespuestaRef.current = null
+    }
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+      abortControllerRef.current = null
+    }
+    enviandoRef.current = false
+    escribiendoRef.current = false
+    setEscribiendo(false)
+  }, [])
 
   // Si el nombre del estudiante se carga de forma asíncrona y la conversación sigue intacta, actualizar saludo
   useEffect(() => {
@@ -67,12 +84,18 @@ export function useChatbot({
     }
   }, [primerNombre])
 
-  // Cancelar peticiones en vuelo al desmontar el componente
+  // Cancelar peticiones en vuelo y temporizadores al desmontar el componente
   useEffect(() => {
     return () => {
+      if (timerRespuestaRef.current) {
+        clearTimeout(timerRespuestaRef.current)
+        timerRespuestaRef.current = null
+      }
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
+        abortControllerRef.current = null
       }
+      enviandoRef.current = false
     }
   }, [])
 
@@ -135,6 +158,7 @@ export function useChatbot({
       const listaConUsuario = [...mensajesRef.current, mensajeUsuario]
       mensajesRef.current = listaConUsuario
       setMensajes(listaConUsuario)
+      escribiendoRef.current = true
       setEscribiendo(true)
 
       // Auto-desplazamiento suave tras enviar
@@ -143,9 +167,17 @@ export function useChatbot({
       try {
         // Pausa simulada orgánica de 350ms con soporte de cancelación por AbortSignal
         await new Promise<void>((resolve, reject) => {
-          const timer = setTimeout(resolve, 350)
+          const timer = setTimeout(() => {
+            timerRespuestaRef.current = null
+            resolve()
+          }, 350)
+          timerRespuestaRef.current = timer
+
           controller.signal.addEventListener('abort', () => {
-            clearTimeout(timer)
+            if (timerRespuestaRef.current) {
+              clearTimeout(timerRespuestaRef.current)
+              timerRespuestaRef.current = null
+            }
             reject(new DOMException('Petición abortada', 'AbortError'))
           })
         })
@@ -206,6 +238,7 @@ export function useChatbot({
         setError('No pudimos procesar tu mensaje. Puedes intentar enviarlo nuevamente.')
         return false
       } finally {
+        escribiendoRef.current = false
         setEscribiendo(false)
         enviandoRef.current = false
       }
@@ -226,10 +259,16 @@ export function useChatbot({
    * Restablece la conversación al estado de bienvenida
    */
   const limpiarConversacion = useCallback(() => {
+    if (timerRespuestaRef.current) {
+      clearTimeout(timerRespuestaRef.current)
+      timerRespuestaRef.current = null
+    }
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
+      abortControllerRef.current = null
     }
     enviandoRef.current = false
+    escribiendoRef.current = false
     setEscribiendo(false)
     setError(null)
     ultimoTextoEnviadoRef.current = null
@@ -251,7 +290,9 @@ export function useChatbot({
     get mensajes() {
       return mensajesRef.current
     },
-    escribiendo,
+    get escribiendo() {
+      return escribiendoRef.current
+    },
     error,
     mostrarBotonBajar,
     contenedorRef,
@@ -259,6 +300,7 @@ export function useChatbot({
     enviarMensaje,
     reintentar,
     limpiarConversacion,
+    cerrarChat,
     desplazarAlFinal,
     manejarScroll,
   }

@@ -26,6 +26,35 @@ import { useReloj } from '@/lib/useReloj'
 import { SUGERENCIAS_RAPIDAS } from './chatbot.service'
 import { useChatbot } from './useChatbot'
 
+/**
+ * Gestiona la temporización del foco automático con cancelación segura (clearTimeout)
+ * para evitar fugas de memoria o intentos de foco sobre elementos cerrados.
+ */
+export function gestionarFocoChatbot(
+  abierto: boolean,
+  inputRef: { current: { focus: () => void } | null },
+  timerRef: { current: ReturnType<typeof setTimeout> | null },
+) {
+  if (abierto) {
+    timerRef.current = setTimeout(() => {
+      inputRef.current?.focus()
+      timerRef.current = null
+    }, 150)
+  } else {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+      timerRef.current = null
+    }
+  }
+
+  return () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+      timerRef.current = null
+    }
+  }
+}
+
 interface ChatbotProps {
   inicialmenteAbierto?: boolean
 }
@@ -52,6 +81,7 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
     enviarMensaje,
     reintentar,
     limpiarConversacion,
+    cerrarChat,
     desplazarAlFinal,
     manejarScroll,
   } = useChatbot({
@@ -63,17 +93,29 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
   })
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const timerFocoRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const shouldReduceMotion = useReducedMotion()
 
-  // Foco automático en el campo de entrada al abrir la ventana
-  useEffect(() => {
-    if (abierto) {
-      const timer = setTimeout(() => {
-        inputRef.current?.focus()
-      }, 150)
-      return () => clearTimeout(timer)
+  const manejarCerrar = () => {
+    if (timerFocoRef.current) {
+      clearTimeout(timerFocoRef.current)
+      timerFocoRef.current = null
     }
+    cerrarChat()
+    setAbierto(false)
+  }
+
+  // Foco automático en el campo de entrada al abrir la ventana con limpieza garantizada
+  useEffect(() => {
+    return gestionarFocoChatbot(abierto, inputRef, timerFocoRef)
   }, [abierto])
+
+  // Cancelar cualquier operación en vuelo si el diálogo pasa a estar cerrado
+  useEffect(() => {
+    if (!abierto) {
+      cerrarChat()
+    }
+  }, [abierto, cerrarChat])
 
   // Devolver foco al campo tras finalizar respuesta
   useEffect(() => {
@@ -87,7 +129,7 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
     if (!abierto) return
     const alPresionarTecla = (e: globalThis.KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setAbierto(false)
+        manejarCerrar()
       }
     }
     window.addEventListener('keydown', alPresionarTecla)
@@ -233,7 +275,7 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setAbierto(false)}
+                  onClick={manejarCerrar}
                   aria-label="Cerrar chat"
                   title="Cerrar chat"
                   className="flex size-8 cursor-pointer items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
