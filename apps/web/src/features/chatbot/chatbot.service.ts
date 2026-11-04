@@ -1,20 +1,19 @@
 /**
- * Servicio del Chatbot de Student HUB.
+ * Servicio del Asistente Virtual de Student HUB.
  *
- * Procesa mensajes del estudiante mediante reconocimiento de intenciones
- * y genera respuestas en tiempo real conectándose a los datos vivos de la app:
- * - Eventos y Noticias dinámicas (directamente del fixture o BD)
- * - Menú del Comedor (según la fecha y ciclo activo)
- * - Horarios de Clases (por grupo y día)
- * - Carnet Digital y funciones de la app
+ * Procesa consultas del estudiante mediante reconocimiento de intenciones
+ * y genera respuestas estructuradas en tiempo real a partir de fuentes locales:
+ * - Eventos y Noticias institucionales (calendario escolar)
+ * - Menú del Comedor (con resolución por fecha y ciclo lectivo)
+ * - Horarios de Clases (por grupo académico y día de la semana)
+ * - Carnet Digital Estudiantil y persistencia sin conexión
  *
  * Resuelve referencias temporales relativas:
  * - "mañana" / "pasado mañana" -> calcula el día siguiente o subsiguiente
- * - "ayer" / "antier" -> calcula el día anterior
- * - nombres de días (lunes, martes, etc.) -> horario o menú del día solicitado
+ * - "ayer" / "antier" -> calcula el día anterior o antepasado
+ * - Nombres de días ("lunes", "martes", etc.) -> día específico de la semana en curso
  *
- * Funciona de manera autónoma en el cliente, permitiendo funcionamiento 100%
- * offline y sin costos de API externas.
+ * Funciona de manera 100% autónoma en el cliente, compatible con PWA offline.
  */
 
 import { addDays, format, isSameDay, parseISO, startOfWeek } from 'date-fns'
@@ -22,17 +21,18 @@ import { es } from 'date-fns/locale'
 import { NOTICIAS, type Noticia } from '@/features/dashboard/noticias.fixture'
 import type { MenuDia } from '@/features/comedor/menu.types'
 import type { DiaDeClases, Clase } from '@/features/horarios/horario.types'
+import type {
+  DiaObjetivo,
+  Intencion,
+  RespuestaChat,
+  SugerenciaRapida,
+} from './chatbot.types'
 
-export type MensajeChat = {
-  id: string
-  emisor: 'usuario' | 'bot'
-  texto: string
-  imagen?: string
-  fecha: Date
-}
+export type { MensajeChat } from './chatbot.types'
 
 /**
- * Normaliza texto eliminando acentos, espacios extra y convirtiendo a minúsculas.
+ * Normaliza una cadena de texto eliminando tildes, signos diacríticos,
+ * espacios redundantes y convirtiendo a minúsculas.
  */
 export function normalizar(texto: string): string {
   return texto
@@ -43,24 +43,13 @@ export function normalizar(texto: string): string {
 }
 
 /**
- * Información de un día objetivo resuelto a partir del texto del usuario.
- */
-export type DiaObjetivo = {
-  fecha: Date
-  etiqueta: string
-  nombreDia: string
-  esFinDeSemana: boolean
-  esExplicito: boolean
-}
-
-/**
- * Resuelve a qué día se refiere el estudiante:
- * - "mañana" -> día siguiente
- * - "ayer" -> día anterior
- * - "pasado mañana" -> en dos días
- * - "antier" / "anteayer" -> hace dos días
- * - "lunes", "martes", etc. -> día indicado por nombre
- * - por defecto -> hoy
+ * Resuelve a qué fecha se refiere la consulta:
+ * - "pasado manana" -> ahora + 2 días
+ * - "manana" -> ahora + 1 día
+ * - "antier" / "anteayer" -> ahora - 2 días
+ * - "ayer" -> ahora - 1 día
+ * - "lunes", "martes", etc. -> día de la semana en curso
+ * - Por defecto -> hoy
  */
 export function resolverDiaObjetivo(texto: string, ahora: Date): DiaObjetivo {
   const t = normalizar(texto)
@@ -94,7 +83,7 @@ export function resolverDiaObjetivo(texto: string, ahora: Date): DiaObjetivo {
     return { fecha, etiqueta: 'ayer', nombreDia, esFinDeSemana, esExplicito: true }
   }
 
-  // Detectar si menciona un día de la semana específico
+  // Detectar día de la semana específico
   const diaMencionado = diasSemana.find((dia) => t.includes(dia))
   if (diaMencionado) {
     const diaIndex = diasSemana.indexOf(diaMencionado) // 0=lunes ... 6=domingo
@@ -111,21 +100,19 @@ export function resolverDiaObjetivo(texto: string, ahora: Date): DiaObjetivo {
 }
 
 /**
- * Detecta la intención principal de la consulta del estudiante.
+ * Detecta la intención principal de la consulta.
  */
-export type Intencion = 'comedor' | 'horarios' | 'eventos' | 'carnet' | 'ayuda' | 'saludo' | 'desconocido'
-
 export function detectarIntencion(texto: string): Intencion {
   const t = normalizar(texto)
 
-  const palabrasSaludo = ['hola', 'buenos dias', 'buenas tardes', 'buenas noches', 'que tal', 'hey']
+  const palabrasSaludo = ['hola', 'buenos dias', 'buenas tardes', 'buenas noches', 'que tal', 'hey', 'saludos']
   const palabrasComedor = ['comedor', 'comer', 'almuerzo', 'almorzar', 'menu', 'comida', 'plato', 'cena', 'cenar', 'desayuno']
   const palabrasHorarios = ['horario', 'clase', 'clases', 'materia', 'materias', 'leccion', 'lecciones', 'aula', 'profesor', 'tengo', 'toca']
   const palabrasEventos = ['evento', 'eventos', 'noticia', 'noticias', 'actividad', 'actividades', 'feria', 'expotecnica', 'graduacion', 'matricula', 'artes', 'civica', 'patrias']
-  const palabrasCarnet = ['carnet', 'qr', 'credencial', 'offline', 'identificacion', 'foto', 'descargar carnet']
-  const palabrasAyuda = ['ayuda', 'que haces', 'que puedes hacer', 'comandos', 'funciones', 'opciones']
+  const palabrasCarnet = ['carnet', 'qr', 'credencial', 'offline', 'identificacion', 'foto', 'descargar carnet', 'guardar carnet']
+  const palabrasAyuda = ['ayuda', 'que haces', 'que puedes hacer', 'comandos', 'funciones', 'opciones', 'capacidades']
 
-  if (palabrasSaludo.some((p) => t === p || t.startsWith(p + ' '))) return 'saludo'
+  if (palabrasSaludo.some((p) => t === p || t.startsWith(`${p} `))) return 'saludo'
   if (palabrasEventos.some((p) => t.includes(p))) return 'eventos'
   if (palabrasComedor.some((p) => t.includes(p))) return 'comedor'
   if (palabrasHorarios.some((p) => t.includes(p))) return 'horarios'
@@ -136,12 +123,12 @@ export function detectarIntencion(texto: string): Intencion {
 }
 
 /**
- * Responde preguntas sobre eventos y noticias escolares.
+ * Responde consultas sobre eventos y actividades institucionales.
  */
 export function responderEventos(
   texto: string,
   eventosActuales: Noticia[] = NOTICIAS,
-): { texto: string; imagen?: string } {
+): RespuestaChat {
   const t = normalizar(texto)
 
   if (!eventosActuales || eventosActuales.length === 0) {
@@ -164,12 +151,12 @@ export function responderEventos(
   if (eventoEncontrado) {
     const periodo = eventoEncontrado.periodo ? ` (${eventoEncontrado.periodo})` : ''
     return {
-      texto: `📅 **${eventoEncontrado.titulo}**${periodo}\n\n${eventoEncontrado.descripcion}`,
+      texto: `**${eventoEncontrado.titulo}**${periodo}\n\n${eventoEncontrado.descripcion}`,
       imagen: eventoEncontrado.imagen,
     }
   }
 
-  // Lista todos los eventos vigentes
+  // Listar todos los eventos vigentes
   const lista = eventosActuales
     .map((ev, i) => {
       const periodo = ev.periodo ? ` — *${ev.periodo}*` : ''
@@ -178,37 +165,40 @@ export function responderEventos(
     .join('\n\n')
 
   return {
-    texto: `📰 **Eventos y Actividades Escolares Vigentes:**\n\n${lista}\n\n💡 *Pregúntame por alguno en específico para ver su afiche o más detalles.*`,
+    texto: `**Eventos y Actividades Institucionales Vigentes:**\n\n${lista}\n\nPuedes consultar por algún evento específico para conocer más detalles.`,
   }
 }
 
 /**
- * Responde preguntas sobre el menú del comedor para hoy, mañana, ayer o cualquier día de la semana.
+ * Responde consultas sobre el menú del comedor para hoy, mañana, ayer o cualquier día de la semana.
  */
 export function responderComedor(
   texto: string,
   menus: MenuDia[],
   ahora: Date,
-): { texto: string } {
+): RespuestaChat {
   const diaObj = resolverDiaObjetivo(texto, ahora)
   const diaNombreFormateado = diaObj.nombreDia.charAt(0).toUpperCase() + diaObj.nombreDia.slice(1)
 
-  // Si cae en fin de semana
+  // Si corresponde a fin de semana
   if (diaObj.esFinDeSemana) {
-    const prefijo =
-      diaObj.etiqueta === 'mañana'
-        ? `🔒 Mañana es **${diaNombreFormateado}** y el comedor estudiantil está **cerrado** los fines de semana.`
-        : diaObj.etiqueta === 'ayer'
-        ? `🔒 Ayer fue **${diaNombreFormateado}** y el comedor estudiantil estuvo **cerrado**.`
-        : `🔒 Los fines de semana (**${diaNombreFormateado}**) el comedor estudiantil se encuentra **cerrado**.`
+    let detalle: string
+    if (diaObj.etiqueta === 'mañana') {
+      detalle = `Mañana es **${diaNombreFormateado}** y el comedor estudiantil se encuentra cerrado los fines de semana.`
+    } else if (diaObj.etiqueta === 'ayer') {
+      detalle = `Ayer fue **${diaNombreFormateado}** y el comedor estudiantil estuvo cerrado por fin de semana.`
+    } else {
+      detalle = `Los fines de semana (**${diaNombreFormateado}**) el comedor estudiantil se encuentra cerrado.`
+    }
     return {
-      texto: `${prefijo} ¡Buen descanso! 😊`,
+      texto: `${detalle} El servicio de alimentación opera de lunes a viernes en horario lectivo regular.`,
     }
   }
 
-  // Buscar menú por fecha exacta o por día de la semana
+  // Buscar menú por fecha exacta
   let menuObjetivo = menus.find((m) => isSameDay(parseISO(m.fecha), diaObj.fecha))
 
+  // Si no coincide la fecha exacta, buscar por día de la semana
   if (!menuObjetivo) {
     menuObjetivo = menus.find((m) => {
       const nombre = normalizar(format(parseISO(m.fecha), 'EEEE', { locale: es }))
@@ -218,7 +208,7 @@ export function responderComedor(
 
   if (!menuObjetivo) {
     return {
-      texto: `😕 No encontré información del menú para **${diaObj.etiqueta} (${diaNombreFormateado})**. Podés revisar la sección de **Comedor** en la barra inferior.`,
+      texto: `No hay información del menú registrada para **${diaObj.etiqueta} (${diaNombreFormateado})**. Puedes consultar la sección de **Comedor** en el menú principal para más información.`,
     }
   }
 
@@ -233,26 +223,26 @@ export function responderComedor(
 
   return {
     texto:
-      `🍽️ **Menú del Comedor para ${tituloEtiqueta}:**\n\n` +
-      `🥩 **Plato principal:** ${menuObjetivo.plato}\n` +
-      `🥗 **Acompañamiento:** ${menuObjetivo.acompanamiento}\n` +
-      `🥤 **Bebida:** ${menuObjetivo.bebida}\n` +
-      `🍌 **Fruta/Postre:** ${menuObjetivo.fruta}`,
+      `**Menú del Comedor Institucional — ${tituloEtiqueta}:**\n\n` +
+      `• **Plato principal:** ${menuObjetivo.plato}\n` +
+      `• **Acompañamiento:** ${menuObjetivo.acompanamiento}\n` +
+      `• **Bebida:** ${menuObjetivo.bebida}\n` +
+      `• **Fruta o postre:** ${menuObjetivo.fruta}`,
   }
 }
 
 /**
- * Responde preguntas sobre los horarios de clases para hoy, mañana, ayer o un día específico.
+ * Responde consultas sobre los horarios de clases para hoy, mañana, ayer o un día específico.
  */
 export function responderHorarios(
   texto: string,
   diasHorario: DiaDeClases[],
   grupo: string,
   ahora: Date,
-): { texto: string } {
+): RespuestaChat {
   if (!diasHorario || diasHorario.length === 0) {
     return {
-      texto: `📅 No hay horarios cargados actualmente para el grupo **${grupo}**. Podés consultar la sección de **Horarios**.`,
+      texto: `No hay horarios registrados actualmente para el grupo **${grupo}**. Puedes verificar la sección de **Horarios** en el menú principal.`,
     }
   }
 
@@ -261,14 +251,16 @@ export function responderHorarios(
 
   // Si cae en fin de semana
   if (diaObj.esFinDeSemana) {
-    const prefijo =
-      diaObj.etiqueta === 'mañana'
-        ? `🎉 ¡Mañana es **${diaNombreFormateado}** y no hay lecciones!`
-        : diaObj.etiqueta === 'ayer'
-        ? `Ayer fue **${diaNombreFormateado}** (fin de semana), no hubo clases.`
-        : `🎉 El **${diaNombreFormateado}** no hay clases por ser fin de semana.`
+    let detalle: string
+    if (diaObj.etiqueta === 'mañana') {
+      detalle = `Mañana es **${diaNombreFormateado}** y no hay lecciones programadas por ser fin de semana.`
+    } else if (diaObj.etiqueta === 'ayer') {
+      detalle = `Ayer fue **${diaNombreFormateado}** (fin de semana) y no se impartieron lecciones.`
+    } else {
+      detalle = `El día **${diaNombreFormateado}** corresponde a fin de semana y no hay clases.`
+    }
     return {
-      texto: `${prefijo} ¡A disfrutar el descanso! 😊`,
+      texto: `${detalle} Las lecciones se imparten regularmente de lunes a viernes.`,
     }
   }
 
@@ -279,12 +271,12 @@ export function responderHorarios(
 
   if (!diaEncontrado || diaEncontrado.clases.length === 0) {
     return {
-      texto: `📅 No hay lecciones programadas para **${diaObj.etiqueta} (${diaNombreFormateado})** en el grupo ${grupo}.`,
+      texto: `No hay lecciones registradas para **${diaObj.etiqueta} (${diaNombreFormateado})** en el grupo ${grupo}.`,
     }
   }
 
   const lecciones = diaEncontrado.clases
-    .map((c: Clase) => `⏰ **${c.hora}** — ${c.materia}${c.docente ? ` *(Docente: ${c.docente})*` : ''}`)
+    .map((c: Clase) => `• **${c.hora}** — ${c.materia}${c.docente ? ` *(Docente: ${c.docente})*` : ''}`)
     .join('\n')
 
   const tituloEtiqueta =
@@ -297,35 +289,96 @@ export function responderHorarios(
       : diaNombreFormateado.toUpperCase()
 
   return {
-    texto: `📅 **Horario de clases para ${tituloEtiqueta} (Grupo ${grupo}):**\n\n${lecciones}`,
+    texto: `**Horario de Clases — ${tituloEtiqueta} (Grupo ${grupo}):**\n\n${lecciones}`,
   }
 }
 
 /**
- * Responde preguntas sobre el carnet digital.
+ * Responde consultas sobre el carnet digital estudiantil.
  */
-export function responderCarnet(): { texto: string } {
+export function responderCarnet(): RespuestaChat {
   return {
     texto:
-      `🪪 **Mi Carnet Digital:**\n\n` +
-      `• Podés acceder a tu carnet desde la sección **Carnet** en la barra de navegación.\n` +
-      `• Cuenta con un **código QR dinámico** para validación en el portón o comedor.\n` +
-      `• Podés presionar el botón **"Guardar Carnet Offline"** para tenerlo siempre disponible aunque no tengas internet.`,
+      `**Carnet Digital Estudiantil:**\n\n` +
+      `• Acceso inmediato desde la sección **Carnet** en la barra de navegación.\n` +
+      `• Cuenta con un **código QR dinámico** para validación en portón y comedor escolar.\n` +
+      `• Puedes utilizar el botón **"Guardar Carnet Offline"** para conservarlo en tu dispositivo aunque no tengas conexión a internet.`,
   }
 }
 
 /**
- * Mensaje de ayuda y capacidades del bot.
+ * Mensaje de orientación y capacidades institucionales del asistente.
  */
-export function responderAyuda(): { texto: string } {
+export function responderAyuda(): RespuestaChat {
   return {
     texto:
-      `👋 ¡Hola! Soy el **Asistente Virtual de Student HUB**.\n\n` +
-      `Puedo responderte con precisión sobre:\n` +
-      `• 🍲 **Comedor:** "¿Qué hay de almuerzo mañana?", "¿Qué hubo ayer?", "¿Menú del viernes?"\n` +
-      `• ⏰ **Horarios:** "¿Qué clases tengo mañana?", "¿Qué tuve ayer?", "¿Horario del martes?"\n` +
-      `• 📰 **Eventos:** "¿Qué noticias hay?", "¿Cuándo es la ExpoTécnica?"\n` +
-      `• 🪪 **Carnet:** "¿Cómo descargo mi carnet offline?"\n\n` +
-      `¿En qué te puedo colaborar hoy?`,
+      `**Asistente Virtual de Student HUB**\n\n` +
+      `Puedo ayudarte con información en tiempo real sobre:\n` +
+      `• **Comedor:** "¿Qué hay de almuerzo mañana?", "¿Qué hubo ayer?", "¿Menú del viernes?"\n` +
+      `• **Horarios:** "¿Qué clases tengo mañana?", "¿Qué tuve ayer?", "¿Horario del martes?"\n` +
+      `• **Eventos:** "¿Qué noticias hay?", "¿Cuándo es la ExpoTécnica?"\n` +
+      `• **Carnet:** "¿Cómo descargo mi carnet offline?"\n\n` +
+      `Escribe tu consulta o presiona una de las opciones sugeridas.`,
   }
 }
+
+/**
+ * Mensaje emitido ante consultas que no coinciden con intenciones conocidas.
+ */
+export function responderDesconocido(): RespuestaChat {
+  return {
+    texto:
+      `No he podido identificar tu consulta con certeza.\n\n` +
+      `Puedes probar preguntándome:\n` +
+      `• "¿Qué hay de almuerzo hoy?"\n` +
+      `• "¿Cuáles son mis clases de hoy?"\n` +
+      `• "¿Qué eventos hay en el colegio?"\n` +
+      `• "¿Cómo guardo mi carnet offline?"`,
+  }
+}
+
+/**
+ * Genera el texto del mensaje de bienvenida inicial.
+ */
+export function generarMensajeBienvenida(primerNombre?: string): string {
+  const saludoNombre = primerNombre ? `, ${primerNombre}` : ''
+  return (
+    `**¡Hola${saludoNombre}! Soy el Asistente Virtual de Student HUB.**\n\n` +
+    `Estoy listo para ayudarte con:\n` +
+    `• Menú oficial del comedor estudiantil\n` +
+    `• Horario de lecciones y materias de tu grupo\n` +
+    `• Eventos oficiales y ferias institucionales\n` +
+    `• Uso y descarga de tu carnet digital offline\n\n` +
+    `¿En qué puedo orientarte hoy?`
+  )
+}
+
+/**
+ * Sugerencias rápidas para el pie del chat.
+ */
+export const SUGERENCIAS_RAPIDAS: SugerenciaRapida[] = [
+  {
+    id: 'sug-almuerzo',
+    etiqueta: 'Almuerzo mañana',
+    consulta: '¿Qué hay de almuerzo mañana?',
+    categoria: 'comedor',
+  },
+  {
+    id: 'sug-clases',
+    etiqueta: 'Clases mañana',
+    consulta: '¿Qué clases tengo mañana?',
+    categoria: 'horarios',
+  },
+  {
+    id: 'sug-eventos',
+    etiqueta: 'Eventos del colegio',
+    consulta: '¿Qué eventos hay en el colegio?',
+    categoria: 'eventos',
+  },
+  {
+    id: 'sug-carnet',
+    etiqueta: 'Carnet offline',
+    consulta: '¿Cómo guardo mi carnet offline?',
+    categoria: 'carnet',
+  },
+]

@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Student HUB · ExpoTÉCNICA 2026 Promo Video</title>
+
+    <!-- Tipografía Oficial: Poppins y JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- GSAP Runtime Oficial para HyperFrames -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+
+    <style>
+      :root {
+        --color-bg: #070c20;
+        --color-surface-elevated: rgba(16, 26, 61, 0.88);
+        --color-cyan: #38bdf8;
+        --color-emerald: #10b981;
+        --border-glow: rgba(56, 189, 248, 0.35);
+        --font-main: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      body {
+        margin: 0;
+        background: var(--color-bg);
+        color: #ffffff;
+        font-family: var(--font-main);
+        overflow: hidden;
+      }
+
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--color-bg);
+      }
+
+      /* Los slots de sub-composiciones ocupan el 100% del frame */
+      #root > div[data-composition-src] {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Capa de Fondo y Atmósfera Digital (Persistente) */
+      .ambient-bg {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .bg-radial-glow {
+        position: absolute;
+        width: 1400px;
+        height: 1000px;
+        left: 260px;
+        top: 40px;
+        background: radial-gradient(circle, rgba(1, 48, 178, 0.28) 0%, rgba(56, 189, 248, 0.08) 45%, transparent 70%);
+        filter: blur(80px);
+      }
+
+      .bg-grid-lines {
+        position: absolute;
+        inset: 0;
+        background-image: 
+          linear-gradient(to right, rgba(56, 189, 248, 0.035) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(56, 189, 248, 0.035) 1px, transparent 1px);
+        background-size: 80px 80px;
+        mask-image: radial-gradient(circle at 50% 50%, black 50%, transparent 90%);
+        -webkit-mask-image: radial-gradient(circle at 50% 50%, black 50%, transparent 90%);
+      }
+
+      /* Insignia Permanente de Stand en Esquina Superior Derecha */
+      #corner-stand-badge {
+        position: absolute;
+        top: 40px;
+        right: 60px;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 24px;
+        background: var(--color-surface-elevated);
+        border: 1.5px solid var(--border-glow);
+        border-radius: 999px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.2);
+      }
+
+      .badge-dot-live {
+        width: 12px;
+        height: 12px;
+        background: var(--color-emerald);
+        border-radius: 50%;
+        box-shadow: 0 0 12px var(--color-emerald);
+      }
+
+      .badge-stand-text {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.25;
+      }
+
+      .badge-stand-event {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        color: #ffffff;
+        text-transform: uppercase;
+      }
+
+      .badge-stand-sub {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--color-cyan);
+      }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-41db"
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-width="1920"
+      data-height="1080"
+      data-duration="20"
+      data-fps="60"
+    >
+      <!-- Capa de Fondo Permanente -->
+      <div data-hf-id="hf-vrso" class="ambient-bg">
+        <div data-hf-id="hf-y4vz" class="bg-radial-glow"></div>
+        <div data-hf-id="hf-dtzg" class="bg-grid-lines"></div>
+      </div>
+
+      <!-- Insignia Permanente de Stand en Esquina Superior Derecha -->
+      <div data-hf-id="hf-cmxb" id="corner-stand-badge">
+        <div data-hf-id="hf-blma" class="badge-dot-live"></div>
+        <div data-hf-id="hf-uv0u" class="badge-stand-text">
+          <span data-hf-id="hf-uojf" class="badge-stand-event">ExpoTÉCNICA 2026 · CTPRN</span>
+          <span data-hf-id="hf-jx1v" class="badge-stand-sub">Informática en Desarrollo de Software</span>
+        </div>
+      </div>
+
+      <!-- Escena 1: Hook y Marca Oficial (00:00 - 00:04) -->
+      <div data-hf-id="hf-l4ex"
+        id="el-scene-1"
+        class="clip"
+        data-composition-id="scene-1-brand"
+        data-composition-src="compositions/scene-1-brand.html"
+        data-start="0"
+        data-duration="4"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <!-- Escena 2: Módulo Carnet Digital con QR Offline (00:04 - 00:08) -->
+      <div data-hf-id="hf-y2im"
+        id="el-scene-2"
+        class="clip"
+        data-composition-id="scene-2-carnet"
+        data-composition-src="compositions/scene-2-carnet.html"
+        data-start="4"
+        data-duration="4"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <!-- Escena 3: Módulo Horarios Dinámicos en Tiempo Real (00:08 - 00:12) -->
+      <div data-hf-id="hf-tph5"
+        id="el-scene-3"
+        class="clip"
+        data-composition-id="scene-3-horarios"
+        data-composition-src="compositions/scene-3-horarios.html"
+        data-start="8"
+        data-duration="4"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <!-- Escena 4: Módulo Comedor Estudiantil y Raciones (00:12 - 00:16) -->
+      <div data-hf-id="hf-pean"
+        id="el-scene-4"
+        class="clip"
+        data-composition-id="scene-4-comedor"
+        data-composition-src="compositions/scene-4-comedor.html"
+        data-start="12"
+        data-duration="4"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+
+      <!-- Escena 5: Call to Action Demo PWA y Loop Seamless (00:16 - 00:20) -->
+      <div data-hf-id="hf-e54y"
+        id="el-scene-5"
+        class="clip"
+        data-composition-id="scene-5-cta"
+        data-composition-src="compositions/scene-5-cta.html"
+        data-start="16"
+        data-duration="4"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+    </div>
+
+    <!-- Timeline Maestro Orquestador para HyperFrames -->
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // Animación de entrada de la insignia de Stand
+      tl.fromTo(
+        "#corner-stand-badge",
+        { y: -30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, ease: "power2.out" },
+        0.2
+      );
+
+      // Desvanecimiento suave al entrar la escena final de CTA para maximizar visibilidad
+      tl.to("#corner-stand-badge", { opacity: 0, duration: 0.5, ease: "power2.in" }, 15.6);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
