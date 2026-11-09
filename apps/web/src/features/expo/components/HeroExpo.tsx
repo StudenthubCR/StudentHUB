@@ -4,6 +4,10 @@ import {
   IconoEscudo,
   IconoDispositivo,
   IconoReloj,
+  IconoBirrete,
+  IconoCarnet,
+  IconoRayo,
+  IconoAgenda,
 } from '@/components/icons'
 
 type Props = {
@@ -50,8 +54,8 @@ export function HeroExpo({ onAbrirInstalar }: Props) {
         <div className="mt-8 mx-auto max-w-3xl rounded-3xl border border-primary/35 bg-surface/75 backdrop-blur-2xl p-4 sm:p-6 shadow-[0_12px_40px_rgba(0,0,0,0.12)] relative text-left ring-1 ring-primary/20">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3.5 border-b border-border/80">
             <div className="flex items-center gap-2.5">
-              <span className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-light text-white text-base font-black shadow-sm">
-                🎓
+              <span className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-light text-white shadow-sm" aria-hidden="true">
+                <IconoBirrete className="size-5" />
               </span>
               <div>
                 <h2 className="text-base sm:text-lg font-black text-text leading-tight">
@@ -77,7 +81,7 @@ export function HeroExpo({ onAbrirInstalar }: Props) {
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xl">🪪</span>
+                  <IconoCarnet className="size-5 text-primary" aria-hidden="true" />
                   <span className="text-micro font-mono font-black text-primary px-2 py-0.5 rounded-md bg-primary-tint border border-primary/20">
                     PASO 1
                   </span>
@@ -103,7 +107,7 @@ export function HeroExpo({ onAbrirInstalar }: Props) {
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xl">⚡</span>
+                  <IconoRayo className="size-5 text-amber-300" aria-hidden="true" />
                   <span className="text-micro font-mono font-black text-white bg-white/20 backdrop-blur-xs px-2 py-0.5 rounded-md border border-white/30 uppercase tracking-wider">
                     PASO 2 · 1 CLIC
                   </span>
@@ -128,7 +132,7 @@ export function HeroExpo({ onAbrirInstalar }: Props) {
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xl">📋</span>
+                  <IconoAgenda className="size-5 text-primary" aria-hidden="true" />
                   <span className="text-micro font-mono font-black text-primary px-2 py-0.5 rounded-md bg-primary-tint border border-primary/20">
                     PASO 3
                   </span>
@@ -186,7 +190,7 @@ export function HeroExpo({ onAbrirInstalar }: Props) {
               <IconoReloj className="size-4.5" />
             </div>
             <div className="text-xl sm:text-2xl font-black text-text tracking-tight">&lt; 1 seg</div>
-            <div className="text-etiqueta font-bold text-emerald-600 uppercase tracking-wider">Validación QR</div>
+            <div className="text-etiqueta font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Validación QR</div>
             <p className="text-menuda text-text-muted mt-0.5">Agiliza el paso al comedor y portón escolar</p>
           </div>
 
@@ -195,7 +199,7 @@ export function HeroExpo({ onAbrirInstalar }: Props) {
               <span className="text-lg font-black leading-none">¢</span>
             </div>
             <div className="text-xl sm:text-2xl font-black text-text tracking-tight">¢0 Costo</div>
-            <div className="text-etiqueta font-bold text-amber-600 uppercase tracking-wider">Presupuesto MEP</div>
+            <div className="text-etiqueta font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Presupuesto MEP</div>
             <p className="text-menuda text-text-muted mt-0.5">Ahorro anual en plástico y cartulinas de carnet</p>
           </div>
 
@@ -204,7 +208,7 @@ export function HeroExpo({ onAbrirInstalar }: Props) {
               <IconoEscudo className="size-4.5" />
             </div>
             <div className="text-xl sm:text-2xl font-black text-text tracking-tight">Ley 8968</div>
-            <div className="text-etiqueta font-bold text-purple-600 uppercase tracking-wider">Privacidad Menores</div>
+            <div className="text-etiqueta font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Privacidad Menores</div>
             <p className="text-menuda text-text-muted mt-0.5">Row Level Security y datos encriptados</p>
           </div>
         </div>

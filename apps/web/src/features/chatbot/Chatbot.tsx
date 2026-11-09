@@ -242,7 +242,7 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
             transition={{ duration: 0.22, ease: 'easeOut' }}
             className={
               'fixed z-[1050] flex flex-col overflow-hidden rounded-3xl border border-border ' +
-              'bg-surface shadow-2xl transition-all ' +
+              'bg-white dark:bg-slate-900 shadow-2xl transition-all ' +
               'left-3 right-3 sm:left-auto sm:right-7 w-auto sm:w-[400px] max-w-[420px] ' +
               'max-h-[calc(100dvh-5.5rem)] h-[min(560px,calc(100svh-5.5rem))] ' +
               'bottom-[calc(76px_+_env(safe-area-inset-bottom))] sm:bottom-24 font-sans'
@@ -292,7 +292,7 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
               role="log"
               aria-live="polite"
               aria-label="Historial de mensajes del asistente"
-              className="relative flex-1 min-h-0 space-y-3.5 overflow-y-auto p-3.5 sm:p-4 bg-surface-alt/40"
+              className="relative flex-1 min-h-0 space-y-3.5 overflow-y-auto p-3.5 sm:p-4 bg-slate-50/95 dark:bg-slate-950/95"
             >
               {mensajes.map((msg) => {
                 const esUsuario = msg.emisor === 'usuario'
@@ -322,7 +322,7 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
                             'rounded-2xl px-3.5 py-2.5 text-menuda shadow-xs ' +
                             (esUsuario
                               ? 'rounded-br-xs bg-primary text-white font-medium self-end'
-                              : 'rounded-bl-xs border border-border bg-surface text-text font-normal self-start')
+                              : 'rounded-bl-xs border border-border bg-white dark:bg-slate-800 text-text font-normal self-start')
                           }
                         >
                           {formatearTexto(msg.texto)}
@@ -431,7 +431,7 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
 
             {/* Píldoras de Sugerencias Rápidas */}
             <div
-              className="flex shrink-0 items-center gap-1.5 overflow-x-auto border-t border-border/70 bg-surface px-3 py-2 scrollbar-none"
+              className="flex shrink-0 items-center gap-1.5 overflow-x-auto border-t border-border/70 bg-white dark:bg-slate-900 px-3 py-2 scrollbar-none"
               role="region"
               aria-label="Sugerencias rápidas de consulta"
             >
@@ -441,7 +441,7 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
                   type="button"
                   disabled={escribiendo}
                   onClick={() => void manejarEnvio(sug.consulta)}
-                  className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-border bg-surface-alt px-2.5 py-1 text-micro font-medium text-text transition-colors hover:border-primary hover:text-primary active:scale-95 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-border bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-micro font-medium text-text transition-colors hover:border-primary hover:text-primary active:scale-95 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   {renderIconoChip(sug.categoria)}
                   <span>{sug.etiqueta}</span>
@@ -452,7 +452,7 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
             {/* Barra de Entrada de Texto Adaptativa */}
             <form
               onSubmit={manejarSubmitForm}
-              className="flex shrink-0 items-end gap-2 border-t border-border bg-surface p-2.5 sm:p-3"
+              className="flex shrink-0 items-end gap-2 border-t border-border bg-white dark:bg-slate-900 p-2.5 sm:p-3"
             >
               <div className="relative flex flex-1 items-center">
                 <textarea

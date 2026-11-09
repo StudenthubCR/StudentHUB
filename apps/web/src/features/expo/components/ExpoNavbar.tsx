@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTheme } from '@/app/use-theme'
-import { IconoSol, IconoLuna, IconoDescargar } from '@/components/icons'
+import { IconoSol, IconoLuna, IconoDescargar, IconoRayo } from '@/components/icons'
 
 type Props = {
   onAbrirInstalar?: () => void
@@ -46,13 +46,11 @@ export function ExpoNavbar({ onAbrirInstalar }: Props) {
         {/* Logo con espaciado balanceado */}
         <div className="flex items-center gap-3">
           <a href="#hero" className="flex items-center group">
-            <div className="relative flex h-10 w-28 sm:w-32 items-center overflow-hidden">
-              <img
-                src="/SHlarge.webp"
-                alt="Student HUB"
-                className="absolute top-1/2 left-[-30px] h-32 w-auto -translate-y-1/2 object-contain transition-transform duration-300 group-hover:scale-105 dark:brightness-0 dark:invert"
-              />
-            </div>
+            <img
+              src="/SHlarge.webp"
+              alt="Student HUB"
+              className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105 dark:brightness-0 dark:invert"
+            />
           </a>
           <span className="inline-flex items-center gap-1 rounded-md bg-primary-tint border border-primary/25 px-2 py-0.5 text-[10px] font-black tracking-widest text-primary uppercase shadow-2xs">
             <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -107,7 +105,7 @@ export function ExpoNavbar({ onAbrirInstalar }: Props) {
             className="relative inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-gradient-to-r from-primary to-primary-light px-4 py-1.5 text-etiqueta sm:text-nota font-black text-white shadow-md shadow-primary/30 ring-1 ring-white/20 transition-all duration-200 hover:scale-105 active:scale-95"
             title="Entrar a la app real en modo demostración para evaluadores"
           >
-            <span>⚡ Modo Juez</span>
+            <IconoRayo className="size-3.5" aria-hidden="true" /><span>Modo Juez</span>
           </button>
 
           <Link
@@ -147,7 +145,7 @@ export function ExpoNavbar({ onAbrirInstalar }: Props) {
               }}
               className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary-light px-3 py-2.5 text-nota font-bold text-white shadow-md cursor-pointer"
             >
-              <span>⚡ Probar App Real (Modo Juez)</span>
+              <IconoRayo className="size-4" aria-hidden="true" /><span>Probar App Real (Modo Juez)</span>
             </button>
 
             {navLinks.map((link) => (

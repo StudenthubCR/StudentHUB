@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom'
 import { PantallaDeAviso } from '@/components/PantallaDeAviso'
-import { IconoAlertaTriangulo, IconoRecargar } from '@/components/icons'
+import { IconoAlertaTriangulo, IconoRecargar, IconoCheck, IconoCompartir } from '@/components/icons'
 
 /**
  * PaginaDeError: Error Boundary oficial de React Router.
@@ -152,9 +152,19 @@ export function PaginaDeError() {
             <button
               type="button"
               onClick={copiarAlPortapapeles}
-              className="cursor-pointer rounded-lg bg-surface border border-rose-500/30 px-2.5 py-1 text-[11px] font-bold text-text hover:bg-surface-alt transition-colors"
+              className="inline-flex items-center gap-1.5 cursor-pointer rounded-lg bg-surface border border-rose-500/30 px-2.5 py-1 text-[11px] font-bold text-text hover:bg-surface-alt transition-colors"
             >
-              {copiado ? '✓ Copiado al portapapeles' : '📋 Copiar Error al Portapapeles'}
+              {copiado ? (
+                <>
+                  <IconoCheck className="size-3 text-emerald-500" aria-hidden="true" />
+                  <span>Copiado al portapapeles</span>
+                </>
+              ) : (
+                <>
+                  <IconoCompartir className="size-3 text-text-muted" aria-hidden="true" />
+                  <span>Copiar Error al Portapapeles</span>
+                </>
+              )}
             </button>
           </div>
           <p className="font-mono text-menuda font-bold text-rose-950 dark:text-rose-100 break-words leading-relaxed">

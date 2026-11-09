@@ -141,9 +141,19 @@ describe('aClases', () => {
 })
 
 describe('agruparPorDia', () => {
-  it('ordena los días de lunes a viernes aunque la hoja los traiga revueltos', () => {
+  it('garantiza los 5 días lectivos oficiales (lunes a viernes) ordenados incluso si faltan días', () => {
     const dias = agruparPorDia(aClases(FILAS), LUNES)
-    expect(dias.map((dia) => dia.dia)).toEqual(['Lunes', 'Martes', 'Miercoles'])
+    expect(dias.map((dia) => dia.dia)).toEqual(['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'])
+  })
+
+  it('asigna clases vacías a días sin lecciones (ej: Jueves y Viernes para FILAS)', () => {
+    const dias = agruparPorDia(aClases(FILAS), LUNES)
+    const jueves = dias.find((d) => d.dia === 'Jueves')
+    const viernes = dias.find((d) => d.dia === 'Viernes')
+    expect(jueves?.clases).toEqual([])
+    expect(jueves?.bloques).toEqual([])
+    expect(viernes?.clases).toEqual([])
+    expect(viernes?.bloques).toEqual([])
   })
 
   it('conserva el orden de las lecciones dentro del día', () => {
@@ -158,13 +168,13 @@ describe('agruparPorDia', () => {
 
   it('marca el día de hoy', () => {
     const dias = agruparPorDia(aClases(FILAS), LUNES)
-    expect(dias.map((dia) => dia.esHoy)).toEqual([true, false, false])
+    expect(dias.map((dia) => dia.esHoy)).toEqual([true, false, false, false, false])
   })
 
   it('reconoce hoy aunque la hoja escriba el día sin tilde', () => {
     // La hoja dice "Miercoles"; date-fns dice "miércoles".
     const dias = agruparPorDia(aClases(FILAS), MIERCOLES)
-    expect(dias.find((dia) => dia.esHoy)?.dia).toBe('Miercoles')
+    expect(dias.find((dia) => dia.esHoy)?.dia).toBe('Miércoles')
   })
 
   it('el fin de semana no marca ningún día', () => {

@@ -1,4 +1,4 @@
-import { IconoImprimir, IconoSalir, IconoEngranaje } from '@/components/icons'
+import { IconoImprimir, IconoSalir, IconoEngranaje, IconoRecargar } from '@/components/icons'
 import { cn } from '@/lib/cn'
 import type { Estudiante } from '@/features/estudiante/estudiante.fixture'
 
@@ -109,7 +109,7 @@ export function PanelDetalles({
               'transition-all duration-200 hover:border-primary/40 hover:bg-surface-alt active:scale-98',
             )}
           >
-            <span>🔄</span>
+            <IconoRecargar className="size-4" aria-hidden="true" />
             <span>{estaVolteada ? 'Ver frente del carnet' : 'Girar carnet (Ver reverso oficial)'}</span>
           </button>
         )}

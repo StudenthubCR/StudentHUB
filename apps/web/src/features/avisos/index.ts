@@ -1,5 +1,6 @@
 export * from './avisos.types'
 export * from './avisos.service'
 export * from './useAvisos'
+export * from './AvisosPage'
 export * from './components/BannersAvisosRapidos'
 export * from './components/ModalCrearAviso'

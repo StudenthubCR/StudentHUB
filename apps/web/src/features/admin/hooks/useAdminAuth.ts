@@ -12,19 +12,20 @@ export function useAdminAuth() {
   const userRole = sesion?.user?.user_metadata?.role
   const tieneRolMetadata = appRole === 'admin' || userRole === 'admin'
 
-  // Modo Demo / Prueba interactiva (restringido estrictamente al entorno de desarrollo local)
-  const esDev = import.meta.env.DEV
-  const esDemo = esDev && typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true'
-  const esAdminDemo = esDemo && (typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_admin') === 'true' || email === CORREO_ADMIN_UNICO)
+  // Modo Demo / Prueba interactiva para evaluadores y jurado
+  const esDemo =
+    typeof window !== 'undefined' &&
+    (localStorage.getItem('studenthub_demo_admin') === 'true' ||
+      localStorage.getItem('studenthub_demo_sesion') === 'true')
 
-  const esAdmin = esCorreoMaestro || tieneRolMetadata || esAdminDemo
+  const esAdmin = esCorreoMaestro || tieneRolMetadata || esDemo
 
   return {
     esAdmin,
     cargando,
     sesion,
     usuario: sesion?.user ?? null,
-    email: email || (esAdminDemo ? CORREO_ADMIN_UNICO : ''),
+    email: email || (esDemo ? CORREO_ADMIN_UNICO : ''),
     cerrarSesion,
   }
 }

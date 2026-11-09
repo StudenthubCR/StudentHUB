@@ -7,7 +7,7 @@ import {
   type PatronFondo,
 } from '@/features/carnet/carnet.estilos'
 import { ESTUDIANTE_DEMO, type Estudiante } from '@/features/estudiante/estudiante.fixture'
-import { IconoFlechaDerecha } from '@/components/icons'
+import { IconoFlechaDerecha, IconoDispositivo, IconoRayo, IconoEngranaje, IconoAgenda, IconoCarnet, IconoEscudo, IconoComedor, IconoRecargar } from '@/components/icons'
 
 export function SimuladorCarnetExpo() {
   const [modoAvanzado, setModoAvanzado] = useState(false)
@@ -38,11 +38,11 @@ export function SimuladorCarnetExpo() {
   const [volteada, setVolteada] = useState(false)
 
   const especialidadesOpciones = [
-    { nombre: 'Desarrollo Web', insigniaId: 'software', emoji: '💻', grupo: '12-1' },
-    { nombre: 'Electrónica & Telecom', insigniaId: 'electronica', emoji: '⚡', grupo: '12-2' },
-    { nombre: 'Mecatrónica & Precisión', insigniaId: 'mecanica', emoji: '⚙️', grupo: '12-3' },
-    { nombre: 'Contabilidad & Finanzas', insigniaId: 'contabilidad', emoji: '📊', grupo: '12-4' },
-    { nombre: 'Diseño Gráfico', insigniaId: 'diseno', emoji: '🎨', grupo: '12-5' },
+    { nombre: 'Desarrollo Web', insigniaId: 'software', Icono: IconoDispositivo, grupo: '12-1' },
+    { nombre: 'Electrónica & Telecom', insigniaId: 'electronica', Icono: IconoRayo, grupo: '12-2' },
+    { nombre: 'Mecatrónica & Precisión', insigniaId: 'mecanica', Icono: IconoEngranaje, grupo: '12-3' },
+    { nombre: 'Contabilidad & Finanzas', insigniaId: 'contabilidad', Icono: IconoAgenda, grupo: '12-4' },
+    { nombre: 'Diseño Gráfico', insigniaId: 'diseno', Icono: IconoCarnet, grupo: '12-5' },
   ]
 
   const cambiarEspecialidad = (opt: (typeof especialidadesOpciones)[0]) => {
@@ -69,7 +69,7 @@ export function SimuladorCarnetExpo() {
       id: 'oficial',
       titulo: '1. Credencial Oficial Web',
       subtitulo: 'Valeria Solano · Grupo 12-1',
-      icono: '💻',
+      icono: <IconoDispositivo className="size-5 text-blue-500" aria-hidden="true" />,
       badge: 'Estándar',
       accentGlow: 'border-blue-500 ring-2 ring-blue-500/30 bg-blue-500/10 shadow-md shadow-blue-500/10',
       badgeStyle: 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30',
@@ -103,7 +103,7 @@ export function SimuladorCarnetExpo() {
       id: 'electronica',
       titulo: '2. Especialidad Electrónica',
       subtitulo: 'Bryan Castro · Grupo 12-2',
-      icono: '⚡',
+      icono: <IconoRayo className="size-5 text-emerald-500" aria-hidden="true" />,
       badge: 'Técnico',
       accentGlow: 'border-emerald-500 ring-2 ring-emerald-500/30 bg-emerald-500/10 shadow-md shadow-emerald-500/10',
       badgeStyle: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30',
@@ -137,7 +137,7 @@ export function SimuladorCarnetExpo() {
       id: 'emergencia',
       titulo: '3. Caso Emergencia Médica',
       subtitulo: '¡Giro Automático al Reverso!',
-      icono: '🩺',
+      icono: <IconoEscudo className="size-5 text-rose-500" aria-hidden="true" />,
       badge: 'Giro Auto',
       accentGlow: 'border-rose-500 ring-2 ring-rose-500/30 bg-rose-500/10 shadow-md shadow-rose-500/10',
       badgeStyle: 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30',
@@ -171,7 +171,7 @@ export function SimuladorCarnetExpo() {
       id: 'comedor',
       titulo: '4. Paso Rápido al Comedor',
       subtitulo: 'Validación Óptica < 1s',
-      icono: '🍽️',
+      icono: <IconoComedor className="size-5 text-amber-500" aria-hidden="true" />,
       badge: 'Velocidad',
       accentGlow: 'border-amber-500 ring-2 ring-amber-500/30 bg-amber-500/10 shadow-md shadow-amber-500/10',
       badgeStyle: 'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30',
@@ -267,7 +267,7 @@ export function SimuladorCarnetExpo() {
                     onClick={() => setVolteada(!volteada)}
                     className="w-full py-2.5 px-4 rounded-2xl bg-gradient-to-r from-primary to-primary-light text-white text-nota font-black shadow-md shadow-primary/30 hover:opacity-95 transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
                   >
-                    <span>🔄 {volteada ? 'Ver Frente Oficial (Credencial)' : 'Girar a Reverso Médico (SOS)'}</span>
+                    <IconoRecargar className="size-4" aria-hidden="true" /><span>{volteada ? 'Ver Frente Oficial (Credencial)' : 'Girar a Reverso Médico (SOS)'}</span>
                   </button>
                 </div>
               </div>
@@ -280,7 +280,7 @@ export function SimuladorCarnetExpo() {
 
             {/* Hint interactivo */}
             <div className="mt-4 flex items-center gap-2 text-menuda text-text-muted bg-surface px-3 py-1.5 rounded-full border border-border">
-              <span>💡</span>
+              <IconoDispositivo className="size-4 text-amber-500" aria-hidden="true" />
               <span><strong>Mueve el mouse</strong> sobre el carnet para ver el efecto 3D holográfico.</span>
             </div>
           </div>
@@ -308,7 +308,7 @@ export function SimuladorCarnetExpo() {
                       : 'text-text-muted hover:text-text'
                   }`}
                 >
-                  ⚡ Modo Juez
+                  Modo Juez
                 </button>
                 <button
                   type="button"
@@ -319,7 +319,7 @@ export function SimuladorCarnetExpo() {
                       : 'text-text-muted hover:text-text'
                   }`}
                 >
-                  🎨 Manual
+                  Manual
                 </button>
               </div>
             </div>
@@ -368,7 +368,7 @@ export function SimuladorCarnetExpo() {
                 {/* Explicación de impacto para el evaluador */}
                 <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/25 p-4 text-emerald-800 dark:text-emerald-300">
                   <div className="flex items-start gap-2.5">
-                    <span className="text-lg">🎯</span>
+                    <IconoEscudo className="size-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" aria-hidden="true" />
                     <div className="text-nota">
                       <p className="font-bold">Qué evalúa el jurado en este simulador:</p>
                       <p className="text-menuda opacity-90 mt-0.5">
@@ -386,7 +386,7 @@ export function SimuladorCarnetExpo() {
                     onClick={iniciarModoDemo}
                     className="w-full flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-primary-tint border border-primary/30 text-primary hover:bg-primary-tint-strong font-bold text-nota transition-all cursor-pointer"
                   >
-                    <span>⚡ ¿Querés probar la app completa en vivo? Entrar en Modo Juez</span>
+                    <IconoRayo className="size-4" aria-hidden="true" /><span>¿Querés probar la app completa en vivo? Entrar en Modo Juez</span>
                     <IconoFlechaDerecha className="size-4" />
                   </button>
                 </div>
@@ -413,7 +413,7 @@ export function SimuladorCarnetExpo() {
                               : 'bg-surface-alt border border-border text-text hover:border-primary/40'
                           }`}
                         >
-                          <span>{esp.emoji}</span>
+                          <esp.Icono className="size-3.5" aria-hidden="true" />
                           <span>{esp.nombre}</span>
                         </button>
                       )

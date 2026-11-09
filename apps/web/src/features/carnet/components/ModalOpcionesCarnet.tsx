@@ -114,7 +114,7 @@ export function ModalOpcionesCarnet({
                 : 'text-text-muted hover:text-text',
             )}
           >
-            🎨 Personalizar Carnet
+            Personalizar Carnet
           </button>
           <button
             type="button"
@@ -126,7 +126,7 @@ export function ModalOpcionesCarnet({
                 : 'text-text-muted hover:text-text',
             )}
           >
-            ⚙️ Cuenta y Ajustes
+            Cuenta y Ajustes
           </button>
         </div>
 

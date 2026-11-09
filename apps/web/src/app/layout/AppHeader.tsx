@@ -39,17 +39,12 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
       <Link
         to="/"
         aria-label="Ir al inicio"
-        className="relative flex h-10 w-[130px] sm:w-[180px] lg:w-[220px] shrink-0 items-center overflow-hidden rounded-sm"
+        className="flex items-center shrink-0 h-9 sm:h-10 transition-transform active:scale-95"
       >
-        {/* Alto sobredimensionado y desplazamiento lateral: el logo
-            trae mucho margen transparente y así se recorta proporcionalmente. */}
         <img
           src="/SHlarge.webp"
           alt="Student HUB"
-          className={
-            'absolute top-1/2 left-[-26px] sm:left-[-36px] lg:left-[-45px] h-32 sm:h-36 lg:h-40 w-auto -translate-y-1/2 object-contain ' +
-            'transition-all duration-250 ease-ui dark:brightness-0 dark:invert'
-          }
+          className="h-8 sm:h-9 w-auto object-contain transition-all duration-200 dark:brightness-0 dark:invert"
         />
       </Link>
 

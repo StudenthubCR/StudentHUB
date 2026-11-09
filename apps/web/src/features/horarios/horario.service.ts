@@ -197,23 +197,40 @@ export function unirConsecutivas(clases: Clase[]): Bloque[] {
  * están en orden de lección, y las horas son texto ('5:50pm'), no algo que
  * se pueda ordenar de forma confiable.
  */
+export const DIAS_SEMANA_OFICIALES = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes']
+
 export function agruparPorDia(clases: Clase[], hoy: Date): DiaDeClases[] {
+  if (clases.length === 0) return []
+
   const porDia = new Map<string, Clase[]>()
 
-  for (const clase of clases) {
-    const existentes = porDia.get(clase.dia)
-    if (existentes) existentes.push(clase)
-    else porDia.set(clase.dia, [clase])
+  // Garantizar siempre la presencia de los 5 días lectivos de lunes a viernes
+  for (const diaOficial of DIAS_SEMANA_OFICIALES) {
+    porDia.set(diaOficial, [])
   }
 
-  const diaDeHoy = sinAcentos(nombreDelDia(hoy))
+  // Agrupar clases existentes haciendo coincidir el nombre de día sin acentos
+  for (const clase of clases) {
+    const diaClaseSinAcentos = sinAcentos(clase.dia).toLowerCase()
+    const claveExistente = [...porDia.keys()].find(
+      (k) => sinAcentos(k).toLowerCase() === diaClaseSinAcentos,
+    )
+
+    if (claveExistente) {
+      porDia.get(claveExistente)!.push(clase)
+    } else {
+      porDia.set(clase.dia, [clase])
+    }
+  }
+
+  const diaDeHoy = sinAcentos(nombreDelDia(hoy)).toLowerCase()
 
   return [...porDia.entries()]
     .sort(([unDia], [otroDia]) => indiceDia(unDia) - indiceDia(otroDia))
     .map(([dia, clasesDelDia]) => ({
       dia,
       abreviatura: abreviarDia(dia),
-      esHoy: sinAcentos(dia) === diaDeHoy,
+      esHoy: sinAcentos(dia).toLowerCase() === diaDeHoy,
       clases: clasesDelDia,
       bloques: unirConsecutivas(clasesDelDia),
     }))

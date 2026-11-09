@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useSesion } from '@/features/auth/useSesion'
-import { IconoVolver, IconoCandado } from '@/components/icons'
+import { IconoVolver, IconoCandado, IconoEscudo } from '@/components/icons'
 
 export function AdminForbiddenPage() {
   const { sesion, cerrarSesion } = useSesion()
@@ -35,13 +35,35 @@ export function AdminForbiddenPage() {
           </div>
         )}
 
-        <div className="mt-8 flex w-full flex-col gap-2.5 sm:flex-row">
+        {/* Acceso de Demostración para Jurado y Evaluadores de la Expotécnica */}
+        <div className="mt-6 w-full rounded-2xl border border-primary/30 bg-primary-tint/30 p-4 text-center shadow-xs">
+          <p className="text-micro font-bold uppercase tracking-wider text-primary">
+            ¿Sos evaluador o jurado de la Expotécnica?
+          </p>
+          <p className="mt-1 text-menuda text-text-muted leading-relaxed">
+            Podés habilitar la vista previa interactiva de evaluación para auditar el panel administrativo, gestor de avisos y métricas.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.setItem('studenthub_demo_sesion', 'true')
+              localStorage.setItem('studenthub_demo_admin', 'true')
+              window.location.href = '/admin'
+            }}
+            className="mt-3 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-menor font-bold text-white shadow-xs transition-all hover:bg-primary-dark active:scale-98"
+          >
+            <IconoEscudo className="size-4" />
+            <span>Activar Modo Evaluación Jurado (Admin)</span>
+          </button>
+        </div>
+
+        <div className="mt-6 flex w-full flex-col gap-2.5 sm:flex-row">
           <Link
             to="/"
-            className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-menor font-bold text-white shadow-xs transition-all hover:bg-primary-dark active:scale-98"
+            className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-menor font-bold text-text shadow-xs transition-all hover:bg-surface-alt active:scale-98"
           >
             <IconoVolver className="size-4" />
-            <span>Volver a la App Estudiantil</span>
+            <span>Volver a la App</span>
           </Link>
           <button
             type="button"
@@ -53,7 +75,7 @@ export function AdminForbiddenPage() {
         </div>
 
         <p className="mt-6 text-micro text-text-muted">
-          Si sos miembro del personal administrativo y necesitás acceso, comunicate con soporte técnico institucional.
+          Si sos miembro del personal administrativo y necesitás acceso con credenciales, comunicate con soporte técnico institucional.
         </p>
       </div>
     </div>

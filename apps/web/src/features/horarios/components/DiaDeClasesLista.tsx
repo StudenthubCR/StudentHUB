@@ -1,6 +1,7 @@
 import { ahoraEnMinutos, jornadaDelDia, progresoDelDia } from '../horario.service'
 import type { DiaDeClases } from '../horario.types'
 import { BloqueClase, type Marca } from './BloqueClase'
+import { IconoReloj, IconoCheck, IconoCalendario } from '@/components/icons'
 
 /**
  * Indicador de progreso dinámico para el día de hoy.
@@ -23,7 +24,7 @@ function EstadoDeHoy({ dia, ahora }: { dia: DiaDeClases; ahora: number }) {
     const proximo = dia.bloques[siguiente]!
     return (
       <span className="inline-flex items-center gap-1 text-micro font-semibold text-text-muted">
-        <span>🕒</span>
+        <IconoReloj className="size-3.5 shrink-0" aria-hidden="true" />
         <span>
           {siguiente === 0
             ? `Inicio a las ${jornada.inicio}`
@@ -35,7 +36,7 @@ function EstadoDeHoy({ dia, ahora }: { dia: DiaDeClases; ahora: number }) {
 
   return (
     <span className="inline-flex items-center gap-1 text-micro font-semibold text-emerald-600 dark:text-emerald-400">
-      <span>✓</span>
+      <IconoCheck className="size-3.5 shrink-0" aria-hidden="true" />
       <span>Jornada finalizada</span>
     </span>
   )
@@ -89,28 +90,40 @@ export function DiaDeClasesLista({ dia, ahora, conTitulo }: Props) {
         </div>
       )}
 
-      <ul className="flex flex-col gap-2.5">
-        {dia.bloques.map((bloque, indice) => {
-          let marca: Marca = null
-          if (indice === progreso.actual) marca = 'ahora'
-          else if (indice === progreso.siguiente) marca = 'siguiente'
+      {dia.bloques.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border p-8 text-center bg-surface-alt/40 shadow-xs">
+          <div className="mb-3 flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <IconoCalendario className="size-6" />
+          </div>
+          <p className="text-cuerpo font-bold text-text">Sin lecciones programadas</p>
+          <p className="mt-1 max-w-xs text-menor text-text-muted">
+            No hay clases registradas para este día en el horario oficial de esta sección.
+          </p>
+        </div>
+      ) : (
+        <ul className="flex flex-col gap-2.5">
+          {dia.bloques.map((bloque, indice) => {
+            let marca: Marca = null
+            if (indice === progreso.actual) marca = 'ahora'
+            else if (indice === progreso.siguiente) marca = 'siguiente'
 
-          const pasado =
-            ahora !== null &&
-            progreso.actual !== null &&
-            indice < progreso.actual
+            const pasado =
+              ahora !== null &&
+              progreso.actual !== null &&
+              indice < progreso.actual
 
-          return (
-            <BloqueClase
-              key={`${dia.dia}-${bloque.inicio}-${indice}`}
-              bloque={bloque}
-              indice={indice}
-              marca={marca}
-              pasado={pasado}
-            />
-          )
-        })}
-      </ul>
+            return (
+              <BloqueClase
+                key={`${dia.dia}-${bloque.inicio}-${indice}`}
+                bloque={bloque}
+                indice={indice}
+                marca={marca}
+                pasado={pasado}
+              />
+            )
+          })}
+        </ul>
+      )}
     </section>
   )
 }

@@ -1,3 +1,4 @@
+import { IconoDeInsignia } from './IconoDeInsignia'
 import { useState } from 'react'
 import { cn } from '@/lib/cn'
 import {
@@ -224,7 +225,7 @@ export function SelectorPersonalizacionCarnet({
                         : 'border-border bg-surface-alt/50 text-text hover:border-primary/40 hover:bg-surface-alt',
                     )}
                   >
-                    <span className="text-xl">{insignia.icono}</span>
+                    <span className="flex size-7 items-center justify-center rounded-lg bg-surface border border-border/80"><IconoDeInsignia id={insignia.id} className="size-4" /></span>
                     <span className="text-etiqueta font-medium leading-tight line-clamp-1">
                       {insignia.nombre}
                     </span>
@@ -314,7 +315,7 @@ export function SelectorPersonalizacionCarnet({
           {/* Contacto de Emergencia */}
           <div className="rounded-xl border border-border bg-surface-alt/40 p-3.5">
             <label className="mb-2 block text-etiqueta font-bold tracking-[0.08em] text-text-muted uppercase">
-              📞 Contacto Familiar de Emergencia
+              Contacto Familiar de Emergencia
             </label>
             <div className="space-y-2.5">
               <div>

@@ -1,3 +1,5 @@
+import { IconoRecargar, IconoEscudo, IconoDispositivo } from '@/components/icons'
+import { IconoDeInsignia } from './IconoDeInsignia'
 import { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { obtenerIniciales } from '@/lib/texto'
@@ -137,7 +139,7 @@ export function TarjetaCarnet({
         title="Girar carnet (ver anverso o reverso)"
         aria-label="Girar carnet digital"
       >
-        <span className="text-xs transition-transform duration-300 group-hover:rotate-180">🔄</span>
+        <IconoRecargar className="size-3.5 transition-transform duration-300 group-hover:rotate-180" aria-hidden="true" />
         <span>{estaVolteada ? 'Ver Frente' : 'Ver Reverso'}</span>
       </button>
 
@@ -186,7 +188,7 @@ export function TarjetaCarnet({
               className="inline-flex items-center gap-1 rounded-full border border-white/25 bg-white/20 px-2 py-0.5 text-etiqueta font-semibold backdrop-blur-xs shadow-xs"
               title={insignia.descripcion}
             >
-              <span aria-hidden>{insignia.icono}</span>
+              <IconoDeInsignia id={insignia.id} className="size-3.5" />
               <span className="max-w-[80px] truncate">{insignia.nombre}</span>
             </span>
           </header>
@@ -317,7 +319,7 @@ export function TarjetaCarnet({
             <div className="mb-3 space-y-2 rounded-xl border border-white/20 bg-white/10 p-3 backdrop-blur-xs">
               <div className="flex items-center justify-between border-b border-white/15 pb-2">
                 <span className="flex items-center gap-1.5 text-menor font-medium text-white/85">
-                  <span>🩸</span> Grupo Sanguíneo:
+                  <IconoEscudo className="size-3.5 shrink-0" aria-hidden="true" /> Grupo Sanguíneo:
                 </span>
                 <span className="rounded-md border border-white/30 bg-white/25 px-2.5 py-0.5 text-nota font-extrabold text-white">
                   {personalizacion.tipoSangre}
@@ -326,7 +328,7 @@ export function TarjetaCarnet({
 
               <div className="text-menor">
                 <span className="flex items-center gap-1.5 text-white/85">
-                  <span>📞</span> Contacto de Emergencia:
+                  <IconoDispositivo className="size-3.5 shrink-0" aria-hidden="true" /> Contacto de Emergencia:
                 </span>
                 <div className="mt-1 pl-5">
                   <p className="font-bold text-white">

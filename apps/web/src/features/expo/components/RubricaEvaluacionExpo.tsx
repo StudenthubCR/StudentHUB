@@ -4,6 +4,8 @@ import {
   IconoDispositivo,
   IconoReloj,
   IconoFlechaDerecha,
+  IconoCheck,
+  IconoRayo,
 } from '@/components/icons'
 
 export function RubricaEvaluacionExpo() {
@@ -13,8 +15,8 @@ export function RubricaEvaluacionExpo() {
     {
       rubro: 'Innovación y Originalidad',
       puntuacion: '10 / 10',
-      icono: <span className="text-xl">💡</span>,
-      color: 'border-blue-500/30 bg-blue-500/5 text-blue-600',
+      icono: <IconoDispositivo className="size-5 text-blue-600 dark:text-blue-400" aria-hidden="true" />,
+      color: 'border-blue-500/30 bg-blue-500/5 text-blue-600 dark:text-blue-400 dark:border-blue-500/40 dark:bg-blue-500/10',
       descripcion:
         'Sustitución 100% digital del carnet tradicional de papel o PVC por una credencial PWA con física 3D en tiempo real, reflejo holográfico y código QR dinámico.',
       aspectosClave: [
@@ -27,7 +29,7 @@ export function RubricaEvaluacionExpo() {
       rubro: 'Impacto Social y Educativo',
       puntuacion: '10 / 10',
       icono: <IconoReloj className="size-5 text-emerald-600" />,
-      color: 'border-emerald-500/30 bg-emerald-500/5 text-emerald-600',
+      color: 'border-emerald-500/30 bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 dark:border-emerald-500/40 dark:bg-emerald-500/10',
       descripcion:
         'Solución a las principales fricciones cotidianas en colegios técnicos: filas extensas en comedor, desinformación de horarios y desorientación por ausencias docentes.',
       aspectosClave: [
@@ -41,7 +43,7 @@ export function RubricaEvaluacionExpo() {
       rubro: 'Viabilidad Económica (¢0 Costo)',
       puntuacion: '10 / 10',
       icono: <span className="text-xl font-bold">¢</span>,
-      color: 'border-amber-500/30 bg-amber-500/5 text-amber-600',
+      color: 'border-amber-500/30 bg-amber-500/5 text-amber-600 dark:text-amber-400 dark:border-amber-500/40 dark:bg-amber-500/10',
       descripcion:
         'Presupuesto ¢0 para la institución educativa y para las familias de los estudiantes.',
       aspectosClave: [
@@ -54,7 +56,7 @@ export function RubricaEvaluacionExpo() {
       rubro: 'Seguridad y Marco Legal (Ley 8968)',
       puntuacion: '10 / 10',
       icono: <IconoEscudo className="size-5 text-purple-600" />,
-      color: 'border-purple-500/30 bg-purple-500/5 text-purple-600',
+      color: 'border-purple-500/30 bg-purple-500/5 text-purple-600 dark:text-purple-400 dark:border-purple-500/40 dark:bg-purple-500/10',
       descripcion:
         'Protección estricta de datos de personas menores de edad según la legislación costarricense.',
       aspectosClave: [
@@ -67,7 +69,7 @@ export function RubricaEvaluacionExpo() {
       rubro: 'Arquitectura & Offline-First',
       puntuacion: '10 / 10',
       icono: <IconoDispositivo className="size-5 text-indigo-600" />,
-      color: 'border-indigo-500/30 bg-indigo-500/5 text-indigo-600',
+      color: 'border-indigo-500/30 bg-indigo-500/5 text-indigo-600 dark:text-indigo-400 dark:border-indigo-500/40 dark:bg-indigo-500/10',
       descripcion:
         'Desarrollado con las tecnologías de vanguardia de la industria de software internacional.',
       aspectosClave: [
@@ -116,7 +118,7 @@ export function RubricaEvaluacionExpo() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Encabezado */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 px-3 py-0.5 text-micro font-bold uppercase tracking-wider text-emerald-600">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 px-3 py-0.5 text-micro font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
             <span>Guía de Evaluación Rápida</span>
           </div>
           <h2 className="mt-3 text-2xl sm:text-4xl font-black text-text">
@@ -164,7 +166,7 @@ export function RubricaEvaluacionExpo() {
                   <ul className="space-y-1.5 text-menuda text-text">
                     {crit.aspectosClave.map((asp, aIdx) => (
                       <li key={aIdx} className="flex items-start gap-1.5">
-                        <span className="text-emerald-500 font-bold shrink-0 mt-0.5">✓</span>
+                        <IconoCheck className="size-3.5 text-emerald-500 font-bold shrink-0 mt-0.5" aria-hidden="true" />
                         <span className="font-medium">{asp}</span>
                       </li>
                     ))}
@@ -196,7 +198,7 @@ export function RubricaEvaluacionExpo() {
               onClick={iniciarModoDemo}
               className="mt-6 w-full flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-primary-light px-5 py-3.5 text-nota font-black text-white shadow-md shadow-primary/30 hover:scale-102 transition-all cursor-pointer active:scale-98 relative z-10"
             >
-              <span>⚡ Abrir App en Vivo (Modo Juez)</span>
+              <IconoRayo className="size-4" aria-hidden="true" /><span>Abrir App en Vivo (Modo Juez)</span>
               <IconoFlechaDerecha className="size-4" />
             </button>
           </div>

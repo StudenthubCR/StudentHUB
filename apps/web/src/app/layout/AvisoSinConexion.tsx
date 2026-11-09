@@ -3,7 +3,10 @@ import { useEnLinea } from '@/lib/useEnLinea'
 /** Barra discreta que aparece sólo cuando el dispositivo se queda sin red. */
 export function AvisoSinConexion() {
   const enLinea = useEnLinea()
-  if (enLinea) return null
+  const esDemo = typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true'
+
+  // Si el dispositivo está en línea o se está navegando en modo demo/evaluador, no mostrar el aviso
+  if (enLinea || esDemo) return null
 
   return (
     <p

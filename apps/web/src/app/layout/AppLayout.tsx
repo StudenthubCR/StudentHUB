@@ -17,6 +17,7 @@ import {
   IconoCalendario,
   IconoComedor,
   IconoInicio,
+  IconoCerrar,
 } from '@/components/icons'
 
 
@@ -154,7 +155,7 @@ export function AppLayout({ children }: { children?: ReactNode }) {
                 aria-label="Ocultar aviso de instalación"
                 className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-border/40 hover:text-text"
               >
-                ✕
+                <IconoCerrar className="size-4" aria-hidden="true" />
               </button>
             </div>
           </div>

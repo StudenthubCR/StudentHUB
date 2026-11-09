@@ -19,14 +19,14 @@ export type InsigniaEspecialidad = {
 }
 
 export const INSIGNIAS_ESPECIALIDAD: InsigniaEspecialidad[] = [
-  { id: 'auto', nombre: 'Automática', icono: '⭐', descripcion: 'Según tu especialidad técnica' },
-  { id: 'software', nombre: 'Informática & Web', icono: '💻', descripcion: 'Desarrollo de software y sistemas' },
-  { id: 'electronica', nombre: 'Electrónica & Telecom', icono: '⚡', descripcion: 'Circuitos, hardware y telecomunicaciones' },
-  { id: 'contabilidad', nombre: 'Contabilidad & Finanzas', icono: '📊', descripcion: 'Gestión contable, finanzas y costos' },
-  { id: 'mecanica', nombre: 'Mecatrónica & Precisión', icono: '⚙️', descripcion: 'Mecánica de precisión y robótica' },
-  { id: 'diseno', nombre: 'Diseño & Publicidad', icono: '🎨', descripcion: 'Diseño gráfico, multimedia e identidad' },
-  { id: 'ejecutivo', nombre: 'Secretariado Ejecutivo', icono: '💼', descripcion: 'Gestión bilingüe y ejecutiva' },
-  { id: 'ciencias', nombre: 'Ciencias & Académico', icono: '🔬', descripcion: 'Ciencias exactas e investigación' },
+  { id: 'auto', nombre: 'Automática', icono: 'auto', descripcion: 'Según tu especialidad técnica' },
+  { id: 'software', nombre: 'Informática & Web', icono: 'software', descripcion: 'Desarrollo de software y sistemas' },
+  { id: 'electronica', nombre: 'Electrónica & Telecom', icono: 'electronica', descripcion: 'Circuitos, hardware y telecomunicaciones' },
+  { id: 'contabilidad', nombre: 'Contabilidad & Finanzas', icono: 'contabilidad', descripcion: 'Gestión contable, finanzas y costos' },
+  { id: 'mecanica', nombre: 'Mecatrónica & Precisión', icono: 'mecanica', descripcion: 'Mecánica de precisión y robótica' },
+  { id: 'diseno', nombre: 'Diseño & Publicidad', icono: 'diseno', descripcion: 'Diseño gráfico, multimedia e identidad' },
+  { id: 'ejecutivo', nombre: 'Secretariado Ejecutivo', icono: 'ejecutivo', descripcion: 'Gestión bilingüe y ejecutiva' },
+  { id: 'ciencias', nombre: 'Ciencias & Académico', icono: 'ciencias', descripcion: 'Ciencias exactas e investigación' },
 ]
 
 export const TIPOS_SANGRE = ['O+', 'A+', 'B+', 'AB+', 'O-', 'A-', 'B-', 'AB-', 'No indicado'] as const
@@ -119,12 +119,12 @@ export const PATRONES: { id: PatronFondo; nombre: string }[] = [
 ]
 
 export const LEMAS_SUGERIDOS = [
-  'Innovación y constancia para el futuro 🚀',
-  'El código nunca duerme 💻✨',
-  'Orgullo técnico profesional 🎓',
-  'Creando soluciones con pasión 💡',
-  'Paso a paso construyendo metas 🌟',
-  'Excelencia y disciplina técnica ⚙️',
+  'Innovación y constancia para el futuro',
+  'El código nunca duerme',
+  'Orgullo técnico profesional',
+  'Creando soluciones con pasión',
+  'Paso a paso construyendo metas',
+  'Excelencia y disciplina técnica',
 ]
 
 const CLAVE_STORAGE = 'studenthub:carnet:personalizacion'
@@ -135,7 +135,7 @@ export const PERSONALIZACION_POR_DEFECTO: PersonalizacionCarnet = {
   efectoBrillo: false,
   efecto3d: true,
   insigniaId: 'auto',
-  lemaPersonal: 'Innovación y constancia para el futuro 🚀',
+  lemaPersonal: 'Innovación y constancia para el futuro',
   tipoSangre: 'O+',
   contactoEmergenciaNombre: '',
   contactoEmergenciaTelefono: '',
@@ -178,7 +178,7 @@ export function resolverInsignia(
   return {
     id: 'auto',
     nombre: especialidadEstudiante || 'Técnico Especializado',
-    icono: '🎓',
+    icono: 'auto',
     descripcion: 'Especialidad técnica oficial',
   }
 }

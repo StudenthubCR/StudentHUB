@@ -37,7 +37,7 @@ describe('carnet.estilos', () => {
   it('resuelve insignia técnica automáticamente por coincidencia de texto', () => {
     const insigSoft = resolverInsignia('auto', 'Desarrollo Web y Software')
     expect(insigSoft.id).toBe('software')
-    expect(insigSoft.icono).toBe('💻')
+    expect(insigSoft.icono).toBe('software')
 
     const insigElec = resolverInsignia('auto', 'Electrónica en Telecomunicaciones')
     expect(insigElec.id).toBe('electronica')

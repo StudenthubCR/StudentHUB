@@ -6,17 +6,24 @@ import { useEffect, useState } from 'react'
  * una tarjeta de error sin saber si el problema es de él o del servidor.
  */
 export function useEnLinea(): boolean {
-  const [enLinea, setEnLinea] = useState(() => navigator.onLine)
+  const [enLinea, setEnLinea] = useState<boolean>(() => {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') return true
+    return typeof navigator.onLine === 'boolean' ? navigator.onLine : true
+  })
 
   useEffect(() => {
-    const conectado = () => setEnLinea(true)
-    const desconectado = () => setEnLinea(false)
+    if (typeof window === 'undefined') return
 
-    window.addEventListener('online', conectado)
-    window.addEventListener('offline', desconectado)
+    const sincronizar = () => {
+      setEnLinea(typeof navigator.onLine === 'boolean' ? navigator.onLine : true)
+    }
+
+    sincronizar()
+    window.addEventListener('online', sincronizar)
+    window.addEventListener('offline', sincronizar)
     return () => {
-      window.removeEventListener('online', conectado)
-      window.removeEventListener('offline', desconectado)
+      window.removeEventListener('online', sincronizar)
+      window.removeEventListener('offline', sincronizar)
     }
   }, [])
 

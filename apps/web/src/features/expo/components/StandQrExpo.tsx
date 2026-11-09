@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
-import { IconoCodigoQR, IconoDescargar, IconoCompartir } from '@/components/icons'
+import { IconoCodigoQR, IconoDescargar, IconoCompartir, IconoCheck } from '@/components/icons'
 
 type Props = {
   onAbrirInstalar?: () => void
@@ -86,8 +86,17 @@ export function StandQrExpo({ onAbrirInstalar }: Props) {
                   onClick={copiarEnlace}
                   className="flex items-center gap-2 rounded-full border border-border bg-surface-alt px-5 py-2.5 text-nota font-bold text-text hover:border-primary/40 hover:bg-surface shadow-xs transition-all active:scale-98 cursor-pointer"
                 >
-                  <IconoCompartir className="size-4 text-primary" />
-                  <span>{copiado ? '✓ Enlace Copiado' : 'Copiar Enlace'}</span>
+                  {copiado ? (
+                    <>
+                      <IconoCheck className="size-4 text-emerald-500" aria-hidden="true" />
+                      <span>Enlace Copiado</span>
+                    </>
+                  ) : (
+                    <>
+                      <IconoCompartir className="size-4 text-primary" aria-hidden="true" />
+                      <span>Copiar Enlace</span>
+                    </>
+                  )}
                 </button>
 
                 {onAbrirInstalar && (
@@ -119,7 +128,7 @@ export function StandQrExpo({ onAbrirInstalar }: Props) {
                   <span className="text-etiqueta font-bold uppercase tracking-wider text-slate-900 block">
                     Escanea con tu Cámara
                   </span>
-                  <span className="text-micro font-mono text-slate-500 mt-0.5 block max-w-[200px] truncate">
+                  <span className="text-micro font-mono text-slate-700 mt-0.5 block max-w-[200px] truncate">
                     {urlActual}
                   </span>
                 </div>

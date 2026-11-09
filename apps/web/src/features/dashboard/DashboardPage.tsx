@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { BellIcon, IconoAlertaTriangulo } from '@/components/icons'
+import { BellIcon, IconoAlertaTriangulo, IconoCerrar, IconoInfo } from '@/components/icons'
+import { Link } from 'react-router-dom'
 
 import { estadoDelDia, nombreLargoDeFecha } from '@/features/comedor/menu.service'
 import { useMenuSemanal } from '@/features/comedor/useMenuSemanal'
@@ -27,8 +28,9 @@ import { primerNombre, saludoSegunHora } from './saludo'
 export function DashboardPage() {
   const { estudiante, cargando: cargandoEstudiante, fueraDelPadron } = useEstudiante()
   const ahora = useReloj()
+  const esModoDemo = typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true'
 
-  const grupoActivo = estudiante?.grupo || '12-1'
+  const grupoActivo = estudiante?.grupo?.trim() || (esModoDemo ? '12-1' : null)
   const horario = useHorario(grupoActivo, ahora)
   const comedor = useMenuSemanal(ahora)
 
@@ -36,7 +38,6 @@ export function DashboardPage() {
   const { permiso, notificacionesActivas } = useNotificaciones()
   const [modalNotifAbierto, setModalNotifAbierto] = useState(false)
   const [bannerOculto, setBannerOculto] = useState(false)
-  const esModoDemo = typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true'
 
   // Skeleton de carga responsivo mientras se valida la sesión y el perfil en Supabase
   if (cargandoEstudiante) {
@@ -96,6 +97,19 @@ export function DashboardPage() {
         </p>
       </header>
 
+      {/* Aviso informativo si el estudiante no tiene sección registrada */}
+      {!grupoActivo && !fueraDelPadron && (
+        <div className="mb-4 sm:mb-5 flex items-start gap-3 rounded-2xl border border-blue-500/30 bg-blue-500/10 p-3.5 sm:p-4 text-menor text-blue-950 dark:text-blue-200">
+          <IconoInfo className="size-5 shrink-0 text-blue-600 dark:text-blue-400 mt-0.5" />
+          <div className="min-w-0">
+            <p className="font-bold">Sección no asignada en tu perfil</p>
+            <p className="mt-0.5 text-micro text-blue-800 dark:text-blue-300">
+              Podés explorar los horarios de todos los niveles en el módulo de <Link to="/horarios" className="underline font-bold">Horarios</Link>.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Aviso institucional si el usuario no figura aún en el padrón oficial */}
       {fueraDelPadron && (
         <div className="mb-4 sm:mb-5 flex items-start gap-3 rounded-2xl border border-amber-500/35 bg-amber-500/10 p-3.5 sm:p-4 text-menor text-amber-950 dark:text-amber-200">
@@ -139,7 +153,7 @@ export function DashboardPage() {
               aria-label="Ocultar aviso de notificaciones"
               className="flex size-6 cursor-pointer items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-border/40 hover:text-text"
             >
-              ✕
+              <IconoCerrar className="size-3.5" aria-hidden="true" />
             </button>
           </div>
         </div>

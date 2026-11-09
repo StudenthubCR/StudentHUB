@@ -8,6 +8,9 @@ import {
   IconoFlechaDerecha,
   IconoReloj,
   IconoAgenda,
+  IconoAlertaTriangulo,
+  IconoCheck,
+  IconoExamen,
 } from '@/components/icons'
 
 export function ModulosExpo() {
@@ -57,7 +60,7 @@ export function ModulosExpo() {
               </div>
             </div>
             <div className="mt-3.5 inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-3 py-1.5 text-menuda font-semibold backdrop-blur-xs border border-white/10">
-              <span>💻 Especialidad: Desarrollo Web</span>
+              <IconoDispositivo className="size-3.5" aria-hidden="true" /><span>Especialidad: Desarrollo Web</span>
             </div>
           </div>
 
@@ -106,7 +109,7 @@ export function ModulosExpo() {
             {/* Alerta de docente ausente */}
             <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-3 text-amber-900 dark:text-amber-200 shadow-xs">
               <div className="flex items-center gap-1.5 text-micro font-bold">
-                <span>⚠️</span>
+                <IconoAlertaTriangulo className="size-3.5 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden="true" />
                 <span>Docente ausente hoy: Prof. Marco Rojas</span>
               </div>
               <p className="text-menuda text-amber-800/80 dark:text-amber-300 mt-0.5 ml-4">
@@ -117,8 +120,8 @@ export function ModulosExpo() {
             {/* Tarea con checklist */}
             <div className="rounded-2xl border border-primary/25 bg-primary-tint/30 p-2.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="flex size-5 rounded-md border-2 border-primary items-center justify-center text-primary text-xs font-black">
-                  ✓
+                <span className="flex size-5 rounded-md border-2 border-primary items-center justify-center text-primary text-xs font-black" aria-hidden="true">
+                  <IconoCheck className="size-3" />
                 </span>
                 <div>
                   <h5 className="text-menuda font-bold text-text">Proyecto Final Frontend</h5>
@@ -133,7 +136,7 @@ export function ModulosExpo() {
             {/* Examen próximo */}
             <div className="rounded-2xl border border-rose-500/25 bg-rose-500/5 p-2.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-base">🎯</span>
+                <IconoExamen className="size-4 text-rose-500" aria-hidden="true" />
                 <div>
                   <h5 className="text-menuda font-bold text-text">Examen de Matemáticas</h5>
                   <p className="text-micro text-text-muted">Funciones y Trigonometría</p>
@@ -223,11 +226,12 @@ export function ModulosExpo() {
       renderPreview: () => (
         <div className="w-full max-w-sm rounded-3xl bg-surface border border-border p-6 shadow-2xl flex flex-col justify-between min-h-[300px] relative">
           <div className="flex items-center justify-between border-b border-border pb-3">
-            <span className="text-micro font-bold uppercase tracking-wider text-amber-600 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
+            <span className="text-micro font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
               Almuerzo de Hoy
             </span>
-            <span className="text-micro font-mono text-emerald-600 font-bold bg-emerald-500/10 px-2.5 py-0.5 rounded-full">
-              ✓ Beca Activa
+            <span className="inline-flex items-center gap-1 text-micro font-mono text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-0.5 rounded-full">
+              <IconoCheck className="size-3" aria-hidden="true" />
+              <span>Beca Activa</span>
             </span>
           </div>
 
@@ -366,8 +370,8 @@ export function ModulosExpo() {
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-nota text-text">
                 {actual.caracteristicas.map((car, cIdx) => (
                   <li key={cIdx} className="flex items-start gap-2">
-                    <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary-tint text-primary text-xs font-bold mt-0.5">
-                      ✓
+                    <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary-tint text-primary text-xs font-bold mt-0.5" aria-hidden="true">
+                      <IconoCheck className="size-3" />
                     </span>
                     <span>{car}</span>
                   </li>

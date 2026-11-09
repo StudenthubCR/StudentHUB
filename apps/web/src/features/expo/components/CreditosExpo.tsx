@@ -60,7 +60,7 @@ export function CreditosExpo() {
         {/* Barra inferior de derechos */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-menuda text-text-muted">
           <p>
-            © 2026 Student HUB. Desarrollado con ❤️ para la educación técnica pública de Costa Rica.
+            © 2026 Student HUB. Desarrollado con dedicación para la educación técnica pública de Costa Rica.
           </p>
           <div className="flex items-center gap-4">
             <a href="#hero" className="hover:text-primary transition-colors">
