@@ -18,6 +18,7 @@ export type Intencion =
   | 'comedor'
   | 'horarios'
   | 'eventos'
+  | 'agenda'
   | 'carnet'
   | 'ayuda'
   | 'saludo'
@@ -40,6 +41,6 @@ export interface SugerenciaRapida {
   id: string
   etiqueta: string
   consulta: string
-  categoria: 'comedor' | 'horarios' | 'eventos' | 'carnet'
+  categoria: 'comedor' | 'horarios' | 'eventos' | 'agenda' | 'carnet'
 }
 

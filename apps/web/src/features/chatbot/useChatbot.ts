@@ -3,6 +3,7 @@ import type { MensajeChat, RespuestaChat } from './chatbot.types'
 import {
   detectarIntencion,
   responderEventos,
+  responderAgenda,
   responderComedor,
   responderHorarios,
   responderCarnet,
@@ -13,6 +14,8 @@ import {
 import { NOTICIAS } from '@/features/dashboard/noticias.fixture'
 import type { MenuDia } from '@/features/comedor/menu.types'
 import type { DiaDeClases } from '@/features/horarios/horario.types'
+import type { EventoAgenda } from '@/features/agenda/agenda.types'
+import { obtenerEventos } from '@/features/agenda/agenda.service'
 
 interface UseChatbotProps {
   primerNombre?: string
@@ -20,6 +23,7 @@ interface UseChatbotProps {
   horariosDias: DiaDeClases[]
   menusComedor: MenuDia[]
   ahora: Date
+  eventosAgenda?: EventoAgenda[]
 }
 
 export function useChatbot({
@@ -28,6 +32,7 @@ export function useChatbot({
   horariosDias,
   menusComedor,
   ahora,
+  eventosAgenda,
 }: UseChatbotProps) {
   const mensajeInicial: MensajeChat = {
     id: 'bienvenida',
@@ -190,6 +195,9 @@ export function useChatbot({
         let respuesta: RespuestaChat
 
         switch (intencion) {
+          case 'agenda':
+            respuesta = responderAgenda(textoLimpio, eventosAgenda ?? obtenerEventos(), ahora)
+            break
           case 'eventos':
             respuesta = responderEventos(textoLimpio, NOTICIAS)
             break
@@ -243,7 +251,7 @@ export function useChatbot({
         enviandoRef.current = false
       }
     },
-    [ahora, desplazarAlFinal, grupoActivo, horariosDias, menusComedor],
+    [ahora, desplazarAlFinal, grupoActivo, horariosDias, menusComedor, eventosAgenda],
   )
 
   /**
