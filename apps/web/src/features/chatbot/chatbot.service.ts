@@ -21,6 +21,9 @@ import { es } from 'date-fns/locale'
 import { NOTICIAS, type Noticia } from '@/features/dashboard/noticias.fixture'
 import type { MenuDia } from '@/features/comedor/menu.types'
 import type { DiaDeClases, Clase } from '@/features/horarios/horario.types'
+import type { EventoAgenda } from '@/features/agenda/agenda.types'
+import { obtenerEventos } from '@/features/agenda/agenda.service'
+import { responderConsultaAgenda } from './agendaQuery'
 import type {
   DiaObjetivo,
   Intencion,
@@ -106,18 +109,68 @@ export function detectarIntencion(texto: string): Intencion {
   const t = normalizar(texto)
 
   const palabrasSaludo = ['hola', 'buenos dias', 'buenas tardes', 'buenas noches', 'que tal', 'hey', 'saludos']
-  const palabrasComedor = ['comedor', 'comer', 'almuerzo', 'almorzar', 'menu', 'comida', 'plato', 'cena', 'cenar', 'desayuno']
-  const palabrasHorarios = ['horario', 'clase', 'clases', 'materia', 'materias', 'leccion', 'lecciones', 'aula', 'profesor', 'tengo', 'toca']
-  const palabrasEventos = ['evento', 'eventos', 'noticia', 'noticias', 'actividad', 'actividades', 'feria', 'expotecnica', 'graduacion', 'matricula', 'artes', 'civica', 'patrias']
-  const palabrasCarnet = ['carnet', 'qr', 'credencial', 'offline', 'identificacion', 'foto', 'descargar carnet', 'guardar carnet']
-  const palabrasAyuda = ['ayuda', 'que haces', 'que puedes hacer', 'comandos', 'funciones', 'opciones', 'capacidades']
-
   if (palabrasSaludo.some((p) => t === p || t.startsWith(`${p} `))) return 'saludo'
-  if (palabrasEventos.some((p) => t.includes(p))) return 'eventos'
-  if (palabrasComedor.some((p) => t.includes(p))) return 'comedor'
-  if (palabrasHorarios.some((p) => t.includes(p))) return 'horarios'
-  if (palabrasCarnet.some((p) => t.includes(p))) return 'carnet'
+
+  const palabrasAyuda = ['ayuda', 'que haces', 'que puedes hacer', 'comandos', 'funciones', 'opciones', 'capacidades']
   if (palabrasAyuda.some((p) => t.includes(p))) return 'ayuda'
+
+  const palabrasCarnet = ['carnet', 'qr', 'credencial', 'offline', 'identificacion', 'foto', 'descargar carnet', 'guardar carnet']
+  if (palabrasCarnet.some((p) => t.includes(p))) return 'carnet'
+
+  // Términos explícitos y directos de la Agenda Estudiantil personal
+  const palabrasAgendaExplicitas = [
+    'agenda',
+    'tarea',
+    'tareas',
+    'examen',
+    'examenes',
+    'prueba',
+    'pruebas',
+    'parcial',
+    'parciales',
+    'quiz',
+    'quices',
+    'deber',
+    'deberes',
+    'proyecto',
+    'proyectos',
+    'ausencia',
+    'ausencias',
+    'profesor ausente',
+    'docente ausente',
+    'recordatorio',
+    'recordatorios',
+    'evaluacion',
+    'evaluaciones',
+    'pendiente',
+    'pendientes',
+  ]
+  if (palabrasAgendaExplicitas.some((p) => t.includes(p))) return 'agenda'
+
+  // Comedor escolar
+  const palabrasComedor = ['comedor', 'comer', 'almuerzo', 'almorzar', 'menu', 'comida', 'plato', 'cena', 'cenar', 'desayuno']
+  if (palabrasComedor.some((p) => t.includes(p))) return 'comedor'
+
+  // Noticias y eventos institucionales del colegio
+  const palabrasEventosInst = ['noticia', 'noticias', 'feria', 'expotecnica', 'graduacion', 'matricula', 'artes', 'civica', 'patrias']
+  if (palabrasEventosInst.some((p) => t.includes(p))) return 'eventos'
+
+  // Actividades programadas (si no especifica contexto institucional externo, va a la agenda)
+  if (t.includes('actividad') || t.includes('actividades')) {
+    if (t.includes('colegio') || t.includes('institucional')) {
+      return 'eventos'
+    }
+    return 'agenda'
+  }
+
+  // Eventos generales
+  if (t.includes('evento') || t.includes('eventos')) {
+    return 'eventos'
+  }
+
+  // Horario de lecciones y materias
+  const palabrasHorarios = ['horario', 'clase', 'clases', 'materia', 'materias', 'leccion', 'lecciones', 'aula', 'profesor', 'tengo', 'toca']
+  if (palabrasHorarios.some((p) => t.includes(p))) return 'horarios'
 
   return 'desconocido'
 }
@@ -167,6 +220,17 @@ export function responderEventos(
   return {
     texto: `**Eventos y Actividades Institucionales Vigentes:**\n\n${lista}\n\nPuedes consultar por algún evento específico para conocer más detalles.`,
   }
+}
+
+/**
+ * Responde consultas sobre la agenda personal del estudiante (tareas, exámenes, ausencias y recordatorios).
+ */
+export function responderAgenda(
+  texto: string,
+  eventosAgenda: EventoAgenda[] = obtenerEventos(),
+  ahora: Date = new Date(),
+): RespuestaChat {
+  return responderConsultaAgenda(texto, eventosAgenda, ahora)
 }
 
 /**
@@ -314,6 +378,7 @@ export function responderAyuda(): RespuestaChat {
     texto:
       `**Asistente Virtual de Student HUB**\n\n` +
       `Puedo ayudarte con información en tiempo real sobre:\n` +
+      `• **Agenda:** "¿Hay actividades hoy?", "¿Qué hay en la agenda para mañana?", "¿Tengo tareas o exámenes pendientes?"\n` +
       `• **Comedor:** "¿Qué hay de almuerzo mañana?", "¿Qué hubo ayer?", "¿Menú del viernes?"\n` +
       `• **Horarios:** "¿Qué clases tengo mañana?", "¿Qué tuve ayer?", "¿Horario del martes?"\n` +
       `• **Eventos:** "¿Qué noticias hay?", "¿Cuándo es la ExpoTécnica?"\n` +
@@ -330,6 +395,7 @@ export function responderDesconocido(): RespuestaChat {
     texto:
       `No he podido identificar tu consulta con certeza.\n\n` +
       `Puedes probar preguntándome:\n` +
+      `• "¿Hay actividades hoy en la agenda?"\n` +
       `• "¿Qué hay de almuerzo hoy?"\n` +
       `• "¿Cuáles son mis clases de hoy?"\n` +
       `• "¿Qué eventos hay en el colegio?"\n` +
@@ -345,6 +411,7 @@ export function generarMensajeBienvenida(primerNombre?: string): string {
   return (
     `**¡Hola${saludoNombre}! Soy el Asistente Virtual de Student HUB.**\n\n` +
     `Estoy listo para ayudarte con:\n` +
+    `• Tareas, exámenes y actividades de tu agenda\n` +
     `• Menú oficial del comedor estudiantil\n` +
     `• Horario de lecciones y materias de tu grupo\n` +
     `• Eventos oficiales y ferias institucionales\n` +
@@ -357,6 +424,12 @@ export function generarMensajeBienvenida(primerNombre?: string): string {
  * Sugerencias rápidas para el pie del chat.
  */
 export const SUGERENCIAS_RAPIDAS: SugerenciaRapida[] = [
+  {
+    id: 'sug-agenda',
+    etiqueta: 'Agenda de hoy',
+    consulta: '¿Hay actividades hoy en la agenda?',
+    categoria: 'agenda',
+  },
   {
     id: 'sug-almuerzo',
     etiqueta: 'Almuerzo mañana',

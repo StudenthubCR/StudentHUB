@@ -77,6 +77,19 @@ export function IconoEventosChip(props: IconProps) {
   )
 }
 
+/** Ícono para categoría de Agenda y Tareas */
+export function IconoAgendaChip(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <path d="m9 16 2 2 4-4" />
+    </BaseIcon>
+  )
+}
+
 /** Ícono para categoría de Carnet Digital */
 export function IconoCarnetChip(props: IconProps) {
   return (

@@ -13,6 +13,7 @@ import {
   IconoComedorChip,
   IconoHorarioChip,
   IconoEventosChip,
+  IconoAgendaChip,
   IconoCarnetChip,
   IconoBajarFinal,
   IconoLimpiarChat,
@@ -22,6 +23,7 @@ import {
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import { useHorario } from '@/features/horarios/useHorario'
 import { useMenuSemanal } from '@/features/comedor/useMenuSemanal'
+import { useAgenda } from '@/features/agenda/useAgenda'
 import { useReloj } from '@/lib/useReloj'
 import { SUGERENCIAS_RAPIDAS } from './chatbot.service'
 import { useChatbot } from './useChatbot'
@@ -68,6 +70,7 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
   const grupoActivo = estudiante?.grupo ?? '11-1'
   const horario = useHorario(grupoActivo, ahora)
   const comedor = useMenuSemanal(ahora)
+  const agenda = useAgenda(ahora)
 
   const primerNombre = estudiante?.nombre ? estudiante.nombre.split(' ')[0] : undefined
 
@@ -90,6 +93,7 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
     horariosDias: horario.dias,
     menusComedor: comedor.menus,
     ahora,
+    eventosAgenda: agenda.eventos,
   })
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -189,8 +193,10 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
     })
   }
 
-  const renderIconoChip = (categoria: 'comedor' | 'horarios' | 'eventos' | 'carnet') => {
+  const renderIconoChip = (categoria: 'comedor' | 'horarios' | 'eventos' | 'agenda' | 'carnet') => {
     switch (categoria) {
+      case 'agenda':
+        return <IconoAgendaChip className="size-3.5 text-primary" />
       case 'comedor':
         return <IconoComedorChip className="size-3.5 text-primary" />
       case 'horarios':

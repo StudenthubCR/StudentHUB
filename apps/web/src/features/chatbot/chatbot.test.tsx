@@ -6,6 +6,7 @@ import {
   resolverDiaObjetivo,
   detectarIntencion,
   responderEventos,
+  responderAgenda,
   responderComedor,
   responderHorarios,
   responderCarnet,
@@ -14,10 +15,15 @@ import {
   generarMensajeBienvenida,
   SUGERENCIAS_RAPIDAS,
 } from './chatbot.service'
+import {
+  resolverRangoAgenda,
+  formatearFechaEspanol,
+} from './agendaQuery'
 import { Chatbot, gestionarFocoChatbot } from './Chatbot'
 import { useChatbot } from './useChatbot'
 import type { MenuDia } from '@/features/comedor/menu.types'
 import type { DiaDeClases } from '@/features/horarios/horario.types'
+import type { EventoAgenda } from '@/features/agenda/agenda.types'
 
 // Regex exhaustivo para detectar cualquier emoji Unicode o pictograma
 const EMOJI_REGEX = /[\p{Extended_Pictographic}\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{2300}-\u{23FF}\u{2B50}\u{200D}\u{FE0F}]/gu
@@ -117,6 +123,34 @@ vi.mock('@/features/comedor/useMenuSemanal', () => ({
   }),
 }))
 
+vi.mock('@/features/agenda/useAgenda', () => ({
+  useAgenda: () => ({
+    eventos: [],
+    eventosFiltrados: [],
+    proximos: [],
+    ausenciasHoy: [],
+    resumenHoy: {
+      fecha: '2026-10-14',
+      eventos: [],
+      ausencias: [],
+      examenes: [],
+      tareasPendientes: [],
+      tareasCompletadas: [],
+    },
+    cargando: false,
+    filtro: 'todos',
+    fechaSeleccionada: null,
+    setFiltro: vi.fn(),
+    setFechaSeleccionada: vi.fn(),
+    crearEvento: vi.fn(),
+    modificarEvento: vi.fn(),
+    borrarEvento: vi.fn(),
+    toggleCompletada: vi.fn(),
+    restaurarMuestras: vi.fn(),
+    recargar: vi.fn(),
+  }),
+}))
+
 describe('Chatbot Service — Detección Semántica y Regla Cero Emojis', () => {
   const fechaMiercoles = new Date('2026-10-14T10:00:00Z')
   const fechaSabado = new Date('2026-10-17T10:00:00Z')
@@ -189,6 +223,14 @@ describe('Chatbot Service — Detección Semántica y Regla Cero Emojis', () => 
     expect(detectarIntencion('¿Cuándo es la feria vocacional o expotecnica?')).toBe('eventos')
     expect(detectarIntencion('¿Cómo guardo mi carnet offline?')).toBe('carnet')
     expect(detectarIntencion('ayuda con los comandos')).toBe('ayuda')
+    expect(detectarIntencion('¿Qué actividades hay hoy en la agenda?')).toBe('agenda')
+    expect(detectarIntencion('¿Hay actividades hoy?')).toBe('agenda')
+    expect(detectarIntencion('¿Qué hay en la agenda para mañana?')).toBe('agenda')
+    expect(detectarIntencion('¿Tengo tareas o exámenes pendientes?')).toBe('agenda')
+    expect(detectarIntencion('actividades del 15 de noviembre')).toBe('agenda')
+    expect(detectarIntencion('actividades en noviembre')).toBe('agenda')
+    expect(detectarIntencion('actividades en 2026')).toBe('agenda')
+    expect(detectarIntencion('¿Hay ausencias de profesor?')).toBe('agenda')
     expect(detectarIntencion('cuanto es la raiz cuadrada de 144')).toBe('desconocido')
   })
 
@@ -548,6 +590,243 @@ describe('useChatbot Hook — Control de Concurrencia, Bloqueo y Cancelación (G
     } finally {
       spyClearTimeout.mockRestore()
       vi.useRealTimers()
+    }
+  })
+})
+
+describe('Agenda Query & Temporal Parser — Pruebas Deterministas en Español', () => {
+  const refMiercoles = new Date('2026-10-14T10:00:00Z') // 14 de octubre de 2026
+
+  it('resuelve días relativos (ayer, hoy, mañana, pasado mañana, antier)', () => {
+    expect(resolverRangoAgenda('¿Qué tengo que hacer hoy?', refMiercoles).fechaInicioIso).toBe('2026-10-14')
+    expect(resolverRangoAgenda('actividades de manana', refMiercoles).fechaInicioIso).toBe('2026-10-15')
+    expect(resolverRangoAgenda('pasado manana que hay', refMiercoles).fechaInicioIso).toBe('2026-10-16')
+    expect(resolverRangoAgenda('que hubo ayer en la agenda', refMiercoles).fechaInicioIso).toBe('2026-10-13')
+    expect(resolverRangoAgenda('que paso antier', refMiercoles).fechaInicioIso).toBe('2026-10-12')
+  })
+
+  it('resuelve días nombrados de la semana (el lunes, este viernes, para el jueves)', () => {
+    // 2026-10-14 es miércoles. Lunes = 2026-10-12, Viernes = 2026-10-16, Jueves = 2026-10-15
+    const rangoLunes = resolverRangoAgenda('que hay para el lunes', refMiercoles)
+    expect(rangoLunes.fechaInicioIso).toBe('2026-10-12')
+    expect(rangoLunes.etiquetaPeriodo).toContain('lunes')
+
+    const rangoViernes = resolverRangoAgenda('tareas para este viernes', refMiercoles)
+    expect(rangoViernes.fechaInicioIso).toBe('2026-10-16')
+    expect(rangoViernes.etiquetaPeriodo).toContain('viernes')
+  })
+
+  it('resuelve fechas de calendario numéricas y textuales específicas', () => {
+    const rangoIso = resolverRangoAgenda('actividades para 2026-11-15', refMiercoles)
+    expect(rangoIso.fechaInicioIso).toBe('2026-11-15')
+    expect(rangoIso.fechaFinIso).toBe('2026-11-15')
+
+    const rangoSlash = resolverRangoAgenda('examenes del 15/11/2026', refMiercoles)
+    expect(rangoSlash.fechaInicioIso).toBe('2026-11-15')
+    expect(rangoSlash.filtroTipo).toBe('examen')
+
+    const rangoTexto = resolverRangoAgenda('que hay el 20 de noviembre de 2026', refMiercoles)
+    expect(rangoTexto.fechaInicioIso).toBe('2026-11-20')
+
+    const rangoEsteMes = resolverRangoAgenda('actividades para el 25 de este mes', refMiercoles)
+    expect(rangoEsteMes.fechaInicioIso).toBe('2026-10-25')
+  })
+
+  it('resuelve alcance de meses completos (en noviembre, este mes, próximo mes)', () => {
+    const rangoNov = resolverRangoAgenda('actividades en noviembre de 2026', refMiercoles)
+    expect(rangoNov.ambito).toBe('mes')
+    expect(rangoNov.fechaInicioIso).toBe('2026-11-01')
+    expect(rangoNov.fechaFinIso).toBe('2026-11-30')
+    expect(rangoNov.etiquetaPeriodo).toContain('noviembre de 2026')
+
+    const rangoEsteMes = resolverRangoAgenda('que tareas tengo este mes', refMiercoles)
+    expect(rangoEsteMes.ambito).toBe('mes')
+    expect(rangoEsteMes.fechaInicioIso).toBe('2026-10-01')
+    expect(rangoEsteMes.fechaFinIso).toBe('2026-10-31')
+    expect(rangoEsteMes.filtroTipo).toBe('tarea')
+
+    const rangoProxMes = resolverRangoAgenda('examenes para el proximo mes', refMiercoles)
+    expect(rangoProxMes.ambito).toBe('mes')
+    expect(rangoProxMes.fechaInicioIso).toBe('2026-11-01')
+    expect(rangoProxMes.fechaFinIso).toBe('2026-11-30')
+    expect(rangoProxMes.filtroTipo).toBe('examen')
+  })
+
+  it('resuelve alcance de año completo (en 2026, este año, para el 2027)', () => {
+    const rangoAno = resolverRangoAgenda('actividades en 2026', refMiercoles)
+    expect(rangoAno.ambito).toBe('ano')
+    expect(rangoAno.fechaInicioIso).toBe('2026-01-01')
+    expect(rangoAno.fechaFinIso).toBe('2026-12-31')
+
+    const rangoEsteAno = resolverRangoAgenda('todo lo que hay este ano', refMiercoles)
+    expect(rangoEsteAno.ambito).toBe('ano')
+    expect(rangoEsteAno.fechaInicioIso).toBe('2026-01-01')
+    expect(rangoEsteAno.fechaFinIso).toBe('2026-12-31')
+
+    const rango2027 = resolverRangoAgenda('agenda para el 2027', refMiercoles)
+    expect(rango2027.ambito).toBe('ano')
+    expect(rango2027.fechaInicioIso).toBe('2027-01-01')
+    expect(rango2027.fechaFinIso).toBe('2027-12-31')
+  })
+
+  it('consulta general por defecto para preguntas abiertas sin filtro temporal', () => {
+    const general = resolverRangoAgenda('¿Qué actividades hay en la agenda?', refMiercoles)
+    expect(general.ambito).toBe('general')
+    expect(general.fechaInicioIso).toBe('2026-10-14')
+    expect(general.fechaFinIso).toBe('9999-12-31')
+  })
+
+  it('formatearFechaEspanol formatea fechas en español sin emojis', () => {
+    const texto = formatearFechaEspanol('2026-11-16', true)
+    expect(texto).toContain('lunes 16 de noviembre de 2026')
+    expect(texto.match(EMOJI_REGEX)).toBeNull()
+  })
+})
+
+describe('Chatbot Agenda Responses — Confirmación, Negación y Cero Emojis', () => {
+  const refMiercoles = new Date('2026-10-14T10:00:00Z')
+
+  const eventosMuestra: EventoAgenda[] = [
+    {
+      id: 'semilla-ausencia-1',
+      tipo: 'ausencia_profesor',
+      titulo: 'Profesor ausente',
+      materia: 'Física Matemática',
+      profesor: 'Prof. Alberto Vargas',
+      fecha: '2026-10-14', // Hoy
+      hora: '07:00',
+      bloqueAfectado: 'Lecciones 1 a 3 (7:00 am - 9:15 am)',
+      indicacion: 'Dejó práctica en Teams.',
+      creadoEn: '2026-10-14T06:00:00Z',
+    },
+    {
+      id: 'semilla-tarea-1',
+      tipo: 'tarea',
+      titulo: 'Guía de Circuitos Lógicos',
+      materia: 'Electrónica Digital',
+      fecha: '2026-10-15', // Mañana
+      hora: '11:40',
+      prioridad: 'alta',
+      completada: false,
+      creadoEn: '2026-10-14T06:00:00Z',
+    },
+    {
+      id: 'semilla-examen-1',
+      tipo: 'examen',
+      titulo: 'Examen Parcial I',
+      materia: 'Desarrollo de Software',
+      fecha: '2026-10-17',
+      hora: '08:40',
+      porcentaje: 25,
+      aula: 'Laboratorio de Cómputo 2',
+      creadoEn: '2026-10-14T06:00:00Z',
+    },
+    {
+      id: 'semilla-tarea-2',
+      tipo: 'tarea',
+      titulo: 'Ensayo sobre Ética Profesional',
+      materia: 'Español',
+      fecha: '2026-11-15',
+      prioridad: 'media',
+      completada: false,
+      creadoEn: '2026-10-14T06:00:00Z',
+    },
+  ]
+
+  it('confirma explícitamente cuando hay actividades hoy con detalle exacto y fecha formateada', () => {
+    const res = responderAgenda('¿Hay actividades hoy en la agenda?', eventosMuestra, refMiercoles)
+    expect(res.texto).toContain('Sí, tienes 1 actividad programada')
+    expect(res.texto).toContain('Profesor ausente')
+    expect(res.texto).toContain('Profesor ausente')
+    expect(res.texto).toContain('Física Matemática')
+    expect(res.texto).toContain('miércoles 14 de octubre de 2026')
+    expect(res.texto).toContain('07:00')
+    expect(res.texto).toContain('Dejó práctica en Teams')
+    expect(res.texto.match(EMOJI_REGEX)).toBeNull()
+  })
+
+  it('confirma explícitamente para mañana con título, materia, tipo, fecha y estado', () => {
+    const res = responderAgenda('¿Qué tareas tengo para mañana?', eventosMuestra, refMiercoles)
+    expect(res.texto).toContain('Sí, tienes 1 actividad programada')
+    expect(res.texto).toContain('Guía de Circuitos Lógicos')
+    expect(res.texto).toContain('Tarea')
+    expect(res.texto).toContain('Electrónica Digital')
+    expect(res.texto).toContain('jueves 15 de octubre de 2026')
+    expect(res.texto).toContain('Estado: Pendiente')
+    expect(res.texto.match(EMOJI_REGEX)).toBeNull()
+  })
+
+  it('confirma explícitamente para una fecha específica (15/11/2026 o 15 de noviembre)', () => {
+    const res = responderAgenda('¿Qué hay para el 15/11/2026?', eventosMuestra, refMiercoles)
+    expect(res.texto).toContain('Sí, tienes 1 actividad programada')
+    expect(res.texto).toContain('Ensayo sobre Ética Profesional')
+    expect(res.texto).toContain('Español')
+    expect(res.texto).toContain('domingo 15 de noviembre de 2026')
+    expect(res.texto.match(EMOJI_REGEX)).toBeNull()
+  })
+
+  it('confirma explícitamente para un mes específico (en noviembre)', () => {
+    const res = responderAgenda('¿Qué actividades hay en noviembre de 2026?', eventosMuestra, refMiercoles)
+    expect(res.texto).toContain('Sí, encontré 1 actividad programada')
+    expect(res.texto).toContain('Ensayo sobre Ética Profesional')
+    expect(res.texto).toContain('noviembre de 2026')
+    expect(res.texto.match(EMOJI_REGEX)).toBeNull()
+  })
+
+  it('confirma explícitamente para un año específico (en 2026)', () => {
+    const res = responderAgenda('¿Cuáles actividades hay en 2026?', eventosMuestra, refMiercoles)
+    expect(res.texto).toContain('Sí, encontré 4 actividades programadas')
+    expect(res.texto).toContain('el año 2026')
+    expect(res.texto).toContain('Profesor ausente')
+    expect(res.texto).toContain('Guía de Circuitos Lógicos')
+    expect(res.texto).toContain('Examen Parcial I')
+    expect(res.texto).toContain('Ensayo sobre Ética Profesional')
+    expect(res.texto.match(EMOJI_REGEX)).toBeNull()
+  })
+
+  it('niega explícitamente cuando no hay actividades para la fecha consultada e indica la próxima actividad futura', () => {
+    const res = responderAgenda('¿Qué hubo ayer en la agenda?', eventosMuestra, refMiercoles)
+    expect(res.texto).toContain('No hay actividades registradas en tu agenda para ayer')
+    expect(res.texto).toContain('Tu próxima actividad programada es')
+    expect(res.texto).toContain('Profesor ausente')
+    expect(res.texto).toContain('Física Matemática')
+    expect(res.texto.match(EMOJI_REGEX)).toBeNull()
+  })
+
+  it('niega explícitamente cuando la agenda está totalmente vacía sin emojis', () => {
+    const res = responderAgenda('¿Hay actividades hoy?', [], refMiercoles)
+    expect(res.texto).toContain('No hay actividades registradas en tu agenda para hoy')
+    expect(res.texto).toContain('Actualmente no tienes tareas, exámenes ni eventos pendientes')
+    expect(res.texto.match(EMOJI_REGEX)).toBeNull()
+  })
+
+  it('soporta consultas a través de useChatbot con inyección de eventosAgenda', async () => {
+    let hookResult: ReturnType<typeof useChatbot> | null = null
+
+    function Harness() {
+      hookResult = useChatbot({
+        primerNombre: 'Valeria',
+        grupoActivo: '11-1',
+        horariosDias: [],
+        menusComedor: [],
+        ahora: refMiercoles,
+        eventosAgenda: eventosMuestra,
+      })
+      return null
+    }
+
+    renderToString(<Harness />)
+
+    if (hookResult) {
+      const hook = hookResult as ReturnType<typeof useChatbot>
+      const exito = await hook.enviarMensaje('¿Hay actividades hoy?')
+      expect(exito).toBe(true)
+
+      const respuestaBot = hook.mensajes[hook.mensajes.length - 1]
+      expect(respuestaBot.emisor).toBe('bot')
+      expect(respuestaBot.texto).toContain('Sí, tienes 1 actividad programada')
+      expect(respuestaBot.texto).toContain('Profesor ausente')
+      expect(respuestaBot.texto.match(EMOJI_REGEX)).toBeNull()
     }
   })
 })
