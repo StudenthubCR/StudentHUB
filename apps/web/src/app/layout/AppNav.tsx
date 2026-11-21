@@ -86,7 +86,7 @@ export function AppNav() {
 }
 
 function FichaLateral() {
-  const { estudiante, rolActivo, encargado, cargando } = useEstudiante()
+  const { estudiante, perspectiva, cargando } = useEstudiante()
   const { sesion, cerrarSesion } = useSesion()
 
   if (cargando) {
@@ -144,16 +144,11 @@ function FichaLateral() {
   return (
     <div className="mt-auto hidden flex-col gap-2 border-t border-border pt-3 lg:flex">
       <div className="flex items-center justify-between px-1">
-        <BadgeRol rol={rolActivo} />
-        {rolActivo === 'encargado' && encargado && (
-          <span className="text-[10px] text-text-muted truncate max-w-[120px]" title={encargado.nombreCompleto}>
-            {encargado.nombreCompleto}
-          </span>
-        )}
+        <BadgeRol perspectiva={perspectiva} />
       </div>
 
       <NavLink
-        to="/carnet"
+        to="/estudiante"
         className={({ isActive }) =>
           cn(
             'flex items-center gap-3 rounded-md border border-border p-2.5',

@@ -14,7 +14,6 @@ import {
   IconoDescargar,
   IconoBirrete,
   IconoVolver,
-  IconoCarnet,
   IconoPeriodico,
   IconoCalendario,
   IconoComedor,
@@ -27,7 +26,7 @@ import {
 export function AppLayout({ children }: { children?: ReactNode }) {
   useTituloDeRuta()
   const { esModoInstalado } = usePwaInstall()
-  const { rolActivo, alternarRolDemo } = useEstudiante()
+  const { rolActivo, perspectiva, alternarRolDemo } = useEstudiante()
   const [modalInstalarAbierto, setModalInstalarAbierto] = useState(false)
   const [bannerDescartado, setBannerDescartado] = useState(false)
 
@@ -77,7 +76,7 @@ export function AppLayout({ children }: { children?: ReactNode }) {
                     <span className="inline-block rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold uppercase">
                       ● Sesión Demo Activa
                     </span>
-                    <BadgeRol rol={rolActivo} />
+                    <BadgeRol perspectiva={perspectiva} />
                   </div>
                   <p className="text-micro text-text-muted mt-0.5">
                     Evaluá la app como {rolActivo === 'estudiante' ? 'estudiante regular' : 'encargado legal con estudiantes a cargo'}:
@@ -109,11 +108,11 @@ export function AppLayout({ children }: { children?: ReactNode }) {
             {/* Píldoras de Acceso Rápido para el Jurado */}
             <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
               <a
-                href="/carnet"
+                href="/estudiante"
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-surface-alt hover:bg-primary-tint hover:text-primary border border-border text-menuda font-bold text-text transition-all active:scale-95"
               >
-                <IconoCarnet className="size-3.5" />
-                <span>Carnet 3D & SOS</span>
+                <IconoBirrete className="size-3.5" />
+                <span>Hub Estudiantil</span>
               </a>
               <a
                 href="/agenda"

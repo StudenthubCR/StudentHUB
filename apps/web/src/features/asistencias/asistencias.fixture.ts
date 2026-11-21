@@ -1,0 +1,121 @@
+import type { RegistroAsistencia } from './asistencias.types'
+
+export const ASISTENCIAS_FIXTURE: RegistroAsistencia[] = [
+  // ==========================================
+  // Erick García Burgos (11-1 Desarrollo Web) - I Periodo
+  // ==========================================
+  {
+    id: 'asist-1',
+    estudianteId: '00000000-0000-0000-0000-000000000001',
+    fecha: '2026-03-20',
+    periodo: 'I Periodo',
+    materia: 'Programación y Desarrollo Web',
+    bloque: 'Lecciones 1-4 (7:00 AM - 10:00 AM)',
+    estado: 'presente',
+  },
+  {
+    id: 'asist-2',
+    estudianteId: '00000000-0000-0000-0000-000000000001',
+    fecha: '2026-03-19',
+    periodo: 'I Periodo',
+    materia: 'Bases de Datos y PostgreSQL',
+    bloque: 'Lecciones 3-6 (8:30 AM - 11:30 AM)',
+    estado: 'presente',
+  },
+  {
+    id: 'asist-3',
+    estudianteId: '00000000-0000-0000-0000-000000000001',
+    fecha: '2026-03-18',
+    periodo: 'I Periodo',
+    materia: 'Matemática Académica',
+    bloque: 'Lecciones 1-2 (7:00 AM - 8:20 AM)',
+    estado: 'tardia',
+    justificacion: 'Retraso de 10 min por transporte público intersectorial.',
+  },
+  {
+    id: 'asist-4',
+    estudianteId: '00000000-0000-0000-0000-000000000001',
+    fecha: '2026-03-17',
+    periodo: 'I Periodo',
+    materia: 'Inglés Técnico para TI',
+    bloque: 'Lecciones 5-6 (10:10 AM - 11:30 AM)',
+    estado: 'presente',
+  },
+  {
+    id: 'asist-5',
+    estudianteId: '00000000-0000-0000-0000-000000000001',
+    fecha: '2026-03-13',
+    periodo: 'I Periodo',
+    materia: 'Soporte y Redes de Comunicación',
+    bloque: 'Lecciones 1-4 (7:00 AM - 10:00 AM)',
+    estado: 'ausencia_justificada',
+    justificacion: 'Cita médica odontológica oficial en CCSS (comprobante N° 2085-B).',
+  },
+  {
+    id: 'asist-6',
+    estudianteId: '00000000-0000-0000-0000-000000000001',
+    fecha: '2026-03-12',
+    periodo: 'I Periodo',
+    materia: 'Español y Literatura',
+    bloque: 'Lecciones 3-4 (8:30 AM - 9:50 AM)',
+    estado: 'presente',
+  },
+  {
+    id: 'asist-7',
+    estudianteId: '00000000-0000-0000-0000-000000000001',
+    fecha: '2026-03-11',
+    periodo: 'I Periodo',
+    materia: 'Educación Cívica',
+    bloque: 'Lecciones 1-2 (7:00 AM - 8:20 AM)',
+    estado: 'presente',
+  },
+  {
+    id: 'asist-8',
+    estudianteId: '00000000-0000-0000-0000-000000000001',
+    fecha: '2026-03-06',
+    periodo: 'I Periodo',
+    materia: 'Programación y Desarrollo Web',
+    bloque: 'Lecciones 1-4 (7:00 AM - 10:00 AM)',
+    estado: 'presente',
+  },
+  {
+    id: 'asist-9',
+    estudianteId: '00000000-0000-0000-0000-000000000001',
+    fecha: '2026-03-05',
+    periodo: 'I Periodo',
+    materia: 'Bases de Datos y PostgreSQL',
+    bloque: 'Lecciones 3-6 (8:30 AM - 11:30 AM)',
+    estado: 'presente',
+  },
+  {
+    id: 'asist-10',
+    estudianteId: '00000000-0000-0000-0000-000000000001',
+    fecha: '2026-03-04',
+    periodo: 'I Periodo',
+    materia: 'Soporte y Redes de Comunicación',
+    bloque: 'Lecciones 1-4 (7:00 AM - 10:00 AM)',
+    estado: 'presente',
+  },
+
+  // ==========================================
+  // Sofía García Burgos (10-2 Contabilidad) - I Periodo
+  // ==========================================
+  {
+    id: 'asist-sofia-1',
+    estudianteId: '00000000-0000-0000-0000-000000000003',
+    fecha: '2026-03-20',
+    periodo: 'I Periodo',
+    materia: 'Contabilidad General y Costos',
+    bloque: 'Lecciones 1-4 (7:00 AM - 10:00 AM)',
+    estado: 'presente',
+  },
+  {
+    id: 'asist-sofia-2',
+    estudianteId: '00000000-0000-0000-0000-000000000003',
+    fecha: '2026-03-19',
+    periodo: 'I Periodo',
+    materia: 'Legislación Laboral y Mercantil',
+    bloque: 'Lecciones 3-6 (8:30 AM - 11:30 AM)',
+    estado: 'presente',
+  },
+]

@@ -1,7 +1,9 @@
 import { createContext } from 'react'
-import type { Estudiante, Encargado, RolUsuario } from './estudiante.fixture'
+import type { Estudiante, Encargado, RolUsuario, ModoPerspectiva } from './estudiante.fixture'
 
 export type EstadoEstudianteContexto = {
+  perspectiva: ModoPerspectiva
+  cambiarPerspectiva: (nueva: ModoPerspectiva) => void
   rolActivo: RolUsuario
   encargado: Encargado | null
   estudiantesVinculados: Estudiante[]

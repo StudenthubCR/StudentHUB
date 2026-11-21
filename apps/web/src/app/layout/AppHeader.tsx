@@ -8,7 +8,7 @@ import { ModalNotificaciones } from '@/features/notificaciones/ModalNotificacion
 import { obtenerIniciales } from '@/lib/texto'
 import { esUsuarioAdmin } from '@/features/avisos/avisos.service'
 import { BadgeRol } from '@/components/BadgeRol'
-import { SelectorEstudianteActivo } from '@/components/SelectorEstudianteActivo'
+import { SelectorPerspectiva } from '@/components/SelectorPerspectiva'
 import { ThemeToggle } from './ThemeToggle'
 
 type Props = {
@@ -17,7 +17,7 @@ type Props = {
 }
 
 export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
-  const { estudiante, rolActivo, cargando: cargandoEstudiante } = useEstudiante()
+  const { estudiante, perspectiva, cargando: cargandoEstudiante } = useEstudiante()
   const { sesion, cerrarSesion } = useSesion()
   const { permiso, notificacionesActivas, noLeidas } = useNotificaciones()
   const [modalNotifAbierto, setModalNotifAbierto] = useState(false)
@@ -53,8 +53,8 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
 
         {sesion && (
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <BadgeRol rol={rolActivo} compacto />
-            <SelectorEstudianteActivo />
+            <BadgeRol perspectiva={perspectiva} compacto />
+            <SelectorPerspectiva />
           </div>
         )}
       </div>

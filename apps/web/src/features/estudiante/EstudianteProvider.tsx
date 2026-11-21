@@ -9,6 +9,7 @@ import {
   type Estudiante,
   type Encargado,
   type RolUsuario,
+  type ModoPerspectiva,
 } from './estudiante.fixture'
 import { EstudianteContext, type EstadoEstudianteContexto } from './estudiante-context'
 
@@ -111,6 +112,24 @@ export function EstudianteProvider({ children }: { children: ReactNode }) {
     }
     return null
   })
+
+  const [perspectiva, setPerspectivaState] = useState<ModoPerspectiva>(() => {
+    if (typeof window !== 'undefined') {
+      const guardada = localStorage.getItem('studenthub_perspectiva_vista')
+      if (guardada === 'ambos' || guardada === 'estudiante' || guardada === 'encargado') {
+        return guardada
+      }
+    }
+    return 'ambos'
+  })
+
+  const cambiarPerspectiva = useCallback((nueva: ModoPerspectiva) => {
+    setPerspectivaState(nueva)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('studenthub_perspectiva_vista', nueva)
+      window.dispatchEvent(new CustomEvent('studenthub:perspectiva-cambiada', { detail: nueva }))
+    }
+  }, [])
 
   // Consulta unificada de perfil y rol del usuario
   const consulta = useQuery<ResultadoCargaPerfil>({
@@ -359,6 +378,8 @@ export function EstudianteProvider({ children }: { children: ReactNode }) {
       void queryClient.invalidateQueries({ queryKey: ['comedor'] })
       void queryClient.invalidateQueries({ queryKey: ['confirmacion-comedor'] })
       void queryClient.invalidateQueries({ queryKey: ['avisos'] })
+      void queryClient.invalidateQueries({ queryKey: ['estudiante-notas'] })
+      void queryClient.invalidateQueries({ queryKey: ['estudiante-asistencias'] })
     },
     [queryClient],
   )
@@ -388,6 +409,8 @@ export function EstudianteProvider({ children }: { children: ReactNode }) {
 
   const valor = useMemo<EstadoEstudianteContexto>(
     () => ({
+      perspectiva,
+      cambiarPerspectiva,
       rolActivo,
       encargado,
       estudiantesVinculados,
@@ -401,6 +424,8 @@ export function EstudianteProvider({ children }: { children: ReactNode }) {
       alternarRolDemo,
     }),
     [
+      perspectiva,
+      cambiarPerspectiva,
       rolActivo,
       encargado,
       estudiantesVinculados,

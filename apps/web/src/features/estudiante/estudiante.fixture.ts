@@ -5,6 +5,7 @@
  */
 
 export type RolUsuario = 'estudiante' | 'encargado'
+export type ModoPerspectiva = 'ambos' | 'estudiante' | 'encargado'
 
 export type Estudiante = {
   id?: string

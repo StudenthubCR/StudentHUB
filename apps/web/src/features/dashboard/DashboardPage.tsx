@@ -15,6 +15,7 @@ import { BannersAvisosRapidos } from '@/features/avisos'
 import { ClaseAhora } from './components/ClaseAhora'
 import { RestoDelDia } from './components/RestoDelDia'
 import { WidgetAgendaDashboard } from '@/features/agenda/components/WidgetAgendaDashboard'
+import { WidgetResumenAcademico } from './components/WidgetResumenAcademico'
 import { NOTICIAS } from './noticias.fixture'
 import { SafeBoundary } from '@/components/SafeBoundary'
 
@@ -187,8 +188,12 @@ export function DashboardPage() {
           </div>
         </SafeBoundary>
 
-        {/* Columna 2: Agenda de pendientes y Menú de almuerzo */}
+        {/* Columna 2: Progreso Académico, Agenda y Menú */}
         <div className="flex flex-col gap-3.5">
+          <SafeBoundary nombre="Progreso Académico y Asistencia">
+            <WidgetResumenAcademico estudianteId={estudiante?.id} />
+          </SafeBoundary>
+
           <SafeBoundary nombre="Agenda Escolar">
             <WidgetAgendaDashboard />
           </SafeBoundary>

@@ -3,6 +3,8 @@ import { EstudianteContext, type EstadoEstudianteContexto } from './estudiante-c
 import { ESTUDIANTE_DEMO } from './estudiante.fixture'
 
 const ESTADO_POR_DEFECTO: EstadoEstudianteContexto = {
+  perspectiva: 'ambos',
+  cambiarPerspectiva: () => {},
   rolActivo: 'estudiante',
   encargado: null,
   estudiantesVinculados: [ESTUDIANTE_DEMO],

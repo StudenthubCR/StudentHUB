@@ -8,7 +8,6 @@ import {
   IconoCarnet,
   IconoRayo,
   IconoAgenda,
-  IconoUsuarios,
 } from '@/components/icons'
 
 type Props = {
@@ -117,29 +116,18 @@ export function HeroExpo({ onAbrirInstalar }: Props) {
                   App Real en Vivo
                 </h3>
                 <p className="text-menuda text-white/90 mt-1 leading-snug">
-                  Probá Student HUB en vivo como estudiante o como encargado legal de 2 hijos.
+                  Probá Student HUB en vivo con el nuevo Hub Estudiantil (Carnet 3D, Notas y Asistencias).
                 </p>
               </div>
               <div className="mt-3.5 flex flex-col gap-1.5">
                 <button
                   type="button"
                   onClick={() => entrarModoDemo('estudiante')}
-                  className="w-full text-micro font-black text-white flex items-center justify-between gap-1.5 bg-black/25 hover:bg-black/35 backdrop-blur-xs px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-95"
+                  className="w-full text-micro font-black text-white flex items-center justify-between gap-1.5 bg-black/25 hover:bg-black/35 backdrop-blur-xs px-3 py-2 rounded-xl transition-all cursor-pointer active:scale-95"
                 >
                   <span className="inline-flex items-center gap-1.5">
                     <IconoBirrete className="size-3.5" />
-                    <span>Demo Estudiante</span>
-                  </span>
-                  <IconoFlechaDerecha className="size-3" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => entrarModoDemo('encargado')}
-                  className="w-full text-micro font-black text-white flex items-center justify-between gap-1.5 bg-emerald-500/30 hover:bg-emerald-500/40 border border-emerald-400/40 backdrop-blur-xs px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-95"
-                >
-                  <span className="inline-flex items-center gap-1.5">
-                    <IconoUsuarios className="size-3.5" />
-                    <span>Demo Encargado (2 hijos)</span>
+                    <span>Iniciar Simulación (Erick García · 11-1)</span>
                   </span>
                   <IconoFlechaDerecha className="size-3" />
                 </button>

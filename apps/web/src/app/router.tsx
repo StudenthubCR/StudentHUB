@@ -31,7 +31,7 @@ function conSuspense(Componente: ComponentType) {
 
 // Carga perezosa (Code-Splitting) para aligerar el bundle inicial de Student HUB
 const DashboardPage = lazy(() => import('@/features/dashboard/DashboardPage').then((m) => ({ default: m.DashboardPage })))
-const CarnetPage = lazy(() => import('@/features/carnet/CarnetPage').then((m) => ({ default: m.CarnetPage })))
+const EstudiantePage = lazy(() => import('@/features/estudiante/EstudiantePage').then((m) => ({ default: m.EstudiantePage })))
 const AgendaPage = lazy(() => import('@/features/agenda/AgendaPage').then((m) => ({ default: m.AgendaPage })))
 const HorariosPage = lazy(() => import('@/features/horarios/HorariosPage').then((m) => ({ default: m.HorariosPage })))
 const HorarioGrupoPage = lazy(() => import('@/features/horarios/HorarioGrupoPage').then((m) => ({ default: m.HorarioGrupoPage })))
@@ -101,7 +101,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: conSuspense(DashboardPage), handle: { titulo: 'Inicio' } },
       { path: 'agenda', element: conSuspense(AgendaPage), handle: { titulo: 'Agenda' } },
-      { path: 'carnet', element: conSuspense(CarnetPage), handle: { titulo: 'Carnet' } },
+      { path: 'estudiante', element: conSuspense(EstudiantePage), handle: { titulo: 'Estudiante' } },
+      { path: 'carnet', element: <Navigate to="/estudiante?tab=carnet" replace /> },
       { path: 'horarios', element: conSuspense(HorariosPage), handle: { titulo: 'Horarios' } },
       {
         path: 'horarios/:grado',

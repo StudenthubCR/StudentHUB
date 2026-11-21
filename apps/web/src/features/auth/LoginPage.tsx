@@ -13,7 +13,6 @@ import {
   IconoRayo,
   IconoVolver,
   IconoBirrete,
-  IconoUsuarios,
   IconoInfo,
 } from '@/components/icons'
 import { ThemeToggle } from '@/app/layout/ThemeToggle'
@@ -28,7 +27,6 @@ import {
   soloDigitos,
   traducirErrorAuth,
   placeholderCorreoPorRol,
-  ayudaCorreoPorRol,
   validarCorreoParaRol,
   type RolAcceso,
 } from './auth.service'
@@ -53,13 +51,7 @@ export function LoginPage() {
   const [modalInstalarAbierto, setModalInstalarAbierto] = useState(false)
   const location = useLocation()
 
-  const [rolSeleccionado, setRolSeleccionado] = useState<RolAcceso>(() => {
-    if (typeof window !== 'undefined') {
-      const guardado = localStorage.getItem('studenthub_rol_preferido')
-      if (guardado === 'encargado' || guardado === 'estudiante') return guardado
-    }
-    return 'estudiante'
-  })
+  const rolSeleccionado: RolAcceso = 'estudiante'
 
   const [paso, setPaso] = useState<Paso>({ nombre: 'correo' })
   const [correo, setCorreo] = useState('')
@@ -85,14 +77,6 @@ export function LoginPage() {
     const t = window.setTimeout(() => setSegundos((s) => s - 1), 1000)
     return () => window.clearTimeout(t)
   }, [segundos])
-
-  const cambiarRol = (nuevoRol: RolAcceso) => {
-    setRolSeleccionado(nuevoRol)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('studenthub_rol_preferido', nuevoRol)
-    }
-    setError(null)
-  }
 
   const pedirCodigo = useCallback(
     async (evento?: React.FormEvent) => {
@@ -404,48 +388,16 @@ export function LoginPage() {
                 noValidate
                 className="flex flex-col gap-5"
               >
-                {/* SELECTOR DE ROL ACCESIBLE */}
+                {/* BANNER INFORMATIVO: CUENTA UNIFICADA ESTUDIANTE Y FAMILIA */}
                 {!modoAdminPassword && !esCorreoAdmin && (
-                  <div>
-                    <label className="mb-2 block text-etiqueta font-bold tracking-[0.08em] text-text-muted uppercase">
-                      Seleccioná tu tipo de cuenta
-                    </label>
-                    <div
-                      role="tablist"
-                      aria-label="Tipo de usuario para inicio de sesión"
-                      className="grid grid-cols-2 gap-1.5 rounded-2xl border border-border bg-surface-alt/80 p-1.5"
-                    >
-                      <button
-                        type="button"
-                        role="tab"
-                        aria-selected={rolSeleccionado === 'estudiante'}
-                        onClick={() => cambiarRol('estudiante')}
-                        className={cn(
-                          'flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-menor font-bold transition-all duration-200 cursor-pointer',
-                          rolSeleccionado === 'estudiante'
-                            ? 'bg-primary-solid text-white shadow-sm'
-                            : 'text-text-muted hover:text-text hover:bg-surface/60',
-                        )}
-                      >
-                        <IconoBirrete className="size-4" aria-hidden="true" />
-                        <span>Estudiante</span>
-                      </button>
-                      <button
-                        type="button"
-                        role="tab"
-                        aria-selected={rolSeleccionado === 'encargado'}
-                        onClick={() => cambiarRol('encargado')}
-                        className={cn(
-                          'flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-menor font-bold transition-all duration-200 cursor-pointer',
-                          rolSeleccionado === 'encargado'
-                            ? 'bg-primary-solid text-white shadow-sm'
-                            : 'text-text-muted hover:text-text hover:bg-surface/60',
-                        )}
-                      >
-                        <IconoUsuarios className="size-4" aria-hidden="true" />
-                        <span>Encargado Legal</span>
-                      </button>
+                  <div className="rounded-2xl border border-primary/25 bg-primary-tint/40 p-4 text-menor">
+                    <div className="flex items-center gap-2 text-primary font-bold text-micro uppercase tracking-wider mb-1">
+                      <IconoBirrete className="size-4 shrink-0" />
+                      <span>Cuenta Institucional Unificada</span>
                     </div>
+                    <p className="text-micro text-text-muted leading-relaxed">
+                      Esta cuenta oficial (<strong className="text-text font-semibold">@mep.go.cr</strong>) brinda acceso integral tanto al <strong className="text-text font-semibold">estudiante</strong> como a su <strong className="text-text font-semibold">familia o encargado legal</strong> para consultar carnet, calificaciones, asistencias y servicios escolares.
+                    </p>
                   </div>
                 )}
 
@@ -457,15 +409,13 @@ export function LoginPage() {
                     <h2 className="text-titulo font-bold text-text">
                       {modoAdminPassword || esCorreoAdmin
                         ? 'Acceso de Administrador'
-                        : rolSeleccionado === 'estudiante'
-                          ? 'Acceso Estudiantil'
-                          : 'Acceso para Encargados'}
+                        : 'Acceso Institucional MEP'}
                     </h2>
                   </div>
                   <p className="mt-1.5 text-menor text-text-muted">
                     {modoAdminPassword || esCorreoAdmin
                       ? 'Autenticación directa para la cuenta oficial de administración institucional.'
-                      : ayudaCorreoPorRol(rolSeleccionado)}
+                      : 'Ingresá el correo institucional del estudiante (@mep.go.cr) para recibir tu código de acceso temporal.'}
                   </p>
                 </div>
 
@@ -595,23 +545,14 @@ export function LoginPage() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2">
                   <button
                     type="button"
                     onClick={() => activarModoDemo('estudiante')}
                     className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary-tint px-3 py-2.5 text-menor font-bold text-primary transition-all hover:bg-primary-tint-strong active:scale-98 shadow-xs"
                   >
                     <IconoBirrete className="size-4" />
-                    <span>Demo Estudiante</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => activarModoDemo('encargado')}
-                    className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 text-menor font-bold text-emerald-700 dark:text-emerald-400 transition-all hover:bg-emerald-500/20 active:scale-98 shadow-xs"
-                  >
-                    <IconoUsuarios className="size-4" />
-                    <span>Demo Encargado</span>
+                    <span>Modo Demostración · Expotécnica 2026</span>
                   </button>
                 </div>
 

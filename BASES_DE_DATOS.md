@@ -2,6 +2,11 @@
 
 Documento oficial de arquitectura de persistencia y seguridad de datos para Student HUB (CTP San Rafael de Alajuela).
 
+> [!TIP] Despliegue Unificado en Supabase
+> El script SQL maestro consolidado e idempotente que contiene todo este esquema, RLS, funciones, triggers y semillas se encuentra en:
+> [`supabase/setup_completo_studenthub.sql`](file:///c:/Users/erick/OneDrive/Documentos/GitHub/StudentHUB/supabase/setup_completo_studenthub.sql).
+> Consultá la guía de despliegue en [`supabase/README.md`](file:///c:/Users/erick/OneDrive/Documentos/GitHub/StudentHUB/supabase/README.md).
+
 ---
 
 ## 1. Principios Rectores y Marco Legal (Ley N° 8968 / PRODHAB & MEP)
@@ -83,19 +88,50 @@ Registro diario de asistencia al servicio de alimentación institucional.
 - `actualizado_el` (timestamptz)
 - *Constraint Unique:* `(estudiante_id, fecha)`
 
+### 2.7 Tabla `public.notas` (Calificaciones Oficiales)
+Registro de notas y evaluaciones por periodo bajo directrices de evaluación del MEP.
+- `id` (uuid, PK)
+- `estudiante_id` (uuid, FK -> `estudiantes.id` on delete cascade)
+- `periodo` (text) — `I Periodo`, `II Periodo`, `III Periodo`, `Anual`
+- `materia` (text) — Nombre oficial de la materia o subárea técnica
+- `docente` (text, nullable) — Docente titular
+- `nota_final` (numeric(5,2)) — Calificación final en escala MEP (0–100)
+- `trabajo_cotidiano` (numeric(5,2)) — Rubro de trabajo en clase
+- `tareas` (numeric(5,2)) — Rubro de tareas y asignaciones
+- `pruebas` (numeric(5,2)) — Rubro de pruebas sumativas
+- `proyecto` (numeric(5,2)) — Rubro de proyecto técnico o académico
+- `asistencia` (numeric(5,2)) — Rubro de asistencia y puntualidad
+- `observaciones` (text, nullable) — Anotaciones formativas del docente
+- `creado_el` (timestamptz)
+- `actualizado_el` (timestamptz)
+
+### 2.8 Tabla `public.asistencias` (Registro Diario de Asistencia)
+Registro cronológico de lecciones impartidas y presencialidad estudiantil.
+- `id` (uuid, PK)
+- `estudiante_id` (uuid, FK -> `estudiantes.id` on delete cascade)
+- `fecha` (date) — Fecha calendario de la sesión
+- `periodo` (text) — `I Periodo`, `II Periodo`, `III Periodo`
+- `materia` (text) — Materia o subárea correspondiente al bloque
+- `bloque` (text) — Bloque o intervalo de lecciones (ej: `1-2`, `3-4`)
+- `estado` (text) — `presente`, `ausencia_injustificada`, `ausencia_justificada`, `tardia`
+- `justificacion` (text, nullable) — Detalle de boleta o comprobante aportado
+- `creado_el` (timestamptz)
+
 ---
 
 ## 3. Matriz de Políticas RLS (Row Level Security)
 
-| Tabla | Operación | Rol Estudiante | Rol Encargado Legal | Rol Administrador |
-| :--- | :--- | :--- | :--- | :--- |
-| `estudiantes` | `SELECT` | Propio perfil (`user_id = auth.uid()` o correo) | Solo estudiantes vinculados activos en `encargado_estudiante` | Todos |
-| `estudiantes` | `INSERT/UPDATE/DELETE` | Bloqueado | Bloqueado | Permitido |
-| `encargados` | `SELECT` | Bloqueado | Propio perfil (`user_id = auth.uid()` o correo) | Todos |
-| `encargado_estudiante` | `SELECT` | Sus propios encargados registrados | Sus propios estudiantes vinculados | Todos |
-| `confirmaciones_comedor` | `SELECT` | Propias confirmaciones | Confirmaciones de sus estudiantes vinculados | Todas |
-| `confirmaciones_comedor` | `INSERT/UPDATE` | Propia confirmación (sujeto a horario) | **Bloqueado (Solo Lectura)** | Permitido |
-| `grupos` / `instituciones` | `SELECT` | Lectura pública autenticada | Lectura pública autenticada | Todos |
+| Tabla | Operación | Cuenta Única (Estudiante / Familia) | Rol Administrador |
+| :--- | :--- | :--- | :--- |
+| `estudiantes` | `SELECT` | Propio perfil (`user_id = auth.uid()` o correo) | Todos |
+| `estudiantes` | `INSERT/UPDATE/DELETE` | Bloqueado | Permitido |
+| `notas` | `SELECT` | Propias notas (`estudiante_id = perfil propio`) | Todas |
+| `notas` | `INSERT/UPDATE/DELETE` | Bloqueado | Permitido |
+| `asistencias` | `SELECT` | Propias asistencias (`estudiante_id = perfil propio`) | Todas |
+| `asistencias` | `INSERT/UPDATE/DELETE` | Bloqueado | Permitido |
+| `confirmaciones_comedor` | `SELECT` | Propias confirmaciones | Todas |
+| `confirmaciones_comedor` | `INSERT/UPDATE` | Propia confirmación (sujeto a horario) | Permitido |
+| `grupos` / `instituciones` | `SELECT` | Lectura pública autenticada | Todos |
 
 ---
 

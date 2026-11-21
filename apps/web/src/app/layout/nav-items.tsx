@@ -1,5 +1,5 @@
 import type { ComponentType, SVGProps } from 'react'
-import { IconoAgenda, IconoCalendario, IconoCarnet, IconoComedor, IconoInicio } from '@/components/icons'
+import { IconoAgenda, IconoCalendario, IconoBirrete, IconoComedor, IconoInicio } from '@/components/icons'
 
 export type NavItem = {
   to: string
@@ -13,6 +13,6 @@ export const NAV_ITEMS: NavItem[] = [
   { to: '/agenda', label: 'Agenda', Icono: IconoAgenda },
   { to: '/horarios', label: 'Horarios', Icono: IconoCalendario },
   { to: '/comedor', label: 'Comedor', Icono: IconoComedor },
-  { to: '/carnet', label: 'Carnet', Icono: IconoCarnet },
+  { to: '/estudiante', label: 'Estudiante', Icono: IconoBirrete },
 ]
 
