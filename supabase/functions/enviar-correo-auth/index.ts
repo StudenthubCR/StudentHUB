@@ -85,26 +85,39 @@ Deno.serve(async (peticion) => {
   const destinatario = payload.user.email?.toLowerCase().trim()
   const codigo = payload.email_data.token
 
-  // Verificación estricta de seguridad: denegar correos fuera del padrón estudiantil
+  // Verificación estricta de seguridad: denegar correos fuera del padrón estudiantil o de encargados
   const administradores = ['erickgarciab2134@gmail.com', 'studenthub.cr@gmail.com']
   if (destinatario && !administradores.includes(destinatario)) {
     if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
       try {
         const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-        const { data: estudiante, error: errorDb } = await supabaseAdmin
+        const { data: estudiante } = await supabaseAdmin
           .from('estudiantes')
           .select('id')
           .ilike('correo', destinatario)
           .eq('estado', 'activo')
           .maybeSingle()
 
-        if (errorDb || !estudiante) {
+        let autorizado = Boolean(estudiante)
+
+        if (!autorizado) {
+          const { data: encargado } = await supabaseAdmin
+            .from('encargados')
+            .select('id')
+            .ilike('correo', destinatario)
+            .eq('activo', true)
+            .maybeSingle()
+
+          autorizado = Boolean(encargado)
+        }
+
+        if (!autorizado) {
           console.warn(`[Seguridad] Intento de login bloqueado para correo no registrado: ${destinatario}`)
           return new Response(
             JSON.stringify({
               error: {
                 http_code: 403,
-                message: 'El correo electrónico no pertenece a un estudiante activo en el padrón.',
+                message: 'El correo electrónico no pertenece a un estudiante activo ni a un encargado registrado en el padrón.',
               },
             }),
             { status: 403, headers: { 'Content-Type': 'application/json' } },

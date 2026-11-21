@@ -7,6 +7,8 @@ import { useNotificaciones } from '@/features/notificaciones/useNotificaciones'
 import { ModalNotificaciones } from '@/features/notificaciones/ModalNotificaciones'
 import { obtenerIniciales } from '@/lib/texto'
 import { esUsuarioAdmin } from '@/features/avisos/avisos.service'
+import { BadgeRol } from '@/components/BadgeRol'
+import { SelectorEstudianteActivo } from '@/components/SelectorEstudianteActivo'
 import { ThemeToggle } from './ThemeToggle'
 
 type Props = {
@@ -15,7 +17,7 @@ type Props = {
 }
 
 export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
-  const { estudiante, cargando: cargandoEstudiante } = useEstudiante()
+  const { estudiante, rolActivo, cargando: cargandoEstudiante } = useEstudiante()
   const { sesion, cerrarSesion } = useSesion()
   const { permiso, notificacionesActivas, noLeidas } = useNotificaciones()
   const [modalNotifAbierto, setModalNotifAbierto] = useState(false)
@@ -32,21 +34,30 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
       data-print="ocultar"
       className={
         'glass sticky top-0 z-100 flex items-center justify-between ' +
-        'border-b border-border px-4.5 py-2 ' +
+        'border-b border-border px-3.5 py-2 ' +
         'md:px-6 md:py-2.5 lg:col-span-2 lg:row-start-1 lg:h-[70px] lg:px-8 lg:py-0'
       }
     >
-      <Link
-        to="/"
-        aria-label="Ir al inicio"
-        className="flex items-center shrink-0 h-9 sm:h-10 transition-transform active:scale-95"
-      >
-        <img
-          src="/SHlarge.webp"
-          alt="Student HUB"
-          className="h-8 sm:h-9 w-auto object-contain transition-all duration-200 dark:brightness-0 dark:invert"
-        />
-      </Link>
+      <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">
+        <Link
+          to="/"
+          aria-label="Ir al inicio"
+          className="flex items-center shrink-0 h-9 sm:h-10 transition-transform active:scale-95"
+        >
+          <img
+            src="/SHlarge.webp"
+            alt="Student HUB"
+            className="h-8 sm:h-9 w-auto object-contain transition-all duration-200 dark:brightness-0 dark:invert"
+          />
+        </Link>
+
+        {sesion && (
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <BadgeRol rol={rolActivo} compacto />
+            <SelectorEstudianteActivo />
+          </div>
+        )}
+      </div>
 
       <div className="flex items-center gap-1.5 sm:gap-2.5">
         {!esModoInstalado && onAbrirInstalar && (
@@ -62,20 +73,19 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
           </button>
         )}
 
-        {/* Botón de Notificaciones:
-            Muestra la cantidad de notificaciones sin leer o un pulso sutil si están inactivas. */}
+        {/* Botón de Notificaciones */}
         <button
           type="button"
           onClick={() => setModalNotifAbierto(true)}
           aria-label={noLeidas > 0 ? `${noLeidas} notificaciones sin leer` : 'Centro de notificaciones'}
-          title={noLeidas > 0 ? `${noLeidas} alertas sin leer` : 'Notificaciones estudiantiles'}
+          title={noLeidas > 0 ? `${noLeidas} alertas sin leer` : 'Notificaciones institucionales'}
           className={
-            'relative flex size-10 cursor-pointer items-center justify-center rounded-full ' +
+            'relative flex size-9 sm:size-10 cursor-pointer items-center justify-center rounded-full ' +
             'border border-border bg-surface text-text-muted transition-all duration-200 ' +
             'hover:border-border-strong hover:bg-surface-alt hover:text-text active:scale-95'
           }
         >
-          <IconoCampana className="size-4.5" />
+          <IconoCampana className="size-4 sm:size-4.5" />
           {noLeidas > 0 ? (
             <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-black text-white shadow-sm ring-2 ring-surface">
               {noLeidas > 9 ? '9+' : noLeidas}
@@ -84,7 +94,6 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
             <span className="absolute top-2.5 right-2.5 size-2 rounded-full bg-primary animate-pulse" />
           ) : null}
         </button>
-
 
         {typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true' && (
           <Link
@@ -117,7 +126,7 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
             aria-label="Cerrar sesión"
             title="Cerrar sesión"
             className={
-              'flex size-10 cursor-pointer items-center justify-center rounded-full ' +
+              'flex size-9 sm:size-10 cursor-pointer items-center justify-center rounded-full ' +
               'border border-border bg-surface text-text-muted transition-all duration-200 ' +
               'hover:border-border-strong hover:bg-surface-alt hover:text-text active:scale-95'
             }
@@ -126,11 +135,8 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
           </button>
         )}
 
-        {/* La foto era decorativa y no llevaba a ningún lado; un avatar en la
-            cabecera es justo lo que la gente toca buscando su ficha. Sin
-            sesión no se muestra una cara ajena: se ofrece entrar. */}
         {cargandoEstudiante ? (
-          <div className="size-10 rounded-full bg-surface-alt border border-border animate-pulse md:size-11" />
+          <div className="size-9 sm:size-10 rounded-full bg-surface-alt border border-border animate-pulse md:size-11" />
         ) : estudiante ? (
           <Link
             to="/carnet"
@@ -142,14 +148,14 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
                 src={estudiante.fotoUrl}
                 alt=""
                 className={
-                  'size-10 rounded-full border-2 border-primary object-cover ' +
+                  'size-9 sm:size-10 rounded-full border-2 border-primary object-cover ' +
                   'shadow-[0_0_0_3px_var(--color-primary-tint)] md:size-11'
                 }
               />
             ) : (
               <span
                 className={
-                  'flex size-10 items-center justify-center rounded-full border-2 border-primary ' +
+                  'flex size-9 sm:size-10 items-center justify-center rounded-full border-2 border-primary ' +
                   'bg-primary-solid text-nota font-bold text-white shadow-[0_0_0_3px_var(--color-primary-tint)] md:size-11'
                 }
               >
@@ -165,7 +171,7 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
           >
             <span
               className={
-                'flex size-10 items-center justify-center rounded-full border-2 border-primary ' +
+                'flex size-9 sm:size-10 items-center justify-center rounded-full border-2 border-primary ' +
                 'bg-primary-solid text-nota font-bold text-white shadow-[0_0_0_3px_var(--color-primary-tint)] md:size-11'
               }
             >
@@ -192,4 +198,3 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
     </header>
   )
 }
-

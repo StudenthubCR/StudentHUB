@@ -23,7 +23,7 @@ type Props = {
 
 export function ConfirmacionAsistenciaComedor({ fecha }: Props) {
   const { sesion } = useSesion()
-  const { estudiante } = useEstudiante()
+  const { estudiante, rolActivo } = useEstudiante()
   const [confirmacion, setConfirmacion] = useState<ConfirmacionComedor | null>(null)
   const [guardando, setGuardando] = useState(false)
   const [cargando, setCargando] = useState(true)
@@ -71,6 +71,11 @@ export function ConfirmacionAsistenciaComedor({ fecha }: Props) {
   }, [cargarConfirmacion])
 
   const manejarSeleccion = async (asistencia: boolean) => {
+    if (rolActivo === 'encargado') {
+      setErrorMensaje('La confirmación o liberación de raciones del comedor es una acción reservada exclusivamente para el estudiante.')
+      return
+    }
+
     if (!sesion) {
       setErrorMensaje('Debes iniciar sesión con tu cuenta estudiantil para confirmar asistencia.')
       return
@@ -173,6 +178,16 @@ export function ConfirmacionAsistenciaComedor({ fecha }: Props) {
         </p>
       </div>
 
+      {/* Banner Exclusivo para Encargados Legales (Solo Lectura) */}
+      {rolActivo === 'encargado' && (
+        <div className="mt-3 flex items-start gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2.5 text-micro text-emerald-800 dark:text-emerald-300">
+          <IconoInfo className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400 mt-0.5" />
+          <p className="leading-relaxed">
+            <strong>Modo Encargado Legal (Solo Lectura):</strong> Estás supervisando el registro de comedor para <strong className="font-bold text-text">{estudiante?.nombre || 'el estudiante'}</strong>. La confirmación o liberación de raciones es exclusiva del estudiante.
+          </p>
+        </div>
+      )}
+
       {/* Selector interactivo táctil */}
       <div className="mt-4.5">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -180,12 +195,13 @@ export function ConfirmacionAsistenciaComedor({ fecha }: Props) {
           <button
             type="button"
             onClick={() => void manejarSeleccion(true)}
-            disabled={guardando || cargando || !estadoHorario.abierto}
+            disabled={guardando || cargando || !estadoHorario.abierto || rolActivo === 'encargado'}
+            title={rolActivo === 'encargado' ? 'Acción reservada exclusivamente para el estudiante' : undefined}
             className={`group relative flex cursor-pointer items-center justify-between rounded-xl border p-4 text-left transition-all duration-200 min-h-[58px] ${
               seleccionActual === true
                 ? 'border-emerald-500 bg-emerald-500/10 text-emerald-950 dark:text-emerald-100 shadow-sm ring-1 ring-emerald-500/40'
                 : 'border-border bg-surface hover:border-emerald-500/50 hover:bg-surface-alt text-text'
-            } ${!estadoHorario.abierto || cargando ? 'opacity-70 cursor-not-allowed' : 'active:scale-[0.98]'}`}
+            } ${!estadoHorario.abierto || cargando || rolActivo === 'encargado' ? 'opacity-70 cursor-not-allowed' : 'active:scale-[0.98]'}`}
           >
             <div className="flex items-center gap-3">
               <span
@@ -217,12 +233,13 @@ export function ConfirmacionAsistenciaComedor({ fecha }: Props) {
           <button
             type="button"
             onClick={() => void manejarSeleccion(false)}
-            disabled={guardando || cargando || !estadoHorario.abierto}
+            disabled={guardando || cargando || !estadoHorario.abierto || rolActivo === 'encargado'}
+            title={rolActivo === 'encargado' ? 'Acción reservada exclusivamente para el estudiante' : undefined}
             className={`group relative flex cursor-pointer items-center justify-between rounded-xl border p-4 text-left transition-all duration-200 min-h-[58px] ${
               seleccionActual === false
                 ? 'border-zinc-400 bg-zinc-500/10 text-text shadow-sm ring-1 ring-zinc-400/40'
                 : 'border-border bg-surface hover:border-zinc-400/50 hover:bg-surface-alt text-text'
-            } ${!estadoHorario.abierto || cargando ? 'opacity-70 cursor-not-allowed' : 'active:scale-[0.98]'}`}
+            } ${!estadoHorario.abierto || cargando || rolActivo === 'encargado' ? 'opacity-70 cursor-not-allowed' : 'active:scale-[0.98]'}`}
           >
             <div className="flex items-center gap-3">
               <span

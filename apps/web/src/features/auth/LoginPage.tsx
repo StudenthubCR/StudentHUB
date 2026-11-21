@@ -12,6 +12,9 @@ import {
   IconoDescargar,
   IconoRayo,
   IconoVolver,
+  IconoBirrete,
+  IconoUsuarios,
+  IconoInfo,
 } from '@/components/icons'
 import { ThemeToggle } from '@/app/layout/ThemeToggle'
 import { usePwaInstall } from '@/features/pwa/usePwaInstall'
@@ -21,10 +24,13 @@ import { cn } from '@/lib/cn'
 import {
   LARGO_CODIGO,
   codigoCompleto,
-  correoValido,
   normalizarCorreo,
   soloDigitos,
   traducirErrorAuth,
+  placeholderCorreoPorRol,
+  ayudaCorreoPorRol,
+  validarCorreoParaRol,
+  type RolAcceso,
 } from './auth.service'
 import { useSesion } from './useSesion'
 
@@ -46,6 +52,14 @@ export function LoginPage() {
   const { esModoInstalado } = usePwaInstall()
   const [modalInstalarAbierto, setModalInstalarAbierto] = useState(false)
   const location = useLocation()
+
+  const [rolSeleccionado, setRolSeleccionado] = useState<RolAcceso>(() => {
+    if (typeof window !== 'undefined') {
+      const guardado = localStorage.getItem('studenthub_rol_preferido')
+      if (guardado === 'encargado' || guardado === 'estudiante') return guardado
+    }
+    return 'estudiante'
+  })
 
   const [paso, setPaso] = useState<Paso>({ nombre: 'correo' })
   const [correo, setCorreo] = useState('')
@@ -72,12 +86,22 @@ export function LoginPage() {
     return () => window.clearTimeout(t)
   }, [segundos])
 
+  const cambiarRol = (nuevoRol: RolAcceso) => {
+    setRolSeleccionado(nuevoRol)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('studenthub_rol_preferido', nuevoRol)
+    }
+    setError(null)
+  }
+
   const pedirCodigo = useCallback(
     async (evento?: React.FormEvent) => {
       evento?.preventDefault()
       const limpio = normalizarCorreo(correo)
-      if (!correoValido(limpio)) {
-        setError('Por favor, ingresá un correo electrónico válido.')
+      const validacion = validarCorreoParaRol(limpio, rolSeleccionado)
+
+      if (!validacion.valido) {
+        setError(validacion.error || 'Por favor, ingresá un correo electrónico válido.')
         return
       }
 
@@ -86,28 +110,46 @@ export function LoginPage() {
 
       const esAdmin = limpio === 'studenthub.cr@gmail.com'
 
-      // Si no es el administrador institucional, validar obligatoriamente contra el padrón estudiantil
+      // Validación previa de seguridad sin exponer PII
       if (!esAdmin) {
         try {
-          const { data: estaEnPadron, error: errorRpc } = await supabase.rpc(
-            'verificar_correo_padron',
-            { correo_a_verificar: limpio },
-          )
-
-          if (errorRpc) {
-            console.warn('RPC verificar_correo_padron no disponible:', errorRpc.message)
-          }
-
-          // Bloquear únicamente si la función RPC en Supabase confirmó explícitamente que no está en el padrón
-          if (!errorRpc && estaEnPadron === false) {
-            setEnviando(false)
-            setError(
-              'Este correo electrónico no está registrado en el padrón estudiantil. El acceso está restringido únicamente a estudiantes matriculados.',
+          if (rolSeleccionado === 'estudiante') {
+            const { data: estaEnPadron, error: errorRpc } = await supabase.rpc(
+              'verificar_correo_padron',
+              { correo_a_verificar: limpio },
             )
-            return
+
+            if (errorRpc) {
+              console.warn('RPC verificar_correo_padron no disponible:', errorRpc.message)
+            }
+
+            if (!errorRpc && estaEnPadron === false) {
+              setEnviando(false)
+              setError(
+                'Este correo electrónico no está registrado en el padrón estudiantil activo. El acceso está restringido únicamente a estudiantes matriculados.',
+              )
+              return
+            }
+          } else {
+            const { data: estaEnEncargados, error: errorRpc } = await supabase.rpc(
+              'verificar_correo_encargado',
+              { correo_a_verificar: limpio },
+            )
+
+            if (errorRpc) {
+              console.warn('RPC verificar_correo_encargado no disponible:', errorRpc.message)
+            }
+
+            if (!errorRpc && estaEnEncargados === false) {
+              setEnviando(false)
+              setError(
+                'Este correo electrónico no está registrado en el sistema de encargados legales activos. Comunícate con la secretaría del colegio para asociar tu correo.',
+              )
+              return
+            }
           }
         } catch (err) {
-          console.warn('Fallo al consultar padrón:', err)
+          console.warn('Fallo al consultar padrón o encargados:', err)
         }
       }
 
@@ -121,13 +163,14 @@ export function LoginPage() {
       setPaso({ nombre: 'codigo', correo: limpio })
       setSegundos(60)
     },
-    [correo],
+    [correo, rolSeleccionado],
   )
 
   const ingresarConPassword = useCallback(
     async (evento?: React.FormEvent) => {
       evento?.preventDefault()
-      const destinoCorreo = paso.nombre === 'codigo' ? paso.correo : normalizarCorreo(correo || 'studenthub.cr@gmail.com')
+      const destinoCorreo =
+        paso.nombre === 'codigo' ? paso.correo : normalizarCorreo(correo || 'studenthub.cr@gmail.com')
 
       if (!contrasenaAdmin.trim()) {
         setError('Por favor ingresá la contraseña de administrador.')
@@ -153,11 +196,10 @@ export function LoginPage() {
           establecerSesion?.(data.session)
         }
 
-        // Navegación limpia de recarga para garantizar sincronización completa de la sesión
         const rutaDestino = (location.state as { desde?: { pathname?: string } })?.desde?.pathname || '/'
         const destinoSeguro = rutaDestino.startsWith('/') && !rutaDestino.startsWith('//') ? rutaDestino : '/'
         window.location.href = destinoSeguro
-      } catch (err) {
+      } catch {
         setEnviando(false)
         setError('Error al conectar con el servidor de autenticación.')
       }
@@ -177,14 +219,12 @@ export function LoginPage() {
       setError(null)
 
       try {
-        // 1. Intentar verificar con type 'email' (estándar para OTP por email en Supabase)
         let resultado = await supabase.auth.verifyOtp({
           email: paso.correo,
           token: tokenAUsar,
           type: 'email',
         })
 
-        // 2. Si falla con error de token/inválido/expirado, intentar con 'magiclink' o 'signup'
         if (resultado.error) {
           const m = resultado.error.message.toLowerCase()
           if (m.includes('invalid') || m.includes('expired') || m.includes('token') || m.includes('otp')) {
@@ -214,16 +254,14 @@ export function LoginPage() {
           return
         }
 
-        // 3. Sincronizar de inmediato la sesión en el contexto de la aplicación
         if (resultado.data?.session) {
           establecerSesion?.(resultado.data.session)
         }
 
-        // 4. Redirigir de manera atómica con recarga completa para evitar rebotes de RutaProtegida
         const rutaDestino = (location.state as { desde?: { pathname?: string } })?.desde?.pathname || '/'
         const destinoSeguro = rutaDestino.startsWith('/') && !rutaDestino.startsWith('//') ? rutaDestino : '/'
         window.location.href = destinoSeguro
-      } catch (err) {
+      } catch {
         setEnviando(false)
         setError('Error inesperado al verificar el código.')
       }
@@ -231,18 +269,27 @@ export function LoginPage() {
     [codigo, establecerSesion, location.state, paso],
   )
 
+  const activarModoDemo = (rol: RolAcceso) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('studenthub_demo_sesion', 'true')
+      localStorage.setItem('studenthub_demo_rol', rol)
+      localStorage.setItem('studenthub_rol_preferido', rol)
+      window.location.href = '/'
+    }
+  }
+
   if (cargando) return null
   if (sesion) return <Navigate to="/" replace />
 
   return (
     <div className="relative min-h-screen bg-bg text-text antialiased">
-      {/* Barra superior flotante con Logo, Botón de Instalación y selector de tema */}
+      {/* Barra superior con Logo, Botón de Instalación y selector de tema */}
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
         <div className="flex items-center gap-3">
           <img
             src="/SHlarge.webp"
             alt="Student HUB"
-            className="h-10 w-auto object-contain transition-all duration-250 dark:brightness-0 dark:invert"
+            className="h-9 sm:h-10 w-auto object-contain transition-all duration-200 dark:brightness-0 dark:invert"
           />
         </div>
         <div className="flex items-center gap-2.5 sm:gap-3">
@@ -277,14 +324,14 @@ export function LoginPage() {
             <div>
               <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-tint px-3.5 py-1 text-micro font-bold tracking-[0.09em] text-primary uppercase shadow-sm">
                 <span className="size-2 animate-pulse rounded-full bg-primary" />
-                Portal Estudiantil Oficial
+                Portal Institucional Seguro
               </span>
               <h1 className="mt-3.5 text-hero font-bold tracking-tight text-text sm:text-[2.5rem] sm:leading-[1.15]">
                 Bienvenido a <span className="text-primary">Student HUB</span>
               </h1>
-              <p className="mt-3 max-w-xl text-cuerpo text-text-muted sm:text-base">
-                Tu plataforma centralizada para consultar tu horario escolar asignado, el menú del
-                comedor y tu carnet digital institucional.
+              <p className="mt-3 max-w-xl text-cuerpo text-text-muted sm:text-base leading-relaxed">
+                Plataforma unificada para estudiantes y familias: consultá horarios asignados, menús
+                del comedor, credenciales digitales y avisos oficiales en tiempo real.
               </p>
             </div>
 
@@ -295,9 +342,9 @@ export function LoginPage() {
                   <IconoCalendario className="size-5" />
                 </div>
                 <div>
-                  <h2 className="text-dato font-bold text-text">Mi Horario de Clases</h2>
+                  <h2 className="text-dato font-bold text-text">Horarios de Clases</h2>
                   <p className="text-menuda text-text-muted">
-                    Consulta las materias, horas y docentes específicos de tu grupo.
+                    Materias, horas lectivas y docentes organizados por sección.
                   </p>
                 </div>
               </div>
@@ -307,9 +354,9 @@ export function LoginPage() {
                   <IconoComedor className="size-5" />
                 </div>
                 <div>
-                  <h2 className="text-dato font-bold text-text">Comedor Estudiantil</h2>
+                  <h2 className="text-dato font-bold text-text">Comedor y Alimentación</h2>
                   <p className="text-menuda text-text-muted">
-                    Menú diario, información nutricional y estado del servicio.
+                    Menú balanceado diario y confirmación de raciones escolares.
                   </p>
                 </div>
               </div>
@@ -319,9 +366,9 @@ export function LoginPage() {
                   <IconoCarnet className="size-5" />
                 </div>
                 <div>
-                  <h2 className="text-dato font-bold text-text">Carnet Digital</h2>
+                  <h2 className="text-dato font-bold text-text">Carnet Digital 3D</h2>
                   <p className="text-menuda text-text-muted">
-                    Tu credencial de estudiante siempre actualizada con código QR oficial.
+                    Credencial interactiva segura con código QR dinámico y ficha de emergencia.
                   </p>
                 </div>
               </div>
@@ -329,7 +376,7 @@ export function LoginPage() {
           </div>
 
           {/* Columna Derecha: Tarjeta interactiva de Autenticación */}
-          <div className="rounded-2xl border border-border bg-surface p-5 shadow-xl elev-md sm:p-8">
+          <div className="rounded-2xl border border-border bg-surface p-5 shadow-xl sm:p-8">
             {!esModoInstalado && (
               <div className="mb-5 flex items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary-tint/60 p-3.5 text-menuda">
                 <div className="flex items-center gap-2.5 text-text">
@@ -337,8 +384,8 @@ export function LoginPage() {
                     <IconoDescargar className="size-4" />
                   </span>
                   <div>
-                    <p className="font-bold text-text">¿Entraste por el enlace?</p>
-                    <p className="text-micro text-text-muted">Instalá la app para acceder sin internet.</p>
+                    <p className="font-bold text-text">¿Ingresaste desde el navegador?</p>
+                    <p className="text-micro text-text-muted">Instalá la aplicación para operar sin internet.</p>
                   </div>
                 </div>
                 <button
@@ -357,19 +404,68 @@ export function LoginPage() {
                 noValidate
                 className="flex flex-col gap-5"
               >
+                {/* SELECTOR DE ROL ACCESIBLE */}
+                {!modoAdminPassword && !esCorreoAdmin && (
+                  <div>
+                    <label className="mb-2 block text-etiqueta font-bold tracking-[0.08em] text-text-muted uppercase">
+                      Seleccioná tu tipo de cuenta
+                    </label>
+                    <div
+                      role="tablist"
+                      aria-label="Tipo de usuario para inicio de sesión"
+                      className="grid grid-cols-2 gap-1.5 rounded-2xl border border-border bg-surface-alt/80 p-1.5"
+                    >
+                      <button
+                        type="button"
+                        role="tab"
+                        aria-selected={rolSeleccionado === 'estudiante'}
+                        onClick={() => cambiarRol('estudiante')}
+                        className={cn(
+                          'flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-menor font-bold transition-all duration-200 cursor-pointer',
+                          rolSeleccionado === 'estudiante'
+                            ? 'bg-primary-solid text-white shadow-sm'
+                            : 'text-text-muted hover:text-text hover:bg-surface/60',
+                        )}
+                      >
+                        <IconoBirrete className="size-4" aria-hidden="true" />
+                        <span>Estudiante</span>
+                      </button>
+                      <button
+                        type="button"
+                        role="tab"
+                        aria-selected={rolSeleccionado === 'encargado'}
+                        onClick={() => cambiarRol('encargado')}
+                        className={cn(
+                          'flex items-center justify-center gap-2 rounded-xl py-2.5 px-3 text-menor font-bold transition-all duration-200 cursor-pointer',
+                          rolSeleccionado === 'encargado'
+                            ? 'bg-primary-solid text-white shadow-sm'
+                            : 'text-text-muted hover:text-text hover:bg-surface/60',
+                        )}
+                      >
+                        <IconoUsuarios className="size-4" aria-hidden="true" />
+                        <span>Encargado Legal</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="flex size-6 items-center justify-center rounded-full bg-primary-solid text-micro font-bold text-white">
                       1
                     </span>
                     <h2 className="text-titulo font-bold text-text">
-                      {modoAdminPassword || esCorreoAdmin ? 'Acceso de Administrador' : 'Ingresá tu correo'}
+                      {modoAdminPassword || esCorreoAdmin
+                        ? 'Acceso de Administrador'
+                        : rolSeleccionado === 'estudiante'
+                          ? 'Acceso Estudiantil'
+                          : 'Acceso para Encargados'}
                     </h2>
                   </div>
                   <p className="mt-1.5 text-menor text-text-muted">
                     {modoAdminPassword || esCorreoAdmin
                       ? 'Autenticación directa para la cuenta oficial de administración institucional.'
-                      : 'Escribí el correo registrado en el padrón estudiantil. Te enviaremos un código de seguridad sin contraseña.'}
+                      : ayudaCorreoPorRol(rolSeleccionado)}
                   </p>
                 </div>
 
@@ -391,7 +487,9 @@ export function LoginPage() {
                     className="mb-2 flex items-center gap-1.5 text-etiqueta font-bold tracking-[0.08em] text-text-muted uppercase"
                   >
                     <IconoCorreo className="size-3.5 text-primary" />
-                    <span>Correo electrónico</span>
+                    <span>
+                      {rolSeleccionado === 'estudiante' ? 'Correo institucional MEP' : 'Correo electrónico del encargado'}
+                    </span>
                   </label>
                   <input
                     id="correo"
@@ -404,9 +502,16 @@ export function LoginPage() {
                       setCorreo(e.target.value)
                       if (error) setError(null)
                     }}
-                    placeholder="estudiante@ejemplo.com"
+                    placeholder={placeholderCorreoPorRol(rolSeleccionado)}
                     className={CAMPO}
                   />
+                  {!modoAdminPassword && !esCorreoAdmin && (
+                    <p className="mt-1.5 text-micro text-text-muted">
+                      {rolSeleccionado === 'estudiante'
+                        ? 'Ejemplo: nombre.apellido@mep.go.cr'
+                        : 'El correo debe coincidir con el registrado en el expediente estudiantil.'}
+                    </p>
+                  )}
                 </div>
 
                 {(modoAdminPassword || esCorreoAdmin) && (
@@ -474,7 +579,7 @@ export function LoginPage() {
                       <span>Enviando código seguro…</span>
                     ) : (
                       <>
-                        <span>Continuar con mi correo</span>
+                        <span>Solicitar código de verificación</span>
                         <IconoFlechaDerecha className="size-4" />
                       </>
                     )}
@@ -486,23 +591,31 @@ export function LoginPage() {
                     <div className="w-full border-t border-border" />
                   </div>
                   <span className="relative bg-surface px-2 text-micro font-semibold text-text-muted uppercase">
-                    Opciones de acceso
+                    Modos de demostración (Expotécnica)
                   </span>
                 </div>
 
-                <div className="flex flex-col gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <button
                     type="button"
-                    onClick={() => {
-                      localStorage.setItem('studenthub_demo_sesion', 'true')
-                      window.location.href = '/'
-                    }}
-                    className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary-tint px-4 py-2.5 text-menor font-bold text-primary transition-all hover:bg-primary-tint-strong active:scale-98 shadow-xs"
+                    onClick={() => activarModoDemo('estudiante')}
+                    className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary-tint px-3 py-2.5 text-menor font-bold text-primary transition-all hover:bg-primary-tint-strong active:scale-98 shadow-xs"
                   >
-                    <span>Entrar en modo demo (Sin esperar correo)</span>
-                    <IconoFlechaDerecha className="size-3.5" />
+                    <IconoBirrete className="size-4" />
+                    <span>Demo Estudiante</span>
                   </button>
 
+                  <button
+                    type="button"
+                    onClick={() => activarModoDemo('encargado')}
+                    className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 text-menor font-bold text-emerald-700 dark:text-emerald-400 transition-all hover:bg-emerald-500/20 active:scale-98 shadow-xs"
+                  >
+                    <IconoUsuarios className="size-4" />
+                    <span>Demo Encargado</span>
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-2 pt-1">
                   {!modoAdminPassword && !esCorreoAdmin ? (
                     <button
                       type="button"
@@ -528,16 +641,15 @@ export function LoginPage() {
                       className="inline-flex items-center justify-center gap-1.5 text-center text-micro font-semibold text-text-muted hover:underline cursor-pointer py-1"
                     >
                       <IconoVolver className="size-3.5" />
-                      <span>Volver al acceso para estudiantes</span>
+                      <span>Volver al acceso estándar</span>
                     </button>
                   )}
                 </div>
 
                 <div className="flex items-center justify-center gap-1.5 pt-1 text-micro text-text-muted">
                   <IconoEscudo className="size-3.5 text-primary" />
-                  <span>Acceso institucional protegido • Student HUB 2026</span>
+                  <span>Aislamiento de identidad y RLS verificado • Ley N° 8968</span>
                 </div>
-
               </form>
             ) : (
               <form onSubmit={verificar} noValidate className="flex flex-col gap-5">
@@ -552,15 +664,19 @@ export function LoginPage() {
                     Ingresá el código de verificación que enviamos a{' '}
                     <strong className="font-semibold text-text">{paso.correo}</strong>.
                   </p>
-                  <p className="mt-1 text-micro text-amber-700 dark:text-amber-300">
-                    💡 Si no aparece en tu bandeja principal, revisá también la carpeta de Spam o Correo no deseado.
-                  </p>
+                  <div className="mt-2.5 flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 p-2.5 text-micro text-amber-900 dark:text-amber-200">
+                    <IconoInfo className="size-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                    <span>
+                      Si no aparece en tu bandeja principal, revisá también la carpeta de Spam o Correo no deseado.
+                    </span>
+                  </div>
                 </div>
 
                 {paso.correo === 'studenthub.cr@gmail.com' && (
                   <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 text-menor text-amber-900 dark:text-amber-200">
                     <p className="font-bold flex items-center gap-1.5">
-                      <span>👑</span> ¿No te llega el código OTP a studenthub.cr@gmail.com?
+                      <IconoEscudo className="size-4 text-amber-600 dark:text-amber-400" />
+                      <span>¿No te llega el código OTP a studenthub.cr@gmail.com?</span>
                     </p>
                     <p className="mt-1 text-menuda opacity-90">
                       Podés ingresar inmediatamente utilizando la contraseña institucional de administrador.
@@ -643,9 +759,10 @@ export function LoginPage() {
                       setCodigo('')
                       setError(null)
                     }}
-                    className="cursor-pointer font-semibold text-primary transition-colors hover:text-primary-dark"
+                    className="cursor-pointer font-semibold text-primary transition-colors hover:text-primary-dark inline-flex items-center gap-1"
                   >
-                    ← Cambiar correo
+                    <IconoVolver className="size-3.5" />
+                    <span>Cambiar correo</span>
                   </button>
 
                   <button

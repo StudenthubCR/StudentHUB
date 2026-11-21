@@ -1,16 +1,11 @@
 /**
- * DATOS DE DEMOSTRACIÓN — no son de una persona real y no salen de ninguna
- * base de datos.
+ * DATOS DE DEMOSTRACIÓN — Cumplen la Ley N° 8968 de protección de datos personales.
  *
- * El carnet es la única sección que muestra datos personales, y esos no viven
- * en Google Sheets ni pueden vivir ahí (plan §2 y §10). Hasta que exista
- * Supabase con RLS y el login por correo MEP, esta pantalla se arma con una
- * ficha inventada: son los mismos valores que la app actual trae escritos a
- * mano en `index.html`.
- *
- * Cuando llegue la autenticación, este archivo se borra y la ficha sale de la
- * tabla `estudiantes` filtrada por la sesión.
+ * Datos ficticios para evaluación de jueces en Expotécnica 2026.
  */
+
+export type RolUsuario = 'estudiante' | 'encargado'
+
 export type Estudiante = {
   id?: string
   user_id?: string
@@ -32,6 +27,18 @@ export type Estudiante = {
   genero?: string
   rol?: string
   esRespaldo?: boolean
+  parentesco?: string
+}
+
+export type Encargado = {
+  id: string
+  user_id?: string
+  correo: string
+  nombreCompleto: string
+  cedula?: string
+  telefono?: string
+  parentesco?: string
+  activo: boolean
 }
 
 export const ESTUDIANTE_DEMO: Estudiante = {
@@ -42,9 +49,38 @@ export const ESTUDIANTE_DEMO: Estudiante = {
   institucion: 'Colegio Técnico Profesional',
   siglaInstitucion: 'CTP',
   grupo: '11-1',
+  seccion: '11-1',
   nivel: 'Undécimo Año',
   jornada: 'Diurna',
   vigencia: 'Ciclo Lectivo 2026',
   fotoUrl: '',
+  activo: true,
+  parentesco: 'Hijo',
+}
+
+export const ESTUDIANTE_DEMO_2: Estudiante = {
+  id: '00000000-0000-0000-0000-000000000003',
+  nombre: 'Sofía García Burgos',
+  codigo: '208520531',
+  especialidad: 'Contabilidad & Finanzas',
+  institucion: 'Colegio Técnico Profesional',
+  siglaInstitucion: 'CTP',
+  grupo: '10-2',
+  seccion: '10-2',
+  nivel: 'Décimo Año',
+  jornada: 'Diurna',
+  vigencia: 'Ciclo Lectivo 2026',
+  fotoUrl: '',
+  activo: true,
+  parentesco: 'Hija',
+}
+
+export const ENCARGADO_DEMO: Encargado = {
+  id: '00000000-0000-0000-0000-000000000002',
+  correo: 'encargado.demo@gmail.com',
+  nombreCompleto: 'María Elena Burgos Soto',
+  cedula: '1-0845-0921',
+  telefono: '8844-1290',
+  parentesco: 'Madre de Familia',
   activo: true,
 }

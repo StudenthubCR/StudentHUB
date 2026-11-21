@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { IconoSalir } from '@/components/icons'
 import { useSesion } from '@/features/auth/useSesion'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
+import { BadgeRol } from '@/components/BadgeRol'
 import { cn } from '@/lib/cn'
 import { obtenerIniciales } from '@/lib/texto'
 import { NAV_ITEMS } from './nav-items'
@@ -85,7 +86,7 @@ export function AppNav() {
 }
 
 function FichaLateral() {
-  const { estudiante, cargando } = useEstudiante()
+  const { estudiante, rolActivo, encargado, cargando } = useEstudiante()
   const { sesion, cerrarSesion } = useSesion()
 
   if (cargando) {
@@ -142,6 +143,15 @@ function FichaLateral() {
 
   return (
     <div className="mt-auto hidden flex-col gap-2 border-t border-border pt-3 lg:flex">
+      <div className="flex items-center justify-between px-1">
+        <BadgeRol rol={rolActivo} />
+        {rolActivo === 'encargado' && encargado && (
+          <span className="text-[10px] text-text-muted truncate max-w-[120px]" title={encargado.nombreCompleto}>
+            {encargado.nombreCompleto}
+          </span>
+        )}
+      </div>
+
       <NavLink
         to="/carnet"
         className={({ isActive }) =>

@@ -5,6 +5,9 @@ import {
   dominioDe,
   dominioPermitido,
   normalizarCorreo,
+  placeholderCorreoPorRol,
+  ayudaCorreoPorRol,
+  validarCorreoParaRol,
   soloDigitos,
 } from './auth.service'
 
@@ -43,6 +46,27 @@ describe('dominioPermitido', () => {
   it('valida coincidencia de dominio', () => {
     expect(dominioPermitido('estudiante@mep.go.cr', 'mep.go.cr')).toBe(true)
     expect(dominioPermitido('estudiante@otro.com', 'mep.go.cr')).toBe(false)
+  })
+})
+
+describe('placeholderCorreoPorRol y ayudaCorreoPorRol', () => {
+  it('devuelve placeholder y orientación para estudiante', () => {
+    expect(placeholderCorreoPorRol('estudiante')).toContain('@mep.go.cr')
+    expect(ayudaCorreoPorRol('estudiante')).toContain('oficial del MEP')
+  })
+
+  it('devuelve placeholder y orientación para encargado legal', () => {
+    expect(placeholderCorreoPorRol('encargado')).toContain('@ejemplo.com')
+    expect(ayudaCorreoPorRol('encargado')).toContain('encargado legal')
+  })
+})
+
+describe('validarCorreoParaRol', () => {
+  it('valida correo no vacío y con formato correcto', () => {
+    expect(validarCorreoParaRol('estudiante@mep.go.cr', 'estudiante')).toEqual({ valido: true })
+    expect(validarCorreoParaRol('mama@gmail.com', 'encargado')).toEqual({ valido: true })
+    expect(validarCorreoParaRol('', 'estudiante').valido).toBe(false)
+    expect(validarCorreoParaRol('invalido', 'encargado').valido).toBe(false)
   })
 })
 

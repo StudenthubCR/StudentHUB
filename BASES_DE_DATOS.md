@@ -1,67 +1,112 @@
-# Bases de datos — Student HUB (equipo)
+# Arquitectura de Bases de Datos y Seguridad — Student HUB
 
-Documento oficial del proyecto. **No guardar solo en cuentas personales**; usar este repositorio.
-
----
-
-## 1. Horarios (activo en la app)
-
-| Recurso | Enlace / valor |
-|--------|----------------|
-| **Google Sheet** | https://docs.google.com/spreadsheets/d/1Qm2sW_y5dL7KokhKjCUJ7hPFDnFzgoJP3oeZlCXYMXo/edit |
-| **ID del libro** | `1Qm2sW_y5dL7KokhKjCUJ7hPFDnFzgoJP3oeZlCXYMXo` |
-| **Pestaña** | `Horarios` |
-| **Columnas** | A=Grupo, B=Día, C=Hora, D=Materia |
-| **Grupo prototipo** | `11-2` (texto plano en columna A, no fecha) |
-| **API (Apps Script)** | https://script.google.com/macros/s/AKfycbxcjXuPs80KsshkCACYPZdOXQmuPY5tg-ThNmcWZ_9_YyOIEkOgb4oMdNlTOYixbfqz/exec |
-| **Filtro por grupo** | `.../exec?grupo=11-2` |
-| **Código backend** | `apps-script/horarios.gs` |
-| **Config en la app** | `js/config.js` → `horariosApiUrl` |
-
-### Probar la API
-
-Abrir en el navegador la URL de la API. Debe verse JSON con `"grupo":"11-2"`, no un mensaje `error`.
+Documento oficial de arquitectura de persistencia y seguridad de datos para Student HUB (CTP San Rafael de Alajuela).
 
 ---
 
-## 2. Dónde lo usa la app
+## 1. Principios Rectores y Marco Legal (Ley N° 8968 / PRODHAB & MEP)
 
-- **URL de la API:** `js/config.js` → `StudentHubConfig.horariosApiUrl`
-- **Grupo del prototipo:** `estudianteGrupo: '11-2'`
-- **Botón 11°:** `index.html` → `data-grupo="11-2"`
-- **Lógica de carga:** `js/script.js` → `fetchHorarios()`
-
-Si cambian el despliegue de Apps Script, actualizar **solo** `horariosApiUrl` en `js/config.js` y subir el cambio a GitHub.
-
----
-
-## 3. Cómo editar horarios
-
-1. Abrir el **Google Sheet** (enlace arriba).
-2. Editar filas en **Horarios** (fila 1 = encabezados).
-3. Guardar — la app lee los cambios al recargar (Ctrl+F5).
-
-Para cambiar el script: **Extensiones → Apps Script** en esa misma hoja → pegar `apps-script/horarios.gs` → **Implementar → Nueva implementación**.
+1. **Privacidad de Menores y Protección de Datos Personales:**
+   - La información personal, académica y de salud de los estudiantes vive exclusivamente en **Supabase (PostgreSQL)** con **Row Level Security (RLS)** obligatorio.
+   - **Bajo ninguna circunstancia se almacenan datos personales, nombres, cédulas, carnets o encargados en Google Sheets.**
+2. **Autenticación Passwordless:**
+   - Se utiliza exclusivamente autenticación OTP (One-Time Password) por correo electrónico enviado a través de Supabase Auth + Resend.
+   - No existen contraseñas estáticas para estudiantes ni encargados legales.
+3. **Aislamiento Multi-Rol Estricto:**
+   - **Estudiante (`estudiante`):** Visualiza y gestiona únicamente su propia ficha personal y confirmaciones del comedor escolar.
+   - **Encargado Legal (`encargado`):** Accede en modo lectura supervisada **únicamente** a los registros de los estudiantes con vínculo familiar activo en `encargado_estudiante`.
+   - **Administrador (`admin`):** Gestión institucional centralizada.
 
 ---
 
-## 4. Próximas bases (aún no conectadas)
+## 2. Esquema Relacional en PostgreSQL (Supabase)
 
-| Módulo | Estado | Notas |
-|--------|--------|--------|
-| Estudiantes / Carnet | Pendiente | Datos fijos en `index.html` |
-| Noticias (carrusel) | Pendiente | Imágenes en `assets/` |
-| Comedor | Pendiente | Placeholder en la app |
+### 2.1 Tabla `public.instituciones`
+Almacena las sedes y colegios técnicos integrados.
+- `id` (uuid, PK)
+- `nombre` (text)
+- `slug` (text, unique)
+- `dominio_correo` (text) — Ej: `mep.go.cr`
+- `activa` (boolean)
 
-Cuando existan, agregar filas aquí y las URLs en `js/config.js`.
+### 2.2 Tabla `public.grupos`
+Secciones académicas y técnicas de la institución.
+- `id` (uuid, PK)
+- `institucion_id` (uuid, FK -> `instituciones.id`)
+- `codigo` (text) — Ej: `11-1`, `12-2`
+- `nivel` (text) — Ej: `10mo`, `11mo`, `12mo`
+- `jornada` (text) — `Diurna` o `Nocturna`
+
+### 2.3 Tabla `public.estudiantes` (Padrón Estudiantil)
+Ficha digital del estudiante.
+- `id` (uuid, PK)
+- `user_id` (uuid, FK -> `auth.users.id`, nullable)
+- `institucion_id` (uuid, FK -> `instituciones.id`)
+- `grupo_id` (uuid, FK -> `grupos.id`)
+- `codigo` (text) — Identificador estudiantil visible en carnet
+- `correo` (text, unique) — Correo institucional `@mep.go.cr`
+- `nombre` (text)
+- `especialidad` (text)
+- `estado` (text) — `activo`, `inactivo`, `egresado`
+- `foto_url` (text, nullable)
+
+### 2.4 Tabla `public.encargados` (Encargados Legales / Tutores)
+Información de madres, padres o tutores legales autorizados.
+- `id` (uuid, PK)
+- `user_id` (uuid, FK -> `auth.users.id`, nullable)
+- `correo` (text, unique) — Correo personal del encargado (Gmail, Outlook, etc.)
+- `nombre_completo` (text)
+- `cedula` (text, nullable)
+- `telefono` (text, nullable)
+- `parentesco_por_defecto` (text) — Ej: `Madre`, `Padre`, `Tutor Legal`
+- `activo` (boolean, default true)
+- `creado_el` (timestamptz)
+- `actualizado_el` (timestamptz)
+
+### 2.5 Tabla `public.encargado_estudiante` (Vínculo M:N)
+Tabla puente para relaciones familiares muchos a muchos.
+- `id` (uuid, PK)
+- `encargado_id` (uuid, FK -> `encargados.id` on delete cascade)
+- `estudiante_id` (uuid, FK -> `estudiantes.id` on delete cascade)
+- `parentesco` (text, nullable)
+- `es_principal` (boolean, default true)
+- `activo` (boolean, default true)
+- `creado_el` (timestamptz)
+- *Constraint Unique:* `(encargado_id, estudiante_id)`
+
+### 2.6 Tabla `public.confirmaciones_comedor`
+Registro diario de asistencia al servicio de alimentación institucional.
+- `id` (uuid, PK)
+- `estudiante_id` (uuid, FK -> `estudiantes.id` on delete cascade)
+- `fecha` (date, default current_date)
+- `asistencia` (boolean)
+- `actualizado_el` (timestamptz)
+- *Constraint Unique:* `(estudiante_id, fecha)`
 
 ---
 
-## 5. Permisos recomendados
+## 3. Matriz de Políticas RLS (Row Level Security)
 
-- Sheet y Apps Script: cuenta del **equipo** o colegio, con acceso de edición para quienes mantienen datos.
-- Despliegue web: **Cualquier persona** (solo lectura vía API).
+| Tabla | Operación | Rol Estudiante | Rol Encargado Legal | Rol Administrador |
+| :--- | :--- | :--- | :--- | :--- |
+| `estudiantes` | `SELECT` | Propio perfil (`user_id = auth.uid()` o correo) | Solo estudiantes vinculados activos en `encargado_estudiante` | Todos |
+| `estudiantes` | `INSERT/UPDATE/DELETE` | Bloqueado | Bloqueado | Permitido |
+| `encargados` | `SELECT` | Bloqueado | Propio perfil (`user_id = auth.uid()` o correo) | Todos |
+| `encargado_estudiante` | `SELECT` | Sus propios encargados registrados | Sus propios estudiantes vinculados | Todos |
+| `confirmaciones_comedor` | `SELECT` | Propias confirmaciones | Confirmaciones de sus estudiantes vinculados | Todas |
+| `confirmaciones_comedor` | `INSERT/UPDATE` | Propia confirmación (sujeto a horario) | **Bloqueado (Solo Lectura)** | Permitido |
+| `grupos` / `instituciones` | `SELECT` | Lectura pública autenticada | Lectura pública autenticada | Todos |
 
 ---
 
-*Última API verificada: grupo 11-2, ~29 bloques horarios (Lunes–Viernes).*
+## 4. Servicios Externos y APIs Auxiliares
+
+### Horarios de Lecciones (Solo Lectura)
+- **Origen:** Hoja de cálculo de horarios y distribución académica CTP.
+- **Despliegue:** Google Apps Script Web App (Solo lectura de materias, bloques y docentes).
+- **Endpoint:** Configurado mediante `VITE_HORARIOS_API_URL`.
+- **Caché:** Indexada y cacheada localmente vía TanStack React Query + LocalStorage para resiliencia offline.
+
+### Menú Semanal de Comedor (Solo Lectura)
+- **Origen:** Publicación semanal del menú de comedor institucional.
+- **Endpoint:** Configurado mediante `VITE_COMEDOR_API_URL`.

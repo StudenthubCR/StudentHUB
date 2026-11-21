@@ -8,6 +8,7 @@ import {
   IconoCarnet,
   IconoRayo,
   IconoAgenda,
+  IconoUsuarios,
 } from '@/components/icons'
 
 type Props = {
@@ -15,8 +16,10 @@ type Props = {
 }
 
 export function HeroExpo({ onAbrirInstalar }: Props) {
-  const entrarModoDemo = () => {
+  const entrarModoDemo = (rol: 'estudiante' | 'encargado' = 'estudiante') => {
     localStorage.setItem('studenthub_demo_sesion', 'true')
+    localStorage.setItem('studenthub_demo_rol', rol)
+    localStorage.removeItem('studenthub_estudiante_activo_id')
     window.location.href = '/'
   }
 
@@ -99,11 +102,9 @@ export function HeroExpo({ onAbrirInstalar }: Props) {
               </span>
             </a>
 
-            {/* Paso 2 (CTA Principal Destacado con Gradiente Vibrante) */}
-            <button
-              type="button"
-              onClick={entrarModoDemo}
-              className="flex flex-col justify-between p-4 rounded-2xl bg-gradient-to-br from-primary via-blue-600 to-indigo-700 text-white text-left transition-all duration-200 group cursor-pointer shadow-lg shadow-primary/30 ring-2 ring-white/30 hover:scale-102 active:scale-98 hover:-translate-y-0.5"
+            {/* Paso 2 (CTA Principal Destacado con Gradiente Vibrante y Soporte Dual de Roles) */}
+            <div
+              className="flex flex-col justify-between p-4 rounded-2xl bg-gradient-to-br from-primary via-blue-600 to-indigo-700 text-white text-left transition-all duration-200 group shadow-lg shadow-primary/30 ring-2 ring-white/30"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
@@ -116,14 +117,34 @@ export function HeroExpo({ onAbrirInstalar }: Props) {
                   App Real en Vivo
                 </h3>
                 <p className="text-menuda text-white/90 mt-1 leading-snug">
-                  Abrí Student HUB como estudiante sin esperar ni digitar correos.
+                  Probá Student HUB en vivo como estudiante o como encargado legal de 2 hijos.
                 </p>
               </div>
-              <span className="mt-3.5 text-micro font-black text-white flex items-center gap-1 bg-black/20 backdrop-blur-xs px-2.5 py-1 rounded-full w-fit">
-                <span>Probar ahora</span>
-                <IconoFlechaDerecha className="size-3 group-hover:translate-x-1 transition-transform" />
-              </span>
-            </button>
+              <div className="mt-3.5 flex flex-col gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => entrarModoDemo('estudiante')}
+                  className="w-full text-micro font-black text-white flex items-center justify-between gap-1.5 bg-black/25 hover:bg-black/35 backdrop-blur-xs px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-95"
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <IconoBirrete className="size-3.5" />
+                    <span>Demo Estudiante</span>
+                  </span>
+                  <IconoFlechaDerecha className="size-3" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => entrarModoDemo('encargado')}
+                  className="w-full text-micro font-black text-white flex items-center justify-between gap-1.5 bg-emerald-500/30 hover:bg-emerald-500/40 border border-emerald-400/40 backdrop-blur-xs px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-95"
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <IconoUsuarios className="size-3.5" />
+                    <span>Demo Encargado (2 hijos)</span>
+                  </span>
+                  <IconoFlechaDerecha className="size-3" />
+                </button>
+              </div>
+            </div>
 
             {/* Paso 3 */}
             <a

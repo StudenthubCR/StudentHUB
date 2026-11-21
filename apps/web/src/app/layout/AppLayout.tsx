@@ -8,6 +8,8 @@ import { usePwaInstall } from '@/features/pwa/usePwaInstall'
 import { ModalInstalarApp } from '@/features/pwa/ModalInstalarApp'
 import { Chatbot } from '@/features/chatbot/Chatbot'
 import { ToastNotificacionFlotante } from '@/features/notificaciones/components/ToastNotificacionFlotante'
+import { useEstudiante } from '@/features/estudiante/useEstudiante'
+import { BadgeRol } from '@/components/BadgeRol'
 import {
   IconoDescargar,
   IconoBirrete,
@@ -18,12 +20,14 @@ import {
   IconoComedor,
   IconoInicio,
   IconoCerrar,
+  IconoRecargar,
 } from '@/components/icons'
 
 
 export function AppLayout({ children }: { children?: ReactNode }) {
   useTituloDeRuta()
   const { esModoInstalado } = usePwaInstall()
+  const { rolActivo, alternarRolDemo } = useEstudiante()
   const [modalInstalarAbierto, setModalInstalarAbierto] = useState(false)
   const [bannerDescartado, setBannerDescartado] = useState(false)
 
@@ -66,26 +70,40 @@ export function AppLayout({ children }: { children?: ReactNode }) {
                   <IconoBirrete className="size-4 text-white" />
                 </span>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-black text-text text-nota leading-tight">
                       Modo Juez · Expotécnica 2026
                     </p>
                     <span className="inline-block rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold uppercase">
                       ● Sesión Demo Activa
                     </span>
+                    <BadgeRol rol={rolActivo} />
                   </div>
                   <p className="text-micro text-text-muted mt-0.5">
-                    Tocá los atajos para evaluar cada módulo o volver a la ficha técnica:
+                    Evaluá la app como {rolActivo === 'estudiante' ? 'estudiante regular' : 'encargado legal con estudiantes a cargo'}:
                   </p>
                 </div>
               </div>
-              <a
-                href="/expo"
-                className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-3.5 py-1.5 text-micro font-bold text-white shadow-xs hover:bg-primary-dark transition-all active:scale-95 shrink-0"
-              >
-                <IconoVolver className="size-3.5" />
-                <span>Volver al Portal de Jueces</span>
-              </a>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => alternarRolDemo(rolActivo === 'estudiante' ? 'encargado' : 'estudiante')}
+                  className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-primary/40 bg-primary-tint px-3 py-1.5 text-micro font-bold text-primary hover:bg-primary-tint-strong transition-all active:scale-95 shadow-2xs"
+                  title="Alternar entre perfil demo de Estudiante y Encargado Legal"
+                >
+                  <IconoRecargar className="size-3.5" />
+                  <span>
+                    {rolActivo === 'estudiante' ? 'Ver como Encargado (2 hijos)' : 'Ver como Estudiante'}
+                  </span>
+                </button>
+                <a
+                  href="/expo"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-3.5 py-1.5 text-micro font-bold text-white shadow-xs hover:bg-primary-dark transition-all active:scale-95"
+                >
+                  <IconoVolver className="size-3.5" />
+                  <span className="hidden sm:inline">Portal Jueces</span>
+                </a>
+              </div>
             </div>
 
             {/* Píldoras de Acceso Rápido para el Jurado */}

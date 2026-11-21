@@ -166,7 +166,7 @@ describe('Admin Service: Cero Mocks y Consultas a Base de Datos Real', () => {
     expect(kpis.avisosVigentes).toBeGreaterThanOrEqual(0)
     expect(kpis.reportesPendientes).toBeGreaterThanOrEqual(0)
     expect(kpis.accionesHoy).toBeGreaterThanOrEqual(0)
-  })
+  }, 30000)
 
   it('obtenerEstudiantesDirectorio retorna un array basado en la base de datos sin arrays semilla hardcodeados', async () => {
     const directorio = await obtenerEstudiantesDirectorio()
@@ -180,5 +180,5 @@ describe('Admin Service: Cero Mocks y Consultas a Base de Datos Real', () => {
       expect(typeof est.especialidad).toBe('string')
       expect(['activo', 'inactivo']).toContain(est.estado)
     }
-  })
+  }, 30000)
 })

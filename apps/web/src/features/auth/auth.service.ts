@@ -4,6 +4,9 @@
  * Todo lo de aquí es para avisar temprano en la interfaz. La validación que
  * manda vive en la base: el padrón decide quién entra, y RLS decide qué ve.
  */
+
+export type RolAcceso = 'estudiante' | 'encargado'
+
 export function normalizarCorreo(correo: string): string {
   return correo.trim().toLowerCase()
 }
@@ -24,6 +27,39 @@ export function correoValido(correo: string): boolean {
 export function dominioPermitido(correo: string, dominio: string | null): boolean {
   if (!dominio) return true
   return dominioDe(correo) === dominio.trim().toLowerCase()
+}
+
+/**
+ * Texto de sugerencia (placeholder) según el rol seleccionado.
+ */
+export function placeholderCorreoPorRol(rol: RolAcceso): string {
+  return rol === 'estudiante' ? 'estudiante@mep.go.cr' : 'encargado@ejemplo.com'
+}
+
+/**
+ * Mensaje de orientación según el rol seleccionado.
+ */
+export function ayudaCorreoPorRol(rol: RolAcceso): string {
+  return rol === 'estudiante'
+    ? 'Ingresá tu correo estudiantil oficial del MEP para recibir tu código de acceso temporal.'
+    : 'Ingresá el correo electrónico personal registrado en la institución como encargado legal o tutor.'
+}
+
+/**
+ * Valida el formato del correo según el rol seleccionado antes del envío del OTP.
+ */
+export function validarCorreoParaRol(
+  correo: string,
+  _rol: RolAcceso,
+): { valido: boolean; error?: string } {
+  const limpio = normalizarCorreo(correo)
+  if (!limpio) {
+    return { valido: false, error: 'Por favor, ingresá tu correo electrónico.' }
+  }
+  if (!correoValido(limpio)) {
+    return { valido: false, error: 'Por favor, ingresá un correo electrónico con formato válido.' }
+  }
+  return { valido: true }
 }
 
 /**

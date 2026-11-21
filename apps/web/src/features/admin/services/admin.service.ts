@@ -87,31 +87,23 @@ export async function obtenerMetricasAdmin(): Promise<AdminKpis> {
   let reportesPendientes = 0
   let accionesHoy = 0
 
-  // 1. Consultar conteo exacto de estudiantes en Supabase
-  try {
-    const { count: total, error: errTotal } = await supabase
-      .from('estudiantes')
-      .select('*', { count: 'exact', head: true })
+  // Consultar estudiantes y avisos en paralelo para evitar latencia acumulada
+  const [estudiantesTotalRes, estudiantesActivosRes, avisosRes] = await Promise.allSettled([
+    supabase.from('estudiantes').select('*', { count: 'exact', head: true }),
+    supabase.from('estudiantes').select('*', { count: 'exact', head: true }).eq('estado', 'activo'),
+    obtenerTodosLosAvisosAdmin(),
+  ])
 
-    if (!errTotal && total !== null) {
-      totalEstudiantes = total
-    }
-
-    const { count: activos, error: errActivos } = await supabase
-      .from('estudiantes')
-      .select('*', { count: 'exact', head: true })
-      .eq('estado', 'activo')
-
-    if (!errActivos && activos !== null) {
-      estudiantesActivos = activos
-    }
-  } catch (err) {
-    console.warn('Error al consultar estadísticas de estudiantes:', err)
+  if (estudiantesTotalRes.status === 'fulfilled' && !estudiantesTotalRes.value.error && estudiantesTotalRes.value.count !== null) {
+    totalEstudiantes = estudiantesTotalRes.value.count
   }
 
-  // 2. Consultar conteo exacto de avisos en Supabase
-  try {
-    const avisos = await obtenerTodosLosAvisosAdmin()
+  if (estudiantesActivosRes.status === 'fulfilled' && !estudiantesActivosRes.value.error && estudiantesActivosRes.value.count !== null) {
+    estudiantesActivos = estudiantesActivosRes.value.count
+  }
+
+  if (avisosRes.status === 'fulfilled') {
+    const avisos = avisosRes.value
     avisosTotales = avisos.length
 
     const ahora = new Date()
@@ -126,8 +118,6 @@ export async function obtenerMetricasAdmin(): Promise<AdminKpis> {
         a.priority === 'urgent' &&
         (!a.expires_at || new Date(a.expires_at) > ahora),
     ).length
-  } catch (err) {
-    console.warn('Error al consultar estadísticas de avisos:', err)
   }
 
   // 3. Conteo de actividad real registrada en las últimas 24 horas

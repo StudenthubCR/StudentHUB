@@ -51,9 +51,9 @@ export function FichaTecnicaExpo() {
       ],
       items: [
         { label: 'Cumplimiento Legal', valor: 'Ley 8968 (Protección de datos de menores)' },
-        { label: 'Identidad Segura', valor: 'Validación por código OTP al correo MEP' },
-        { label: 'Cero Contraseñas', valor: 'Sin contraseñas guardadas ni filtrables' },
-        { label: 'Rol Jurídico', valor: 'Encargado del tratamiento de datos' },
+        { label: 'Roles Soportados', valor: 'Estudiante + Encargado Legal (M:N RLS)' },
+        { label: 'Identidad Segura', valor: 'Validación OTP sin contraseñas estáticas' },
+        { label: 'Aislamiento Familiar', valor: 'Encargados solo leen estudiantes vinculados' },
       ],
     },
     {
