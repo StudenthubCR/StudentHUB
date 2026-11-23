@@ -37,7 +37,7 @@ vi.mock('@/features/estudiante/useEstudiante', () => ({
       nombre: 'Valeria Solís',
       grupo: '11-1',
       especialidad: 'Informática Empresarial',
-      sede: 'San Rafael',
+      sede: 'Rosario de Naranjo',
     },
     cargando: false,
     error: null,

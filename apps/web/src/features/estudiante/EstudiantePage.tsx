@@ -111,7 +111,7 @@ export function EstudiantePage() {
         <div>
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-tint border border-primary/25 px-2.5 py-0.5 text-micro font-bold text-primary uppercase tracking-wider">
-              <span>{estudiante.siglaInstitucion} San Rafael</span>
+              <span>{estudiante.siglaInstitucion} Rosario de Naranjo</span>
               <span>·</span>
               <span>Sección {estudiante.grupo}</span>
             </span>

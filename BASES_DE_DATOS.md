@@ -1,6 +1,6 @@
 # Arquitectura de Bases de Datos y Seguridad — Student HUB
 
-Documento oficial de arquitectura de persistencia y seguridad de datos para Student HUB (CTP San Rafael de Alajuela).
+Documento oficial de arquitectura de persistencia y seguridad de datos para Student HUB (CTP Rosario de Naranjo).
 
 > [!TIP] Despliegue Unificado en Supabase
 > El script SQL maestro consolidado e idempotente que contiene todo este esquema, RLS, funciones, triggers y semillas se encuentra en:

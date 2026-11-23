@@ -1,5 +1,5 @@
 -- ==============================================================================
--- STUDENT HUB — CTP SAN RAFAEL DE ALAJUELA
+-- STUDENT HUB — CTP ROSARIO DE NARANJO
 -- MIGRACIÓN MAESTRA UNIFICADA DEL BACKEND EN SUPABASE (POSTGRESQL)
 -- ==============================================================================
 -- Archivo: setup_completo_studenthub.sql
@@ -820,7 +820,7 @@ $$;
 -- SECCIÓN 12: DATOS SEMILLA (INSTITUCIÓN, SECCIONES Y PADRÓN ESCOLAR)
 -- ==============================================================================
 
--- 12.1 Sede CTP San Rafael de Alajuela
+-- 12.1 Sede CTP Rosario de Naranjo
 insert into public.instituciones (nombre, slug, dominio_correo, activa)
 values ('Colegio Técnico Profesional', 'ctp', 'gmail.com', true)
 on conflict (slug) do update set
@@ -930,7 +930,7 @@ begin
       (erick_id, '2026-03-19', 'I Periodo', 'Bases de Datos y PostgreSQL', 'Lecciones 5-8 (10:15 AM - 1:15 PM)', 'presente', null),
       (erick_id, '2026-03-18', 'I Periodo', 'Soporte de TI y Redes', 'Lecciones 1-3 (7:00 AM - 9:15 AM)', 'tardia', 'Llegada 10 minutos tarde por retraso en transporte público'),
       (erick_id, '2026-03-17', 'I Periodo', 'Inglés Técnico para TI', 'Lecciones 4-6 (9:30 AM - 11:45 AM)', 'presente', null),
-      (erick_id, '2026-03-16', 'I Periodo', 'Matemática Aplicada', 'Lecciones 1-2 (7:00 AM - 8:30 AM)', 'ausencia_justificada', 'Cita médica en Ebáis San Rafael debidamente comprobada'),
+      (erick_id, '2026-03-16', 'I Periodo', 'Matemática Aplicada', 'Lecciones 1-2 (7:00 AM - 8:30 AM)', 'ausencia_justificada', 'Cita médica en Ebáis debidamente comprobada'),
       (erick_id, '2026-03-13', 'I Periodo', 'Español', 'Lecciones 3-4 (8:45 AM - 10:15 AM)', 'presente', null),
       (erick_id, '2026-03-12', 'I Periodo', 'Estudios Sociales', 'Lecciones 1-2 (7:00 AM - 8:30 AM)', 'presente', null),
       (erick_id, '2026-03-11', 'I Periodo', 'Programación y Desarrollo Web', 'Lecciones 5-8 (10:15 AM - 1:15 PM)', 'presente', null),
@@ -945,7 +945,7 @@ insert into public.institution_alerts (
   title, message, category, priority, target_type, created_by, active
 ) values (
   'Bienvenida al Ciclo Lectivo Oficial 2026',
-  'Le damos la más cordial bienvenida a toda la comunidad educativa del CTP San Rafael de Alajuela al nuevo ecosistema digital Student HUB. Consultá tu horario, carnet digital y menú escolar desde tu dispositivo.',
+  'Le damos la más cordial bienvenida a toda la comunidad educativa del CTP Rosario de Naranjo al nuevo ecosistema digital Student HUB. Consultá tu horario, carnet digital y menú escolar desde tu dispositivo.',
   'general',
   'info',
   'all',

@@ -288,7 +288,7 @@ export function SelectorPersonalizacionCarnet({
           {/* Tipo de Sangre */}
           <div>
             <label className="mb-2 block text-etiqueta font-bold tracking-[0.08em] text-text-muted uppercase">
-              🩸 Tipo de Sangre (Reverso Oficial)
+              Tipo de Sangre (Reverso Oficial)
             </label>
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
               {TIPOS_SANGRE.map((sangre) => {

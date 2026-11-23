@@ -1,6 +1,6 @@
 # Guía de Despliegue de Base de Datos — Supabase (PostgreSQL)
 
-Esta carpeta contiene el backend relacional y las políticas de seguridad de **Student HUB** para el Colegio Técnico Profesional San Rafael de Alajuela (CTP).
+Esta carpeta contiene el backend relacional y las políticas de seguridad de **Student HUB** para el Colegio Técnico Profesional Rosario de Naranjo (CTP).
 
 ---
 

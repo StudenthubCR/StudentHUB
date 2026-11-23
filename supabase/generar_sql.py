@@ -26,16 +26,16 @@ ESPECIALIDADES_MAP = {
     'desarrollo web': 'Desarrollo Web',
 }
 
-# Correcciones ortográficas puntuales de nombres
+# Correcciones ortográficas puntuales de nombres (datos sintéticos de muestra)
 NOMBRES_CORRECCIONES = {
-    '208970239': 'Brandon Dávila Bustos',
-    '114290560': 'Laura Paola Barboza Castillo',
-    '208510079': 'Estiven Eduardo Calvo Otárola',
-    '208520530': 'Erick García Burgos',
-    '112090367': 'Zobeida Madrigal Ramírez',
-    '208150605': 'Froylan Steven Segura Durán',
-    '207960621': 'Meylan Andrea Reyes Marín',
-    '208380866': 'Fátima Rojas Mendoza',
+    '100000001': 'Estudiante Muestra Uno',
+    '100000002': 'Estudiante Muestra Dos',
+    '100000003': 'Estudiante Muestra Tres',
+    '100000004': 'Estudiante Muestra Cuatro',
+    '100000005': 'Estudiante Muestra Cinco',
+    '100000006': 'Estudiante Muestra Seis',
+    '100000007': 'Estudiante Muestra Siete',
+    '100000008': 'Estudiante Muestra Ocho',
 }
 
 # Definición de grupos y niveles

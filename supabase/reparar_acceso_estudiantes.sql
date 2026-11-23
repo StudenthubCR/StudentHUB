@@ -1,6 +1,6 @@
 -- =============================================================================
 -- StudentHUB: Reparación y Activación de Acceso para Estudiantes
--- Casos reportados: estebanoses861@gmail.com y ethanmurillo05@gmail.com
+-- Plantilla de aprovisionamiento y diagnóstico de cuentas (Datos sintéticos)
 -- =============================================================================
 -- Ejecutá este script completo en el SQL Editor de tu proyecto en Supabase.
 -- =============================================================================
@@ -105,9 +105,9 @@ grant execute on function public.verificar_correo_padron(text) to anon, authenti
 -- 7. Consulta de Diagnóstico Final: muestra el estado de usuarios
 select 
   lista.correo,
-  case when u.id is not null then '✅ Registrado (' || u.id::text || ')' else '⏳ Sin cuenta creada aún' end as estado_auth_users,
-  case when e.id is not null then '✅ En padrón (' || e.nombre || ')' else '❌ No existe en estudiantes' end as estado_estudiante,
-  case when e.user_id is not null then '✅ Vinculado correctamente' else '⚠️ user_id sin vincular' end as vinculo_sesion,
+  case when u.id is not null then '[OK] Registrado (' || u.id::text || ')' else '[PENDIENTE] Sin cuenta creada aún' end as estado_auth_users,
+  case when e.id is not null then '[OK] En padrón (' || e.nombre || ')' else '[ERROR] No existe en estudiantes' end as estado_estudiante,
+  case when e.user_id is not null then '[OK] Vinculado correctamente' else '[ALERTA] user_id sin vincular' end as vinculo_sesion,
   g.codigo as seccion,
   e.especialidad
 from (

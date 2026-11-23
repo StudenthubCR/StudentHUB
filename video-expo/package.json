@@ -1,0 +1,17 @@
+{
+  "name": "video-expo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.9.84 preview",
+    "check": "npx --yes hyperframes@0.9.84 check",
+    "render": "npx --yes hyperframes@0.9.84 render",
+    "publish": "npx --yes hyperframes@0.9.84 publish"
+  },
+  "dependencies": {
+    "@fontsource/poppins": "^5.3.0",
+    "animejs": "^4.5.0",
+    "gsap": "^3.15.1",
+    "qrcode": "^1.5.4"
+  }
+}

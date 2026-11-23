@@ -1,7 +1,48 @@
-# Enlaces simbólicos con rutas absolutas de la máquina que instaló las skills.
-# El contenido real vive en .agents/skills y ese sí se versiona; estos enlaces
-# se recrean con `npx skills add` usando skills-lock.json.
-.claude/skills/
+# ==============================================================================
+# STUDENTHUB — ROOT .GITIGNORE (PUBLIC REPOSITORY SECURITY STANDARDS)
+# ==============================================================================
 
-# Material multimedia, presentaciones, brochures y video de ExpoTÉCNICA 2026
+# Entornos y Secretos (Ley N° 8968 / Seguridad)
+.env
+.env.*
+!.env.example
+.dev.vars
+*.pem
+*.key
+*.local
+
+# Dependencias y Salidas de Compilación
+node_modules/
+dist/
+dev-dist/
+.wrangler/
+.wrangler-dry/
+video-expo/node_modules/
+video-expo/output/
+
+# Cachés de Testing y Herramientas de Build
+.vite/
+**/.vite/
+coverage/
+*.tsbuildinfo
+
+# Herramientas Locales de IA, Agentes e IDEs
+.mcp.json
+.claude/
+.agents/
+.cursor/
+.vscode/
+skills-lock.json
+
+# Scripts Temporales y Estados Locales
+scratch/
+state/
+*.log
+
+# Documentos Internos / Evaluación y Material Multimedia
+*.pdf
 multimedia presentacion expotecnica/
+
+# Archivos de Sistema Operativo
+.DS_Store
+Thumbs.db

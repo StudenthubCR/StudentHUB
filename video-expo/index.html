@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>StudentHUB — Video Promocional Expotécnica 2026</title>
+    <!-- Fuentes locales Poppins desde @fontsource/poppins -->
+    <link rel="stylesheet" href="./node_modules/@fontsource/poppins/latin-400.css" />
+    <link rel="stylesheet" href="./node_modules/@fontsource/poppins/latin-600.css" />
+    <link rel="stylesheet" href="./node_modules/@fontsource/poppins/latin-700.css" />
+    <link rel="stylesheet" href="./node_modules/@fontsource/poppins/latin-800.css" />
+    <link rel="stylesheet" href="./styles.css" />
+
+    <!-- Librerías de animación locales (deterministas) -->
+    <script src="./node_modules/gsap/dist/gsap.min.js"></script>
+    <script src="./vendor/anime.deterministic.js"></script>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="42"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- Fondo ambiental determinista -->
+      <div id="bg-canvas-container">
+        <div id="bg-radial-glow"></div>
+        <div id="bg-grid"></div>
+        <div class="bg-particle" id="p1" style="top: 150px; left: 280px"></div>
+        <div class="bg-particle" id="p2" style="top: 240px; right: 320px"></div>
+        <div class="bg-particle" id="p3" style="top: 780px; left: 180px"></div>
+        <div class="bg-particle" id="p4" style="top: 820px; right: 260px"></div>
+        <div class="bg-particle" id="p5" style="top: 480px; left: 50%"></div>
+      </div>
+
+      <!-- Cabecera Superior Fija (se activa en Scene 2 y Scene 3) -->
+      <header id="fixed-header" data-layout-ignore="true">
+        <div class="header-brand">
+          <div class="header-logo-icon-bg"></div>
+          <div class="header-brand-title">Student<span>HUB</span></div>
+        </div>
+        <div class="header-badge" data-layout-ignore="true">
+          <svg viewBox="0 0 24 24"><path d="M12 2L1 7l11 5 9-4.09V17h2V7L12 2zM3.46 8.78L12 12.67l7.54-3.43L12 5.54 3.46 8.78zM19 19.5c0 .28-.22.5-.5.5h-13c-.28 0-.5-.22-.5-.5v-6.22l-2 .91V19.5C3 20.88 4.12 22 5.5 22h13c1.38 0 2.5-1.12 2.5-2.5v-5.81l-2-.91V19.5z"/></svg>
+          CTP Rosario de Naranjo · Expotécnica 2026
+        </div>
+      </header>
+
+      <!-- ======================================================================
+           ESCENA 1: BRAND HOOK (0.0s - 4.5s)
+           ====================================================================== -->
+      <section id="scene-1" data-layout-allow-overlap="true">
+        <div class="hero-pill-badge" id="hero-badge" data-layout-ignore="true">
+          <svg viewBox="0 0 24 24"><path d="M12 2L1 7l11 5 9-4.09V17h2V7L12 2zM3.46 8.78L12 12.67l7.54-3.43L12 5.54 3.46 8.78zM19 19.5c0 .28-.22.5-.5.5h-13c-.28 0-.5-.22-.5-.5v-6.22l-2 .91V19.5C3 20.88 4.12 22 5.5 22h13c1.38 0 2.5-1.12 2.5-2.5v-5.81l-2-.91V19.5z"/></svg>
+          CTP Rosario de Naranjo · Expotécnica 2026
+        </div>
+        <div class="hero-brand-row" id="hero-brand" data-layout-ignore="true">
+          <img class="hero-logo-icon" src="./assets/studenthub-icon.png" alt="StudentHUB Logo" />
+          <h1 class="hero-title" data-layout-ignore="true">Student<span>HUB</span></h1>
+        </div>
+        <p class="hero-subtitle" id="hero-sub" data-layout-ignore="true">Todo tu colegio técnico en una sola aplicación web progresiva</p>
+        <div class="hero-pills-row" id="hero-pills" data-layout-ignore="true">
+          <div class="hero-feature-tag" data-layout-ignore="true">Carnet Digital</div>
+          <div class="hero-feature-tag" data-layout-ignore="true">Horarios en Vivo</div>
+          <div class="hero-feature-tag" data-layout-ignore="true">Comedor</div>
+          <div class="hero-feature-tag" data-layout-ignore="true">Agenda & Alertas</div>
+          <div class="hero-feature-tag" data-layout-ignore="true">Orientación</div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           ESCENA 2: FEATURE SHOWCASE (4.5s - 34.5s)
+           ====================================================================== -->
+      <section id="scene-2">
+        <!-- MÓDULO 1: CARNET DIGITAL -->
+        <div class="feature-module" id="mod-1">
+          <div class="module-left">
+            <div class="module-badge" data-layout-ignore="true">
+              <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4V6h16v12zm-8-2h6v-2h-6v2zm-4-4h2V8H8v4zm4 0h6v-2h-6v2z"/></svg>
+              Módulo 01 · Identidad Estudiantil
+            </div>
+            <h2 class="module-title">Carnet Digital Inteligente</h2>
+            <div class="module-subtitle">Tu identidad técnica en tu bolsillo</div>
+            <div class="module-bullets">
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Identidad verificada con código QR institucional dinámico</div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Color distintivo según tu especialidad técnica oficial</div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Acceso garantizado y seguro aún en modo sin conexión</div>
+              </div>
+            </div>
+          </div>
+          <div class="module-right">
+            <div class="mockup-card" data-layout-ignore="true">
+              <div class="id-card-header">
+                <div>
+                  <div class="id-card-institution">CTP Rosario de Naranjo</div>
+                  <div class="id-card-title">Carnet Estudiantil Oficial</div>
+                </div>
+                <div class="id-specialty-pill">Informática Empresarial</div>
+              </div>
+              <div class="id-card-body">
+                <div class="id-avatar-box">
+                  <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                  <div class="id-avatar-pill">12° Año</div>
+                </div>
+                <div class="id-info-col">
+                  <div class="id-name">Valeria Mora Castillo</div>
+                  <div class="id-details-row">
+                    <div class="id-meta-item">
+                      <span class="id-meta-label">Sección</span>
+                      <span class="id-meta-val">12-2 Diurna</span>
+                    </div>
+                    <div class="id-meta-item">
+                      <span class="id-meta-label">Año Lectivo</span>
+                      <span class="id-meta-val">2026</span>
+                    </div>
+                    <div class="id-meta-item">
+                      <span class="id-meta-label">Carnet ID</span>
+                      <span class="id-meta-val">CR-2026-9042</span>
+                    </div>
+                    <div class="id-meta-item">
+                      <span class="id-meta-label">Especialidad</span>
+                      <span class="id-meta-val">Software</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="id-card-footer">
+                <div class="id-status-tag">
+                  <div class="id-status-dot"></div>
+                  Matrícula Activa y Vigente
+                </div>
+                <div class="id-offline-tag">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                  Modo Offline Disponible
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 2: HORARIOS DINÁMICOS -->
+        <div class="feature-module" id="mod-2">
+          <div class="module-left">
+            <div class="module-badge" data-layout-ignore="true">
+              <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+              Módulo 02 · Horarios en Vivo
+            </div>
+            <h2 class="module-title">Horarios Dinámicos Diurno y Nocturno</h2>
+            <div class="module-subtitle">De 7° a 12° con detección de recesos</div>
+            <div class="module-bullets">
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Horarios siempre sincronizados para turnos diurnos y nocturnos</div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Indicador en vivo de la lección actual y aula asignada</div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Cuenta regresiva automática hacia los recesos y cambios de clase</div>
+              </div>
+            </div>
+          </div>
+          <div class="module-right">
+            <div class="mockup-card" data-layout-ignore="true">
+              <div class="schedule-header">
+                <div>
+                  <div class="id-card-institution">Horario Diurno · Miércoles</div>
+                  <div class="id-card-title">Sección 12-2 · Jornada Actual</div>
+                </div>
+                <div class="schedule-clock">08:42 AM</div>
+              </div>
+              <div class="schedule-periods">
+                <div class="period-row">
+                  <span class="period-time">07:00 – 08:20</span>
+                  <span class="period-subject">Programación Web Avanzada</span>
+                  <span class="period-room">Lab 2</span>
+                </div>
+                <div class="period-row active">
+                  <span class="period-time">08:20 – 09:40</span>
+                  <span class="period-subject">Redes y Seguridad Técnica</span>
+                  <span class="period-room">Lab 4 (En Curso)</span>
+                </div>
+                <div class="period-row">
+                  <span class="period-time">10:00 – 11:20</span>
+                  <span class="period-subject">Gestión de Proyectos de Software</span>
+                  <span class="period-room">Aula 14</span>
+                </div>
+              </div>
+              <div class="break-alert-pill">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                Próximo Receso Matutino en 18 minutos (09:40 AM)
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 3: COMEDOR ESTUDIANTIL -->
+        <div class="feature-module" id="mod-3">
+          <div class="module-left">
+            <div class="module-badge" data-layout-ignore="true">
+              <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></svg>
+              Módulo 03 · Alimentación Escolar
+            </div>
+            <h2 class="module-title">Comedor Estudiantil Inteligente</h2>
+            <div class="module-subtitle">Menú cíclico y confirmación rápida</div>
+            <div class="module-bullets">
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Menú cíclico institucional de 5 semanas balanceadas</div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Confirmación de asistencia al almuerzo en un solo toque</div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Información de ingredientes y balance nutricional diario</div>
+              </div>
+            </div>
+          </div>
+          <div class="module-right">
+            <div class="mockup-card" data-layout-ignore="true">
+              <div class="id-card-header">
+                <div>
+                  <div class="id-card-institution">Comedor Estudiantil CTP</div>
+                  <div class="id-card-title">Menú Oficial · Semana 2</div>
+                </div>
+                <div class="id-specialty-pill">Almuerzo</div>
+              </div>
+              <div class="dining-dish-card">
+                <div class="dish-title">Arroz con Pollo a la Campesina</div>
+                <div class="dish-desc">Acompañado de ensalada rusa tradicional, frijoles tiernos y fruta fresca de temporada.</div>
+                <div class="dish-stats">
+                  <span class="stat-badge">480 kcal</span>
+                  <span class="stat-badge">26g Proteína</span>
+                  <span class="stat-badge">100% Saludable</span>
+                </div>
+              </div>
+              <div class="confirm-action-box">
+                <div>
+                  <div class="confirm-label">Confirmación Registrada</div>
+                  <div style="font-size: 14px; color: #a7f3d0">Turno de almuerzo: 11:30 AM</div>
+                </div>
+                <div class="confirm-btn">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+                  Confirmado
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 4: AGENDA & ALERTAS -->
+        <div class="feature-module" id="mod-4">
+          <div class="module-left">
+            <div class="module-badge" data-layout-ignore="true">
+              <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+              Módulo 04 · Organización Escolar
+            </div>
+            <h2 class="module-title">Agenda y Alertas Tempranas</h2>
+            <div class="module-subtitle">Tareas, exámenes y ausencias docentes</div>
+            <div class="module-bullets">
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Cronograma unificado de tareas, proyectos y exámenes</div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Avisos oportunos de ausencias o licencias docentes</div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Prioridades claras y recordatorios automáticos de entrega</div>
+              </div>
+            </div>
+          </div>
+          <div class="module-right">
+            <div class="mockup-card" data-layout-ignore="true">
+              <div class="alert-banner">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                Aviso: Ausencia en Lecciones 7 y 8 (Inglés Técnico)
+              </div>
+              <div class="agenda-list">
+                <div class="agenda-item">
+                  <div class="agenda-item-left">
+                    <span class="agenda-task-name">Entrega de Proyecto: Arquitectura Cloud</span>
+                    <span class="agenda-task-meta">Programación Web · Vence Mañana 11:59 PM</span>
+                  </div>
+                  <span class="agenda-priority-pill priority-urgent">Urgente</span>
+                </div>
+                <div class="agenda-item">
+                  <div class="agenda-item-left">
+                    <span class="agenda-task-name">Prueba Práctica de Subnetting IPv4</span>
+                    <span class="agenda-task-meta">Redes de Computadoras · Viernes 8:00 AM</span>
+                  </div>
+                  <span class="agenda-priority-pill priority-high">Próximo</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 5: HUB ESTUDIANTIL -->
+        <div class="feature-module" id="mod-5">
+          <div class="module-left">
+            <div class="module-badge" data-layout-ignore="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+              Módulo 05 · Acompañamiento Escolar
+            </div>
+            <h2 class="module-title">Expediente Académico y Citas</h2>
+            <div class="module-subtitle">Control de notas, asistencias y orientación</div>
+            <div class="module-bullets">
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Promedios y asistencias en vivo</div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Solicitud de citas a Orientación</div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Acceso unificado para estudiante y encargado</div>
+              </div>
+            </div>
+          </div>
+          <div class="module-right">
+            <div class="mockup-card" data-layout-ignore="true">
+              <div class="id-card-header">
+                <div>
+                  <div class="id-card-institution">Expediente del Estudiante</div>
+                  <div class="id-card-title">Resumen Académico 2026</div>
+                </div>
+                <div class="id-specialty-pill">Vigente</div>
+              </div>
+              <div class="hub-metrics-grid">
+                <div class="metric-box">
+                  <span class="metric-label">Promedio General</span>
+                  <div class="metric-value">94.8<span> / 100</span></div>
+                </div>
+                <div class="metric-box">
+                  <span class="metric-label">Asistencia Trimestral</span>
+                  <div class="metric-value">98.5<span>%</span></div>
+                </div>
+              </div>
+              <div class="orientacion-action-card">
+                <div>
+                  <div class="orientacion-text">Departamento de Orientación</div>
+                  <div style="font-size: 14px; color: var(--text-muted)">Atención vocacional y psicológica</div>
+                </div>
+                <div class="orientacion-btn">Solicitar Cita</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 6: CHATBOT INSTITUCIONAL -->
+        <div class="feature-module" id="mod-6">
+          <div class="module-left">
+            <div class="module-badge" data-layout-ignore="true">
+              <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+              Módulo 06 · Soporte Inteligente
+            </div>
+            <h2 class="module-title">Asistente Virtual Escolar</h2>
+            <div class="module-subtitle">Tus dudas y fechas resueltas al instante</div>
+            <div class="module-bullets">
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Consultas inmediatas de horarios, aulas y fechas límites</div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Respuestas automatizadas sobre trámites y servicios del colegio</div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Disponible 24/7 de manera accesible y confidencial</div>
+              </div>
+            </div>
+          </div>
+          <div class="module-right">
+            <div class="mockup-card" data-layout-ignore="true">
+              <div class="id-card-header">
+                <div class="bot-author-tag">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+                  Chatbot StudentHUB
+                </div>
+                <div class="id-status-tag"><div class="id-status-dot"></div>En línea</div>
+              </div>
+              <div class="chat-window">
+                <div class="chat-bubble chat-user">¿A qué hora termina el receso matutino hoy?</div>
+                <div class="chat-bubble chat-bot">Finaliza a las <strong>09:40 AM</strong>. Faltan 18 minutos.</div>
+                <div class="chat-bubble chat-user">¿Cuándo se entrega el anteproyecto de informática?</div>
+                <div class="chat-bubble chat-bot">Fecha límite: este <strong>viernes a las 11:59 PM</strong>.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÓDULO 7: PWA RÁPIDA Y SEGURA -->
+        <div class="feature-module" id="mod-7">
+          <div class="module-left">
+            <div class="module-badge" data-layout-ignore="true">
+              <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+              Módulo 07 · Tecnología Web Progresiva
+            </div>
+            <h2 class="module-title">PWA Rápida, Segura y Privada</h2>
+            <div class="module-subtitle">100% instalable y datos protegidos</div>
+            <div class="module-bullets">
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Instalación directa en tu pantalla de inicio sin pasar por tiendas</div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Modo oscuro y modo claro adaptados para cualquier iluminación</div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                <div>Privacidad garantizada bajo la Ley N° 8968</div>
+              </div>
+            </div>
+          </div>
+          <div class="module-right">
+            <div class="mockup-card" data-layout-ignore="true">
+              <div class="id-card-header">
+                <div>
+                  <div class="id-card-institution">Tecnología de Punta</div>
+                  <div class="id-card-title">Estándares PWA y Seguridad</div>
+                </div>
+                <div class="id-specialty-pill">Web App</div>
+              </div>
+              <div class="pwa-feature-grid">
+                <div class="pwa-card-item">
+                  <div class="pwa-icon-box">
+                    <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
+                  </div>
+                  <div class="pwa-text-col">
+                    <span class="pwa-item-title">Instalación Inmediata</span>
+                    <span class="pwa-item-desc">Añadí el ícono directo a tu celular Android o iOS en 2 segundos.</span>
+                  </div>
+                </div>
+                <div class="pwa-card-item">
+                  <div class="pwa-icon-box">
+                    <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                  </div>
+                  <div class="pwa-text-col">
+                    <span class="pwa-item-title">Privacidad Protegida (Ley N° 8968)</span>
+                    <span class="pwa-item-desc">Tus datos estudiantiles nunca se comparten con terceros.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================================
+           ESCENA 3: QR FINALE (34.5s - 42.0s · Retención fija de 7.0s)
+           ====================================================================== -->
+      <section id="scene-3" data-layout-allow-overlap="true">
+        <div class="finale-left">
+          <div class="finale-pill" data-layout-ignore="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 7l11 5 9-4.09V17h2V7L12 2z"/></svg>
+            Expotécnica 2026 · CTP Rosario de Naranjo
+          </div>
+          <h2 class="finale-title">Escaneá y probá StudentHUB ahora</h2>
+          <div class="finale-subtitle">Modo Evaluador Expotécnica 2026 · Sin instalación</div>
+          <div class="finale-bullets" data-layout-ignore="true">
+            <div class="finale-bullet">
+              <div class="finale-bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <span>Accedé al instante desde cualquier celular con tu cámara</span>
+            </div>
+            <div class="finale-bullet">
+              <div class="finale-bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <span>Probá en vivo el carnet, horarios, comedor y agenda</span>
+            </div>
+            <div class="finale-bullet">
+              <div class="finale-bullet-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <span>Proyecto creado por y para nuestra comunidad técnica</span>
+            </div>
+          </div>
+        </div>
+        <div class="finale-right">
+          <!-- Tarjeta QR 100% estática entre 34.5s y 41.5s (Ajuste #5) -->
+          <div class="qr-card-outer" id="qr-static-card">
+            <div class="qr-svg-wrapper">
+              <!-- SVG Vectorial Nítido incrustado -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 39 39" shape-rendering="crispEdges">
+                <path fill="#FFFFFF" d="M0 0h39v39H0z"/>
+                <path stroke="#000000" d="M3 3.5h7m1 0h3m1 0h3m1 0h2m4 0h1m3 0h7M3 4.5h1m5 0h1m2 0h2m10 0h2m1 0h1m1 0h1m5 0h1M3 5.5h1m1 0h3m1 0h1m1 0h2m2 0h2m2 0h2m1 0h1m1 0h1m1 0h1m2 0h1m1 0h3m1 0h1M3 6.5h1m1 0h3m1 0h1m2 0h1m2 0h1m8 0h2m3 0h1m1 0h3m1 0h1M3 7.5h1m1 0h3m1 0h1m2 0h2m4 0h1m1 0h1m1 0h1m2 0h1m1 0h1m1 0h1m1 0h3m1 0h1M3 8.5h1m5 0h1m1 0h1m2 0h1m2 0h2m2 0h2m1 0h2m3 0h1m5 0h1M3 9.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M12 10.5h2m3 0h3m1 0h3m2 0h2M3 11.5h1m1 0h1m3 0h2m1 0h1m6 0h1m6 0h2m2 0h1m2 0h1m1 0h1M3 12.5h1m1 0h4m3 0h1m2 0h2m1 0h3m1 0h2m1 0h3m1 0h1m2 0h1m1 0h2M4 13.5h3m2 0h1m1 0h1m3 0h1m2 0h1m3 0h1m1 0h1m1 0h4m2 0h2m1 0h1M3 14.5h2m1 0h3m1 0h4m1 0h2m2 0h2m1 0h1m2 0h1m1 0h1m1 0h4m2 0h1M3 15.5h1m2 0h1m2 0h1m5 0h2m1 0h1m1 0h1m1 0h1m3 0h1m2 0h1M7 16.5h2m1 0h1m2 0h1m1 0h1m9 0h6m1 0h1m1 0h2M3 17.5h3m1 0h3m2 0h1m1 0h1m2 0h2m1 0h1m1 0h1m1 0h1m1 0h1m4 0h1m3 0h1M3 18.5h1m1 0h3m3 0h2m2 0h1m1 0h1m9 0h4m1 0h1M4 19.5h1m2 0h1m1 0h1m1 0h1m2 0h1m1 0h3m3 0h1m3 0h2m1 0h2m1 0h1m1 0h1M4 20.5h1m1 0h2m2 0h3m1 0h1m3 0h2m2 0h3m1 0h4m2 0h1m2 0h1M4 21.5h1m1 0h1m2 0h4m4 0h10m1 0h3m1 0h4M3 22.5h5m2 0h3m2 0h2m4 0h3m3 0h3m1 0h2m2 0h1M3 23.5h1m2 0h1m1 0h2m9 0h3m1 0h1m2 0h5m3 0h2M8 24.5h1m4 0h1m1 0h2m2 0h1m1 0h1m1 0h5m1 0h2m1 0h2m1 0h1M3 25.5h2m1 0h1m1 0h2m1 0h4m4 0h2m2 0h7m5 0h1M7 26.5h2m1 0h4m2 0h1m1 0h2m1 0h3m3 0h3m1 0h2m1 0h1M3 27.5h4m2 0h3m2 0h2m1 0h1m1 0h1m3 0h1m2 0h6m2 0h2M11 28.5h5m1 0h4m1 0h1m2 0h3m3 0h1m2 0h2M3 29.5h7m1 0h6m1 0h2m2 0h4m1 0h1m1 0h1m1 0h3m1 0h1M3 30.5h1m5 0h1m2 0h1m1 0h1m4 0h2m1 0h1m3 0h2m3 0h2m1 0h2M3 31.5h1m1 0h3m1 0h1m2 0h1m2 0h2m1 0h1m1 0h1m1 0h2m2 0h6m2 0h2M3 32.5h1m1 0h3m1 0h1m2 0h1m2 0h1m4 0h1m7 0h1m1 0h2m2 0h2M3 33.5h1m1 0h3m1 0h1m1 0h1m4 0h3m3 0h1m1 0h1m2 0h1m2 0h3m1 0h2M3 34.5h1m5 0h1m2 0h3m2 0h1m4 0h2m1 0h1m1 0h6M3 35.5h7m1 0h3m2 0h3m4 0h1m3 0h2m1 0h3m2 0h1"/>
+              </svg>
+            </div>
+          </div>
+          <!-- Barra de progreso perimetral de los 7 segundos exactos -->
+          <div class="qr-progress-bar-container">
+            <div id="qr-progress-fill"></div>
+          </div>
+          <div class="qr-url-label" data-layout-ignore="true">studenthub.studenthub-cr.workers.dev/expo</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ======================================================================
+         SCRIPT DE SINCRONIZACIÓN DETERMINISTA MAESTRA (GSAP + Anime.js v4)
+         ====================================================================== -->
+    <script>
+      // 1. Constante centralizada de URL destino
+      const TARGET_QR_URL = 'https://studenthub.studenthub-cr.workers.dev/expo';
+
+      // 2. Inicialización de la línea de tiempo maestra en GSAP
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // Tween maestro obligatorio de 42 segundos exactos (Ajuste #1)
+      tl.to({}, { duration: 42, ease: 'none' }, 0);
+
+      // 3. Configuración del fondo determinista (Ajuste #2: Cero CSS @keyframes)
+      tl.fromTo('#bg-radial-glow', 
+        { scale: 1.0, opacity: 0.75 }, 
+        { scale: 1.15, opacity: 0.95, duration: 21, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 
+        0
+      );
+      tl.fromTo('#bg-grid', 
+        { opacity: 0.12 }, 
+        { opacity: 0.18, duration: 21, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 
+        0
+      );
+
+      // Movimiento determinista de partículas
+      tl.fromTo('#p1', { x: 0, y: 0, opacity: 0.3 }, { x: 40, y: -30, opacity: 0.7, duration: 21, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0);
+      tl.fromTo('#p2', { x: 0, y: 0, opacity: 0.4 }, { x: -35, y: 40, opacity: 0.8, duration: 21, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0);
+      tl.fromTo('#p3', { x: 0, y: 0, opacity: 0.3 }, { x: 50, y: 25, opacity: 0.6, duration: 21, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0);
+      tl.fromTo('#p4', { x: 0, y: 0, opacity: 0.5 }, { x: -45, y: -35, opacity: 0.75, duration: 21, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0);
+      tl.fromTo('#p5', { x: 0, y: 0, opacity: 0.2 }, { x: 30, y: -45, opacity: 0.65, duration: 21, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0);
+
+      // 4. Cabecera fija que aparece en 4.5s y se desvanece en 41.5s
+      tl.fromTo('#fixed-header', { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 4.5);
+      tl.to('#fixed-header', { opacity: 0, y: -20, duration: 0.5, ease: 'power2.in' }, 41.5);
+
+      // 5. ESCENA 1: BRAND HOOK (0.0s – 4.5s)
+      // Comienza en opacidad 0 igual que t=42.0s y se revela suavemente
+      tl.fromTo('#scene-1', { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power2.out' }, 0);
+      tl.fromTo('#hero-badge', { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.8, ease: 'back.out(1.4)' }, 0.2);
+      tl.fromTo('#hero-brand', { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1.0, duration: 0.9, ease: 'power2.out' }, 0.3);
+      tl.fromTo('#hero-sub', { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 0.5);
+      tl.fromTo('#hero-pills', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 0.8);
+      // Salida suave de la Escena 1
+      tl.to('#scene-1', { opacity: 0, scale: 0.96, duration: 0.5, ease: 'power2.in' }, 3.9);
+
+      // 6. ESCENA 2: FEATURE SHOWCASE (4.5s – 34.5s)
+      tl.fromTo('#scene-2', { opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power1.out' }, 4.5);
+
+      // Animaciones de módulos con selectores de cadena fija (sin template literals)
+      const moduleConfigs = [
+        { id: '#mod-1', left: '#mod-1 .module-left', right: '#mod-1 .module-right', card: '#mod-1 .mockup-card', tIn: 4.50, tOut: 8.33, durFloat: 3.28 },
+        { id: '#mod-2', left: '#mod-2 .module-left', right: '#mod-2 .module-right', card: '#mod-2 .mockup-card', tIn: 8.78, tOut: 12.62, durFloat: 3.29 },
+        { id: '#mod-3', left: '#mod-3 .module-left', right: '#mod-3 .module-right', card: '#mod-3 .mockup-card', tIn: 13.07, tOut: 16.90, durFloat: 3.28 },
+        { id: '#mod-4', left: '#mod-4 .module-left', right: '#mod-4 .module-right', card: '#mod-4 .mockup-card', tIn: 17.35, tOut: 21.19, durFloat: 3.29 },
+        { id: '#mod-5', left: '#mod-5 .module-left', right: '#mod-5 .module-right', card: '#mod-5 .mockup-card', tIn: 21.64, tOut: 25.47, durFloat: 3.28 },
+        { id: '#mod-6', left: '#mod-6 .module-left', right: '#mod-6 .module-right', card: '#mod-6 .mockup-card', tIn: 25.92, tOut: 29.76, durFloat: 3.29 },
+        { id: '#mod-7', left: '#mod-7 .module-left', right: '#mod-7 .module-right', card: '#mod-7 .mockup-card', tIn: 30.21, tOut: 34.05, durFloat: 3.29 }
+      ];
+
+      moduleConfigs.forEach(function(cfg) {
+        tl.fromTo(cfg.id, { opacity: 0 }, { opacity: 1, duration: 0.55, ease: 'power2.out' }, cfg.tIn);
+        tl.fromTo(cfg.left, { x: -40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.55, ease: 'power3.out' }, cfg.tIn);
+        tl.fromTo(cfg.right, { x: 40, opacity: 0, scale: 0.95 }, { x: 0, opacity: 1, scale: 1, duration: 0.55, ease: 'back.out(1.4)' }, cfg.tIn);
+        tl.to(cfg.card, { y: -8, duration: cfg.durFloat, ease: 'sine.inOut' }, cfg.tIn + 0.55);
+        tl.to(cfg.id, { opacity: 0, scale: 0.97, duration: 0.45, ease: 'power2.in' }, cfg.tOut);
+      });
+
+      tl.to('#scene-2', { opacity: 0, duration: 0.3 }, 34.2);
+
+      // 7. ESCENA 3: QR FINALE (34.5s – 42.0s)
+      tl.fromTo('#scene-3', { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'power2.out' }, 34.5);
+      tl.fromTo('.finale-left', { x: -50, opacity: 0 }, { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }, 34.5);
+      
+      // Ajuste #5: El código QR entra a las 34.5s y SE MANTIENE 100% ESTÁTICO, PLANO Y NÍTIDO HASTA 41.5s
+      tl.fromTo('.finale-right', { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1.0, duration: 0.5, ease: 'power2.out' }, 34.5);
+
+      // Barra de progreso exterior de exactamente 7.0 segundos (34.5s a 41.5s)
+      tl.fromTo('#qr-progress-fill', 
+        { width: '0%' }, 
+        { width: '100%', duration: 7.0, ease: 'none' }, 
+        34.5
+      );
+
+      // Ajuste #2: Transición de bucle continuo en 41.5s - 42.0s
+      // Disolución de Scene 3 hacia el fondo ambiental (a t=42.0s el fondo coincide al píxel con t=0.0s)
+      tl.to('#scene-3', { opacity: 0, duration: 0.5, ease: 'power2.in' }, 41.5);
+
+      // 8. Integración con Anime.js v4 determinista (Ajuste #1)
+      if (typeof window.anime !== 'undefined' && typeof window.anime.createTimeline === 'function') {
+        const animeTl = window.anime.createTimeline({ autoplay: false });
+        tl.eventCallback('onUpdate', function() {
+          const currentMs = tl.time() * 1000;
+          animeTl.seek(currentMs);
+        });
+      }
+
+      // Registro oficial para el motor de captura de Hyperframes
+      window.__timelines['main'] = tl;
+      tl.seek(0, false);
+    </script>
+  </body>
+</html>
