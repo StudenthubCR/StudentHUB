@@ -172,19 +172,27 @@ export function useChatbot({
       try {
         // Pausa simulada orgánica de 350ms con soporte de cancelación por AbortSignal
         await new Promise<void>((resolve, reject) => {
-          const timer = setTimeout(() => {
-            timerRespuestaRef.current = null
-            resolve()
-          }, 350)
-          timerRespuestaRef.current = timer
-
-          controller.signal.addEventListener('abort', () => {
+          const alAbortar = () => {
             if (timerRespuestaRef.current) {
               clearTimeout(timerRespuestaRef.current)
               timerRespuestaRef.current = null
             }
             reject(new DOMException('Petición abortada', 'AbortError'))
-          })
+          }
+
+          if (controller.signal.aborted) {
+            alAbortar()
+            return
+          }
+
+          const timer = setTimeout(() => {
+            timerRespuestaRef.current = null
+            controller.signal.removeEventListener('abort', alAbortar)
+            resolve()
+          }, 350)
+          timerRespuestaRef.current = timer
+
+          controller.signal.addEventListener('abort', alAbortar, { once: true })
         })
 
         if (controller.signal.aborted) {

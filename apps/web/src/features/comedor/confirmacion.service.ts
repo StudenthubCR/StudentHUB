@@ -27,6 +27,11 @@ export interface EstadoVentanaConfirmacion {
 }
 
 const CLAVE_STORAGE_PREFIX = 'studenthub_confirmacion_comedor_'
+const ES_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+function esUuidValido(id: string): boolean {
+  return ES_UUID.test(id)
+}
 
 // Configuración de la Ventana Horaria de la Sección Nocturna
 export const HORA_APERTURA_PREVIA = 20 // 8:00 PM del día previo
@@ -193,23 +198,25 @@ export async function obtenerConfirmacionEstudiante(
   if (!estudianteId) return null
   const fechaDestino = fechaStr || calcularFechaServicio().fechaServicioStr
 
-  // 1. Intentar consultar en Supabase
-  try {
-    const { data, error } = await supabase
-      .from('confirmaciones_comedor')
-      .select('id, estudiante_id, fecha, asistencia, actualizado_el')
-      .eq('estudiante_id', estudianteId)
-      .eq('fecha', fechaDestino)
-      .maybeSingle()
+  // 1. Intentar consultar en Supabase (solo con UUID válido para evitar 22P02)
+  if (esUuidValido(estudianteId)) {
+    try {
+      const { data, error } = await supabase
+        .from('confirmaciones_comedor')
+        .select('id, estudiante_id, fecha, asistencia, actualizado_el')
+        .eq('estudiante_id', estudianteId)
+        .eq('fecha', fechaDestino)
+        .maybeSingle()
 
-    if (!error && data) {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(`${CLAVE_STORAGE_PREFIX}${estudianteId}_${fechaDestino}`, JSON.stringify(data))
+      if (!error && data) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(`${CLAVE_STORAGE_PREFIX}${estudianteId}_${fechaDestino}`, JSON.stringify(data))
+        }
+        return data as ConfirmacionComedor
       }
-      return data as ConfirmacionComedor
+    } catch {
+      // Si la tabla no existe aún o falla la red, usar fallback local
     }
-  } catch {
-    // Si la tabla no existe aún o falla la red, usar fallback local
   }
 
   // 2. Fallback a almacenamiento local
@@ -260,7 +267,11 @@ export async function guardarConfirmacionEstudiante(
     }
   }
 
-  // Persistir en Supabase bajo RLS
+  // Persistir en Supabase bajo RLS (solo si es UUID válido)
+  if (!esUuidValido(estudianteId)) {
+    return { ok: true, confirmacion: nuevoRegistro }
+  }
+
   try {
     const { data, error } = await supabase
       .from('confirmaciones_comedor')

@@ -3,11 +3,14 @@ import type { PeriodoNota } from './notas.types'
 import { obtenerNotasEstudiante, calcularResumenNotas } from './notas.service'
 
 export function useNotas(estudianteId?: string, periodo: PeriodoNota = 'I Periodo') {
+  const esDemo =
+    typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true'
+
   const query = useQuery({
     queryKey: ['estudiante-notas', estudianteId, periodo],
     queryFn: () => obtenerNotasEstudiante(estudianteId || '', periodo),
     staleTime: 1000 * 60 * 10, // 10 minutos
-    enabled: true,
+    enabled: Boolean(estudianteId) || esDemo,
   })
 
   const notas = query.data ?? []

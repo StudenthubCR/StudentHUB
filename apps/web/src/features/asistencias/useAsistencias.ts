@@ -3,11 +3,14 @@ import type { PeriodoAsistencia } from './asistencias.types'
 import { obtenerAsistenciasEstudiante, calcularResumenAsistencias } from './asistencias.service'
 
 export function useAsistencias(estudianteId?: string, periodo: PeriodoAsistencia = 'I Periodo') {
+  const esDemo =
+    typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true'
+
   const query = useQuery({
     queryKey: ['estudiante-asistencias', estudianteId, periodo],
     queryFn: () => obtenerAsistenciasEstudiante(estudianteId || '', periodo),
     staleTime: 1000 * 60 * 10, // 10 minutos
-    enabled: true,
+    enabled: Boolean(estudianteId) || esDemo,
   })
 
   const asistencias = query.data ?? []

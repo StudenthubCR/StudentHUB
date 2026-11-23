@@ -7,6 +7,8 @@ import {
   IconoCarnet,
   IconoCalendario,
   IconoRayo,
+  IconoCheck,
+  IconoChevron,
 } from '@/components/icons'
 import { usePwaInstall } from './usePwaInstall'
 
@@ -121,7 +123,17 @@ export function ModalInstalarApp({ abierto, alCerrar }: Props) {
                 onClick={copiarEnlace}
                 className="mt-3 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary-solid px-4 py-2.5 text-menuda font-bold text-white transition-all hover:bg-primary-dark"
               >
-                {copiado ? '✓ ¡Enlace copiado! Abrí Safari y pegalo' : '📋 Copiar enlace para Safari / Chrome'}
+                {copiado ? (
+                  <>
+                    <IconoCheck className="size-4 shrink-0" />
+                    <span>¡Enlace copiado! Abrí Safari y pegalo</span>
+                  </>
+                ) : (
+                  <>
+                    <IconoCompartir className="size-4 shrink-0" />
+                    <span>Copiar enlace para Safari / Chrome</span>
+                  </>
+                )}
               </button>
             </div>
           ) : plataforma === 'ios' ? (
@@ -167,9 +179,9 @@ export function ModalInstalarApp({ abierto, alCerrar }: Props) {
 
               {/* Indicador animado hacia la barra inferior */}
               <div className="mt-4 flex items-center justify-center gap-2 text-micro font-semibold text-primary animate-bounce">
-                <span>⬇</span>
+                <IconoChevron hacia="abajo" className="size-3.5 shrink-0" />
                 <span>El botón de compartir está abajo en Safari</span>
-                <span>⬇</span>
+                <IconoChevron hacia="abajo" className="size-3.5 shrink-0" />
               </div>
             </div>
           ) : (

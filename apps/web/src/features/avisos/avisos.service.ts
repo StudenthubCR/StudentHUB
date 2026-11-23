@@ -88,7 +88,7 @@ export async function crearAviso(
 ): Promise<{ ok: boolean; aviso?: InstitutionAlert; error?: string }> {
   // 1. Barrera estricta en frontend
   if (!esUsuarioAdmin(correoCreador)) {
-    console.error(`[Seguridad] Bloqueado intento no autorizado de publicación por: ${correoCreador}`)
+    console.error('[Seguridad] Bloqueado intento no autorizado de publicación')
     return {
       ok: false,
       error: 'Operación denegada: Ningún estudiante tiene permisos para publicar comunicados.',
@@ -170,7 +170,7 @@ export function obtenerAvisosDescartados(): string[] {
 
 export async function eliminarAviso(id: string, correoUsuario: string): Promise<boolean> {
   if (!esUsuarioAdmin(correoUsuario)) {
-    console.error(`[Seguridad] Intento no autorizado de eliminación por: ${correoUsuario}`)
+    console.error('[Seguridad] Intento no autorizado de eliminación')
     return false
   }
 

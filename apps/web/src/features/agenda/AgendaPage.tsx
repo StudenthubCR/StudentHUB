@@ -4,6 +4,7 @@ import {
   IconoExamen,
   IconoProfesorAusente,
   IconoTarea,
+  IconoCerrar,
   MagnifyingGlassIcon,
   BackpackIcon,
 } from '@/components/icons'
@@ -269,9 +270,10 @@ export function AgendaPage() {
               <button
                 type="button"
                 onClick={() => setFechaSeleccionada(null)}
-                className="text-micro font-bold text-primary hover:underline"
+                className="inline-flex items-center gap-1 text-micro font-bold text-primary hover:underline"
               >
-                Limpiar filtro de fecha ✕
+                <span>Limpiar filtro de fecha</span>
+                <IconoCerrar className="size-3" />
               </button>
             )}
           </div>
