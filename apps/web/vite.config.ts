@@ -16,7 +16,26 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon-192.png', 'icon-512.png', 'icon-maskable-512.png'],
+      includeAssets: [
+        'favicon.ico',
+        'favicon.png',
+        'favicon-16x16.png',
+        'favicon-32x32.png',
+        'favicon-48x48.png',
+        'apple-touch-icon.png',
+        'pwa-192x192.png',
+        'pwa-512x512.png',
+        'pwa-maskable-512x512.png',
+        'icon-192.png',
+        'icon-512.png',
+        'icon-maskable-512.png',
+        'studenthub-icon.webp',
+        'studenthub-icon.png',
+        'studenthub-logo.webp',
+        'studenthub-logo-dark.webp',
+        'studenthub-logo-vertical.webp',
+        'studenthub-logo-vertical-dark.webp',
+      ],
       manifest: {
         id: '/',
         name: 'Student HUB',
@@ -30,16 +49,18 @@ export default defineConfig({
         background_color: '#060b1e',
         theme_color: '#0130B2',
         /**
-         * Chrome sólo ofrece "Instalar aplicación" con al menos un ícono de
-         * 192x192 y uno de 512x512, cuadrados y con el tamaño declarado igual
-         * al real. Si no, ofrece "Agregar acceso directo", que es un marcador
-         * y no la app instalada.
-         *
-         * El `maskable` va aparte y no combinado en un mismo `purpose`: el
-         * lanzador de Android recorta ese ícono con su propia forma, así que
-         * necesita más margen que el que se ve entero.
+         * Chrome y Android ofrecen "Instalar aplicación" con íconos de
+         * 192x192 y 512x512 estándar, más el maskable con 20% de margen.
          */
         icons: [
+          { src: '/pwa-192x192.png', type: 'image/png', sizes: '192x192' },
+          { src: '/pwa-512x512.png', type: 'image/png', sizes: '512x512' },
+          {
+            src: '/pwa-maskable-512x512.png',
+            type: 'image/png',
+            sizes: '512x512',
+            purpose: 'maskable',
+          },
           { src: '/icon-192.png', type: 'image/png', sizes: '192x192' },
           { src: '/icon-512.png', type: 'image/png', sizes: '512x512' },
           {

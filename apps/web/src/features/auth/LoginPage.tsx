@@ -16,6 +16,7 @@ import {
   IconoInfo,
 } from '@/components/icons'
 import { ThemeToggle } from '@/app/layout/ThemeToggle'
+import { Logo } from '@/components/Logo'
 import { usePwaInstall } from '@/features/pwa/usePwaInstall'
 import { ModalInstalarApp } from '@/features/pwa/ModalInstalarApp'
 import { OtpInput } from '@/components/ui/otp-input'
@@ -270,11 +271,7 @@ export function LoginPage() {
       {/* Barra superior con Logo, Botón de Instalación y selector de tema */}
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
         <div className="flex items-center gap-3">
-          <img
-            src="/SHlarge.webp"
-            alt="Student HUB"
-            className="h-9 sm:h-10 w-auto object-contain transition-all duration-200 dark:brightness-0 dark:invert"
-          />
+          <Logo />
         </div>
         <div className="flex items-center gap-2.5 sm:gap-3">
           <Link

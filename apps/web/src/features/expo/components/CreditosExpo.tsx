@@ -8,11 +8,16 @@ export function CreditosExpo() {
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 pb-10 border-b border-border">
           {/* Logo y resumen */}
           <div className="xl:col-span-6 space-y-3">
-            <div className="relative flex h-10 w-36 items-center overflow-hidden">
+            <div className="flex h-10 items-center">
               <img
-                src="/SHlarge.webp"
-                alt="Student HUB"
-                className="absolute top-1/2 left-[-35px] h-32 w-auto -translate-y-1/2 object-contain dark:brightness-0 dark:invert"
+                src="/studenthub-logo.webp"
+                alt="StudentHUB"
+                className="h-9 w-auto object-contain dark:hidden"
+              />
+              <img
+                src="/studenthub-logo-dark.webp"
+                alt="StudentHUB"
+                className="h-9 w-auto object-contain hidden dark:block"
               />
             </div>
             <p className="text-nota text-text-muted max-w-md leading-relaxed">

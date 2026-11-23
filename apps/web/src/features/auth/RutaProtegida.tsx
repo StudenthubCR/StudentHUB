@@ -14,11 +14,16 @@ export function RutaProtegida({ children }: { children?: ReactNode }) {
           <div className="relative flex items-center justify-center">
             {/* Anillo de pulso sutil */}
             <div className="absolute size-24 animate-ping rounded-full bg-primary/15 opacity-75" />
-            <div className="relative flex size-20 items-center justify-center rounded-2xl border border-border bg-surface shadow-md">
+            <div className="relative flex size-20 items-center justify-center rounded-2xl border border-border bg-surface shadow-md p-2">
               <img
-                src="/SHlarge.webp"
-                alt="Student HUB"
-                className="h-9 w-auto object-contain transition-all duration-250 dark:brightness-0 dark:invert"
+                src="/studenthub-logo-vertical.webp"
+                alt="StudentHUB"
+                className="h-14 w-auto object-contain transition-all duration-250 dark:hidden"
+              />
+              <img
+                src="/studenthub-logo-vertical-dark.webp"
+                alt="StudentHUB"
+                className="h-14 w-auto object-contain transition-all duration-250 hidden dark:block"
               />
             </div>
           </div>

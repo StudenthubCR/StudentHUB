@@ -251,7 +251,7 @@ export function agregarNotificacion(
     if (canales[itemCompleto.categoria]) {
       void emitirNotificacion(itemCompleto.titulo, {
         body: itemCompleto.mensaje,
-        icon: '/SHlogo.svg',
+        icon: '/icon-192.png',
       })
     }
   }
@@ -445,8 +445,8 @@ export async function emitirNotificacion(
   if (Notification.permission !== 'granted') return false
 
   const configCompleta: NotificationOptions = {
-    icon: '/SHlogo.svg',
-    badge: '/SHlogo.svg',
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
     tag: 'studenthub-aviso',
     ...opciones,
   }

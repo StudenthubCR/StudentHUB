@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTheme } from '@/app/use-theme'
 import { IconoSol, IconoLuna, IconoDescargar, IconoRayo } from '@/components/icons'
+import { Logo } from '@/components/Logo'
 
 type Props = {
   onAbrirInstalar?: () => void
@@ -44,15 +45,11 @@ export function ExpoNavbar({ onAbrirInstalar }: Props) {
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         {/* Logo con espaciado balanceado */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <a href="#hero" className="flex items-center group">
-            <img
-              src="/SHlarge.webp"
-              alt="Student HUB"
-              className="h-8 sm:h-9 w-auto object-contain transition-transform duration-300 group-hover:scale-105 dark:brightness-0 dark:invert"
-            />
+            <Logo />
           </a>
-          <span className="inline-flex items-center gap-1 rounded-md bg-primary-tint border border-primary/25 px-2 py-0.5 text-[10px] font-black tracking-widest text-primary uppercase shadow-2xs">
+          <span className="hidden xs:inline-flex items-center gap-1 rounded-md bg-primary-tint border border-primary/25 px-2 py-0.5 text-[10px] font-black tracking-widest text-primary uppercase shadow-2xs">
             <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
             Expo 2026
           </span>

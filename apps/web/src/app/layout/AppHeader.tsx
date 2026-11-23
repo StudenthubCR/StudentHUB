@@ -9,6 +9,7 @@ import { obtenerIniciales } from '@/lib/texto'
 import { esUsuarioAdmin } from '@/features/avisos/avisos.service'
 import { BadgeRol } from '@/components/BadgeRol'
 import { SelectorPerspectiva } from '@/components/SelectorPerspectiva'
+import { Logo } from '@/components/Logo'
 import { ThemeToggle } from './ThemeToggle'
 
 type Props = {
@@ -33,43 +34,39 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
     <header
       data-print="ocultar"
       className={
-        'glass sticky top-0 z-100 flex items-center justify-between ' +
-        'border-b border-border px-3.5 py-2 ' +
-        'md:px-6 md:py-2.5 xl:col-span-2 xl:row-start-1 xl:h-[70px] xl:px-8 xl:py-0'
+        'glass sticky top-0 z-100 flex items-center justify-between min-w-0 ' +
+        'border-b border-border px-3 py-2 ' +
+        'sm:px-3.5 sm:py-2 md:px-6 md:py-2.5 xl:col-span-2 xl:row-start-1 xl:h-[70px] xl:px-8 xl:py-0'
       }
     >
-      <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">
+      <div className="flex items-center gap-2 sm:gap-3.5 shrink-0 min-w-0">
         <Link
           to="/"
           aria-label="Ir al inicio"
-          className="flex items-center shrink-0 h-9 sm:h-10 transition-transform active:scale-95"
+          className="flex items-center shrink-0 h-9 sm:h-10 transition-transform active:scale-95 min-w-0"
         >
-          <img
-            src="/SHlarge.webp"
-            alt="Student HUB"
-            className="h-8 sm:h-9 w-auto object-contain transition-all duration-200 dark:brightness-0 dark:invert"
-          />
+          <Logo />
         </Link>
 
         {sesion && (
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="hidden sm:flex items-center gap-1.5 sm:gap-2">
             <BadgeRol perspectiva={perspectiva} compacto />
             <SelectorPerspectiva />
           </div>
         )}
       </div>
 
-      <div className="flex items-center gap-1.5 sm:gap-2.5">
+      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
         {!esModoInstalado && onAbrirInstalar && (
           <button
             type="button"
             onClick={onAbrirInstalar}
-            className="flex cursor-pointer items-center gap-1.5 rounded-full border border-primary/30 bg-primary-tint px-3 py-1.5 text-etiqueta font-bold text-primary shadow-xs transition-all duration-200 hover:bg-primary-tint-strong active:scale-95"
+            className="flex cursor-pointer items-center justify-center gap-1.5 rounded-full border border-primary/30 bg-primary-tint size-9 sm:size-auto sm:px-3 sm:py-1.5 text-etiqueta font-bold text-primary shadow-xs transition-all duration-200 hover:bg-primary-tint-strong active:scale-95"
             title="Instalar Student HUB en tu dispositivo"
+            aria-label="Instalar Student HUB en tu dispositivo"
           >
-            <IconoDescargar className="size-3.5" />
+            <IconoDescargar className="size-4 sm:size-3.5 shrink-0" />
             <span className="hidden sm:inline">Instalar App</span>
-            <span className="sm:hidden">Instalar</span>
           </button>
         )}
 
@@ -109,11 +106,12 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
         {esAdmin && (
           <Link
             to="/admin"
-            className="inline-flex items-center gap-1.5 rounded-full bg-primary-tint border border-primary/30 px-3 py-1 text-etiqueta font-bold text-primary hover:bg-primary-tint-strong transition-all shadow-2xs active:scale-95"
+            className="flex sm:inline-flex items-center justify-center gap-1.5 rounded-full bg-primary-tint border border-primary/30 size-9 sm:size-auto sm:px-3 sm:py-1 text-etiqueta font-bold text-primary hover:bg-primary-tint-strong transition-all shadow-2xs active:scale-95"
             title="Ingresar al Panel de Control Administrativo"
+            aria-label="Panel de Control Administrativo"
           >
-            <IconoEscudo className="size-3.5" />
-            <span>Panel Admin</span>
+            <IconoEscudo className="size-4 sm:size-3.5" />
+            <span className="hidden sm:inline">Panel Admin</span>
           </Link>
         )}
 
@@ -126,7 +124,7 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
             aria-label="Cerrar sesión"
             title="Cerrar sesión"
             className={
-              'flex size-9 sm:size-10 cursor-pointer items-center justify-center rounded-full ' +
+              'hidden sm:flex size-9 sm:size-10 cursor-pointer items-center justify-center rounded-full ' +
               'border border-border bg-surface text-text-muted transition-all duration-200 ' +
               'hover:border-border-strong hover:bg-surface-alt hover:text-text active:scale-95'
             }
