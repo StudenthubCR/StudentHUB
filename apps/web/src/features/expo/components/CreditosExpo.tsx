@@ -5,9 +5,9 @@ export function CreditosExpo() {
   return (
     <footer className="py-14 border-t border-border bg-surface text-text">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pb-10 border-b border-border">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 pb-10 border-b border-border">
           {/* Logo y resumen */}
-          <div className="md:col-span-6 space-y-3">
+          <div className="xl:col-span-6 space-y-3">
             <div className="relative flex h-10 w-36 items-center overflow-hidden">
               <img
                 src="/SHlarge.webp"
@@ -27,7 +27,7 @@ export function CreditosExpo() {
           </div>
 
           {/* Ficha Institucional */}
-          <div className="md:col-span-3 space-y-2">
+          <div className="xl:col-span-3 space-y-2">
             <h4 className="text-etiqueta font-bold uppercase tracking-wider text-text">
               Institución y Especialidad
             </h4>
@@ -40,7 +40,7 @@ export function CreditosExpo() {
           </div>
 
           {/* Enlaces de Acceso */}
-          <div className="md:col-span-3 space-y-3">
+          <div className="xl:col-span-3 space-y-3">
             <h4 className="text-etiqueta font-bold uppercase tracking-wider text-text">
               Acceso al Sistema
             </h4>

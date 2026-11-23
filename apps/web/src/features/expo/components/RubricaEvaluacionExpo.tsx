@@ -131,12 +131,12 @@ export function RubricaEvaluacionExpo() {
         </div>
 
         {/* Criterios de la Rúbrica en Tarjetas Claras */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {criterios.map((crit, idx) => (
             <div
               key={idx}
               className={`rounded-3xl border border-border/80 bg-surface p-6 shadow-xs flex flex-col justify-between hover:shadow-lg hover:border-primary/40 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden group ${
-                idx === 4 ? 'md:col-span-2 lg:col-span-1' : ''
+                idx === 4 ? 'xl:col-span-1' : ''
               }`}
             >
               {/* Barra superior del color de categoría */}

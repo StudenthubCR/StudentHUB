@@ -31,7 +31,7 @@ export function AppLayout({ children }: { children?: ReactNode }) {
   const [bannerDescartado, setBannerDescartado] = useState(false)
 
   return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[264px_1fr] lg:grid-rows-[70px_1fr]">
+    <div className="min-h-screen xl:grid xl:grid-cols-[264px_1fr] xl:grid-rows-[70px_1fr] overflow-x-clip">
       {/* Para quien navega con teclado: saltarse la barra y caer en el
           contenido. Sólo se ve al enfocarlo. */}
       <a
@@ -55,9 +55,9 @@ export function AppLayout({ children }: { children?: ReactNode }) {
         id="contenido"
         tabIndex={-1}
         className={
-          'mx-auto w-full px-4.5 pt-5 pb-[calc(100px_+_env(safe-area-inset-bottom))] ' +
-          'md:max-w-[700px] md:px-6 md:pt-7 md:pb-[calc(110px_+_env(safe-area-inset-bottom))] ' +
-          'lg:col-start-2 lg:row-start-2 lg:max-w-[1200px] lg:px-10 lg:py-9 lg:pb-9'
+          'mx-auto w-full max-w-[680px] px-4.5 pt-5 pb-[calc(100px_+_env(safe-area-inset-bottom))] ' +
+          'md:px-6 md:pt-7 md:pb-[calc(110px_+_env(safe-area-inset-bottom))] ' +
+          'xl:col-start-2 xl:row-start-2 xl:max-w-[1200px] xl:px-10 xl:py-9 xl:pb-9'
         }
       >
         {/* Barra de Evaluación Rápida para Jueces (Expotécnica 2026) */}

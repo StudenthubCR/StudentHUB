@@ -108,3 +108,4 @@ CREATE POLICY "Solo administradores gestionan asistencias"
 -- 7. Comentarios Informativos en el Catálogo
 COMMENT ON TABLE public.notas IS 'Calificaciones oficiales del estudiante bajo rúbrica MEP protegidas por RLS.';
 COMMENT ON TABLE public.asistencias IS 'Registro diario y cronológico de asistencia a lecciones protegido por RLS.';
+   

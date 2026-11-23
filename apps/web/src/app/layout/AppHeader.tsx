@@ -35,7 +35,7 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
       className={
         'glass sticky top-0 z-100 flex items-center justify-between ' +
         'border-b border-border px-3.5 py-2 ' +
-        'md:px-6 md:py-2.5 lg:col-span-2 lg:row-start-1 lg:h-[70px] lg:px-8 lg:py-0'
+        'md:px-6 md:py-2.5 xl:col-span-2 xl:row-start-1 xl:h-[70px] xl:px-8 xl:py-0'
       }
     >
       <div className="flex items-center gap-2 sm:gap-3.5 shrink-0">

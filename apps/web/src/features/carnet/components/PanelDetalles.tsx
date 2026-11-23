@@ -59,8 +59,8 @@ export function PanelDetalles({
     <div
       data-print="ocultar"
       className={cn(
-        'w-full max-w-[350px] rounded-lg border border-border bg-surface p-6 elev-md',
-        'lg:max-w-none lg:flex-[1.2] lg:p-7',
+        'w-full max-w-[360px] sm:max-w-[420px] rounded-lg border border-border bg-surface p-6 elev-md',
+        'xl:max-w-none xl:flex-[1.2] xl:p-7',
       )}
     >
       <h3 className="mb-1.5 text-subtitulo font-bold tracking-[-0.01em]">

@@ -217,7 +217,7 @@ export function AgendaPage() {
       </div>
 
       {/* Disposición en 2 columnas (Calendario + Lista) */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[330px_1fr] lg:items-start">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[330px_1fr] xl:items-start">
         {/* Columna Izquierda: Mini-calendario y atajos */}
         <aside className="space-y-4">
           <MiniCalendarioAgenda

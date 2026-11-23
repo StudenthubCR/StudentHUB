@@ -9,8 +9,8 @@ import { NAV_ITEMS } from './nav-items'
 
 /**
  * Una sola pieza para las dos formas de navegación de la app actual:
- *   · < 1024px → píldora flotante fija al fondo (glass), indicador arriba
- *   · ≥ 1024px → barra lateral de 264px pegada bajo el header, indicador a la izquierda
+ *   · < 1280px → píldora flotante fija al fondo (glass), indicador arriba
+ *   · ≥ 1280px → barra lateral de 264px pegada bajo el header, indicador a la izquierda
  */
 export function AppNav() {
   return (
@@ -21,15 +21,15 @@ export function AppNav() {
         // Píldora flotante (móvil y tablet)
         'fixed right-3.5 bottom-[calc(14px_+_env(safe-area-inset-bottom))] left-3.5 z-[1000]',
         'flex h-[66px] items-center justify-around px-1.5',
-        'rounded-xl border border-border max-lg:glass max-lg:elev-nav',
+        'rounded-xl border border-border max-xl:glass max-xl:elev-nav',
         // Tablet: misma píldora, centrada y acotada
         'md:right-auto md:bottom-[calc(18px_+_env(safe-area-inset-bottom))] md:left-1/2',
-        'md:h-[72px] md:w-[min(520px,calc(100%_-_48px))] md:-translate-x-1/2',
+        'md:h-[72px] md:w-[min(540px,calc(100%_-_48px))] md:-translate-x-1/2',
         // Escritorio: se convierte en barra lateral
-        'lg:sticky lg:top-[70px] lg:right-auto lg:bottom-auto lg:left-0 lg:z-90',
-        'lg:col-start-1 lg:row-start-2 lg:h-[calc(100vh_-_70px)] lg:w-[264px] lg:translate-x-0',
-        'lg:flex-col lg:items-stretch lg:justify-start lg:gap-1.5 lg:px-4 lg:py-6',
-        'lg:rounded-none lg:border-0 lg:border-r lg:border-border lg:bg-surface',
+        'xl:sticky xl:top-[70px] xl:right-auto xl:bottom-auto xl:left-0 xl:z-90',
+        'xl:col-start-1 xl:row-start-2 xl:h-[calc(100vh_-_70px)] xl:w-[264px] xl:translate-x-0',
+        'xl:flex-col xl:items-stretch xl:justify-start xl:gap-1.5 xl:px-4 xl:py-6',
+        'xl:rounded-none xl:border-0 xl:border-r xl:border-border xl:bg-surface',
       )}
     >
       {NAV_ITEMS.map((item) => (
@@ -46,13 +46,13 @@ export function AppNav() {
               'before:-translate-x-1/2 before:rounded-full before:bg-primary',
               'before:transition-[width] before:duration-300 before:ease-soft before:content-[""]',
               // …y barra lateral izquierda en escritorio
-              'lg:h-auto lg:w-full lg:flex-none lg:flex-row lg:items-center lg:justify-start',
-              'lg:gap-3.5 lg:rounded-md lg:px-4 lg:py-3 lg:transition-all',
-              'lg:before:top-1/2 lg:before:left-0 lg:before:h-0 lg:before:w-[3px]',
-              'lg:before:translate-x-0 lg:before:-translate-y-1/2 lg:before:transition-[height]',
+              'xl:h-auto xl:w-full xl:flex-none xl:flex-row xl:items-center xl:justify-start',
+              'xl:gap-3.5 xl:rounded-md xl:px-4 xl:py-3 xl:transition-all',
+              'xl:before:top-1/2 xl:before:left-0 xl:before:h-0 xl:before:w-[3px]',
+              'xl:before:translate-x-0 xl:before:-translate-y-1/2 xl:before:transition-[height]',
               isActive
-                ? 'text-primary before:w-5 lg:bg-primary-tint lg:before:h-[22px] lg:before:w-[3px]'
-                : 'text-text-muted lg:hover:bg-surface-alt lg:hover:text-text',
+                ? 'text-primary before:w-5 xl:bg-primary-tint xl:before:h-[22px] xl:before:w-[3px]'
+                : 'text-text-muted xl:hover:bg-surface-alt xl:hover:text-text',
             )
           }
         >
@@ -61,14 +61,14 @@ export function AppNav() {
               <span
                 className={cn(
                   '[&>svg]:size-[23px] [&>svg]:transition-transform [&>svg]:duration-300 [&>svg]:ease-soft',
-                  'md:[&>svg]:size-[25px] lg:[&>svg]:size-[22px]',
+                  'md:[&>svg]:size-[25px] xl:[&>svg]:size-[22px]',
                   'group-active:[&>svg]:scale-88',
-                  isActive && 'max-lg:[&>svg]:translate-y-px max-lg:[&>svg]:scale-106',
+                  isActive && 'max-xl:[&>svg]:translate-y-px max-xl:[&>svg]:scale-106',
                 )}
               >
                 <item.Icono />
               </span>
-              <span className="text-etiqueta font-semibold tracking-[0.01em] md:text-menuda lg:text-dato">
+              <span className="text-etiqueta font-semibold tracking-[0.01em] md:text-menuda xl:text-dato">
                 {item.label}
               </span>
             </>
@@ -91,7 +91,7 @@ function FichaLateral() {
 
   if (cargando) {
     return (
-      <div className="mt-auto hidden animate-pulse items-center gap-3 rounded-md border border-border p-2.5 lg:flex">
+      <div className="mt-auto hidden animate-pulse items-center gap-3 rounded-md border border-border p-2.5 xl:flex">
         <div className="size-9 shrink-0 rounded-full bg-surface-alt" />
         <div className="min-w-0 flex-1 space-y-1.5">
           <div className="h-3.5 w-24 rounded-sm bg-surface-alt" />
@@ -104,7 +104,7 @@ function FichaLateral() {
   if (!estudiante) {
     if (sesion) {
       return (
-        <div className="mt-auto hidden flex-col gap-2 border-t border-border pt-3 lg:flex">
+        <div className="mt-auto hidden flex-col gap-2 border-t border-border pt-3 xl:flex">
           <div className="rounded-md border border-border bg-surface-alt p-2.5 text-menuda text-text-muted">
             <span className="block font-semibold text-text truncate">
               {sesion.user.email}
@@ -133,7 +133,7 @@ function FichaLateral() {
         className={cn(
           'mt-auto hidden items-center justify-center rounded-md border border-border',
           'bg-primary-tint p-2.5 text-menor font-semibold text-primary',
-          'transition-colors duration-250 hover:bg-primary-tint-strong lg:flex',
+          'transition-colors duration-250 hover:bg-primary-tint-strong xl:flex',
         )}
       >
         Iniciar sesión
@@ -142,7 +142,7 @@ function FichaLateral() {
   }
 
   return (
-    <div className="mt-auto hidden flex-col gap-2 border-t border-border pt-3 lg:flex">
+    <div className="mt-auto hidden flex-col gap-2 border-t border-border pt-3 xl:flex">
       <div className="flex items-center justify-between px-1">
         <BadgeRol perspectiva={perspectiva} />
       </div>

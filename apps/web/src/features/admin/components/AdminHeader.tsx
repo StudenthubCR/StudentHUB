@@ -18,7 +18,7 @@ export function AdminHeader({ alAbrirMenuMovil }: Props) {
           type="button"
           onClick={alAbrirMenuMovil}
           aria-label="Abrir menú de navegación"
-          className="flex size-11 cursor-pointer items-center justify-center rounded-xl border border-border bg-surface text-text-muted transition-colors hover:bg-surface-alt hover:text-text lg:hidden active:scale-95"
+          className="flex size-11 cursor-pointer items-center justify-center rounded-xl border border-border bg-surface text-text-muted transition-colors hover:bg-surface-alt hover:text-text xl:hidden active:scale-95"
         >
           <IconoMenu className="size-5" />
         </button>

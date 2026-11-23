@@ -64,7 +64,7 @@ export function AdminSidebar({
         <div
           role="presentation"
           aria-hidden="true"
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs transition-opacity lg:hidden"
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs transition-opacity xl:hidden"
           onClick={alCerrarMovil}
         />
       )}
@@ -73,9 +73,9 @@ export function AdminSidebar({
       <aside
         className={cn(
           'fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-surface transition-all duration-300 ease-ui overflow-hidden',
-          'lg:static lg:z-30',
-          colapsadoEscritorio ? 'lg:w-[76px]' : 'lg:w-[270px]',
-          abiertoEnMovil ? 'translate-x-0 w-[290px] shadow-2xl' : '-translate-x-full lg:translate-x-0',
+          'xl:static xl:z-30',
+          colapsadoEscritorio ? 'xl:w-[76px]' : 'xl:w-[270px]',
+          abiertoEnMovil ? 'translate-x-0 w-[290px] shadow-2xl' : '-translate-x-full xl:translate-x-0',
         )}
       >
         {/* Cabecera del Sidebar */}
@@ -103,7 +103,7 @@ export function AdminSidebar({
             type="button"
             onClick={alCerrarMovil}
             aria-label="Cerrar menú de navegación"
-            className="flex size-11 cursor-pointer items-center justify-center rounded-xl text-text-muted hover:bg-surface-alt hover:text-text lg:hidden active:scale-95"
+            className="flex size-11 cursor-pointer items-center justify-center rounded-xl text-text-muted hover:bg-surface-alt hover:text-text xl:hidden active:scale-95"
           >
             <IconoCerrar className="size-5" />
           </button>
@@ -111,7 +111,7 @@ export function AdminSidebar({
 
         {/* Lista de Navegación */}
         <nav className="flex-1 space-y-1.5 overflow-y-auto p-3">
-          <div className={cn('px-3 py-1.5', colapsadoEscritorio && 'lg:hidden')}>
+          <div className={cn('px-3 py-1.5', colapsadoEscritorio && 'xl:hidden')}>
             <span className="text-micro font-extrabold uppercase tracking-wider text-text-muted">
               Módulos de Gestión
             </span>
@@ -127,7 +127,7 @@ export function AdminSidebar({
               className={({ isActive }) =>
                 cn(
                   'group flex items-center gap-3.5 rounded-xl px-3.5 py-3 text-menor font-semibold transition-all duration-200 min-h-[44px]',
-                  colapsadoEscritorio && 'lg:justify-center lg:px-2.5',
+                  colapsadoEscritorio && 'xl:justify-center xl:px-2.5',
                   isActive
                     ? 'bg-primary text-white shadow-sm font-bold'
                     : 'text-text-muted hover:bg-surface-alt hover:text-text',
@@ -168,7 +168,7 @@ export function AdminSidebar({
             type="button"
             onClick={alAlternarColapso}
             className={cn(
-              'hidden w-full cursor-pointer items-center gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 text-menuda font-semibold text-text-muted transition-all hover:bg-surface-alt hover:text-text lg:flex min-h-[44px]',
+              'hidden w-full cursor-pointer items-center gap-3 rounded-xl border border-border bg-surface px-3 py-2.5 text-menuda font-semibold text-text-muted transition-all hover:bg-surface-alt hover:text-text xl:flex min-h-[44px]',
               colapsadoEscritorio && 'justify-center px-1',
             )}
             title={colapsadoEscritorio ? 'Expandir barra lateral' : 'Colapsar barra lateral'}
@@ -185,7 +185,7 @@ export function AdminSidebar({
             to="/"
             className={cn(
               'flex items-center gap-3 rounded-xl border border-primary/25 bg-primary-tint px-3.5 py-2.5 text-menor font-bold text-primary transition-all duration-200 hover:bg-primary-tint-strong active:scale-98 min-h-[44px]',
-              colapsadoEscritorio && 'lg:justify-center lg:px-2',
+              colapsadoEscritorio && 'xl:justify-center xl:px-2',
             )}
             title={colapsadoEscritorio ? 'Ir a la App Estudiantil' : undefined}
           >

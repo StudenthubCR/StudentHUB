@@ -222,7 +222,7 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
             'bg-primary text-white shadow-xl transition-all duration-300 ' +
             'hover:bg-primary-dark hover:scale-105 active:scale-95 ' +
             'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-primary focus-visible:ring-offset-2 ' +
-            'right-4 bottom-[calc(86px_+_env(safe-area-inset-bottom))] lg:right-7 lg:bottom-7'
+            'right-4 bottom-[calc(86px_+_env(safe-area-inset-bottom))] md:right-6 md:bottom-[calc(96px_+_env(safe-area-inset-bottom))] xl:right-7 xl:bottom-7'
           }
         >
           <div className="relative flex items-center justify-center">
@@ -251,7 +251,7 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
               'bg-white dark:bg-slate-900 shadow-2xl transition-all ' +
               'left-3 right-3 sm:left-auto sm:right-7 w-auto sm:w-[400px] max-w-[420px] ' +
               'max-h-[calc(100dvh-5.5rem)] h-[min(560px,calc(100svh-5.5rem))] ' +
-              'bottom-[calc(76px_+_env(safe-area-inset-bottom))] sm:bottom-24 font-sans'
+              'bottom-[calc(86px_+_env(safe-area-inset-bottom))] md:bottom-[calc(98px_+_env(safe-area-inset-bottom))] xl:bottom-24 font-sans'
             }
           >
             {/* Cabecera del Asistente */}

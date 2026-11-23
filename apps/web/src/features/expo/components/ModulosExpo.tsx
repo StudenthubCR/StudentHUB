@@ -354,8 +354,8 @@ export function ModulosExpo() {
         </div>
 
         {/* Tarjeta de Detalle del Módulo Seleccionado */}
-        <div className="rounded-3xl border border-border bg-surface p-6 sm:p-10 shadow-lg grid grid-cols-1 lg:grid-cols-12 gap-8 items-center backdrop-blur-xs">
-          <div className="lg:col-span-7 space-y-4">
+        <div className="rounded-3xl border border-border bg-surface p-6 sm:p-10 shadow-lg grid grid-cols-1 xl:grid-cols-12 gap-8 items-center backdrop-blur-xs">
+          <div className="xl:col-span-7 space-y-4">
             <div className="inline-flex items-center gap-2 text-primary font-bold text-etiqueta uppercase tracking-wider">
               {actual.icono}
               <span>Módulo Oficial · {actual.badge}</span>
@@ -393,7 +393,7 @@ export function ModulosExpo() {
           </div>
 
           {/* Tarjeta Visual de Previsualización Interactiva */}
-          <div className="lg:col-span-5 flex justify-center">
+          <div className="xl:col-span-5 flex justify-center">
             {actual.renderPreview()}
           </div>
         </div>

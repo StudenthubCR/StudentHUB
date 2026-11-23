@@ -34,9 +34,9 @@ export function StandQrExpo({ onAbrirInstalar }: Props) {
           {/* Decoración luminosa */}
           <div className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full bg-primary/10 blur-3xl" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-center">
             {/* Lado izquierdo: Instrucciones y botones */}
-            <div className="lg:col-span-7 space-y-5">
+            <div className="xl:col-span-7 space-y-5">
               <div className="inline-flex items-center gap-2 rounded-full bg-primary-tint border border-primary/20 px-3 py-0.5 text-micro font-bold uppercase tracking-wider text-primary">
                 <IconoCodigoQR className="size-3.5" />
                 <span>Interactúa en Vivo</span>
@@ -113,7 +113,7 @@ export function StandQrExpo({ onAbrirInstalar }: Props) {
             </div>
 
             {/* Lado derecho: Tarjeta de QR interactiva grande */}
-            <div className="lg:col-span-5 flex flex-col items-center justify-center">
+            <div className="xl:col-span-5 flex flex-col items-center justify-center">
               <div className="rounded-3xl border-2 border-primary/20 bg-white p-6 shadow-2xl flex flex-col items-center justify-center">
                 <div className="p-2 bg-white rounded-2xl shadow-inner border border-slate-100">
                   <QRCodeSVG

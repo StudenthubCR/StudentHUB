@@ -11,7 +11,7 @@ const TARJETA =
  */
 export function SelectorDeGrado() {
   return (
-    <div className="mt-2.5 grid grid-cols-2 gap-3.5 md:grid-cols-3 md:gap-4 xl:grid-cols-6">
+    <div className="mt-2.5 grid grid-cols-2 gap-3.5 xl:grid-cols-6 xl:gap-4">
       {GRADOS.map((grado) =>
         grado.grupo ? (
           <Link

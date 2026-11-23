@@ -3,7 +3,7 @@ import { etiquetaCortaDeFecha, nombreDelDia } from '../menu.service'
 import type { DiaDeLaSemana } from '../menu.types'
 import { MenuDiaCard } from './MenuDiaCard'
 
-const GRID = 'grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-4.5 xl:grid-cols-3'
+const GRID = 'grid grid-cols-1 gap-4 xl:grid-cols-3 xl:gap-4.5'
 
 /**
  * Esqueleto de carga. Conserva el encabezado real del día — la fecha ya se

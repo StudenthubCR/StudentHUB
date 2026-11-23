@@ -301,10 +301,10 @@ export function LoginPage() {
       </header>
 
       {/* Contenedor principal responsive */}
-      <main className="mx-auto flex max-w-6xl flex-col justify-center px-5 py-6 sm:px-8 lg:py-12">
-        <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+      <main className="mx-auto flex w-full max-w-[540px] flex-col justify-center px-4 py-6 sm:px-6 xl:max-w-6xl xl:px-8 xl:py-12">
+        <div className="grid items-center gap-8 xl:grid-cols-[1.1fr_1fr] xl:gap-14">
           {/* Columna Izquierda: Bienvenida institucional y beneficios */}
-          <div className={cn('flex flex-col gap-6', paso.nombre === 'codigo' ? 'hidden lg:flex' : 'flex')}>
+          <div className={cn('flex flex-col gap-6', paso.nombre === 'codigo' ? 'hidden xl:flex' : 'flex')}>
             <div>
               <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-tint px-3.5 py-1 text-micro font-bold tracking-[0.09em] text-primary uppercase shadow-sm">
                 <span className="size-2 animate-pulse rounded-full bg-primary" />
@@ -320,7 +320,7 @@ export function LoginPage() {
             </div>
 
             {/* Tarjetas de características */}
-            <div className="grid gap-3.5 sm:grid-cols-3 lg:grid-cols-1">
+            <div className="grid gap-3.5 grid-cols-1">
               <div className="flex items-start gap-3.5 rounded-xl border border-border bg-surface/70 p-4 backdrop-blur-sm transition-all hover:border-primary/40 hover:bg-surface">
                 <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary-tint text-primary">
                   <IconoCalendario className="size-5" />

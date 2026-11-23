@@ -149,7 +149,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   onClick={this.copiarAlPortapapeles}
                   className="cursor-pointer rounded-lg bg-surface border border-rose-500/30 px-2.5 py-1 text-[11px] font-bold text-text hover:bg-surface-alt transition-colors"
                 >
-                  {this.state.copiado ? '✓ Copiado al portapapeles' : '📋 Copiar Error al Portapapeles'}
+                  {this.state.copiado ? 'Copiado al portapapeles' : 'Copiar error al portapapeles'}
                 </button>
               </div>
               <p className="font-mono text-menuda font-bold text-rose-950 dark:text-rose-100 break-words leading-relaxed">

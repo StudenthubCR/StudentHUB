@@ -226,9 +226,9 @@ export function SimuladorCarnetExpo() {
         </div>
 
         {/* Contenedor Principal: Simulador en Teléfono a la izquierda + Panel de Control a la derecha */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-center">
           {/* Lado izquierdo: Marco de Celular con el Carnet interactivo */}
-          <div className="lg:col-span-5 flex flex-col items-center justify-center">
+          <div className="xl:col-span-5 flex flex-col items-center justify-center">
             {/* Teléfono Mockup con iluminación ambiental */}
             <div className="relative w-full max-w-[340px] sm:max-w-[360px] rounded-[46px] border-[7px] border-slate-900 bg-slate-950 p-3.5 shadow-[0_25px_70px_-15px_rgba(37,99,235,0.35)] ring-1 ring-white/20">
               {/* Parlante / Notch de teléfono */}
@@ -286,7 +286,7 @@ export function SimuladorCarnetExpo() {
           </div>
 
           {/* Lado derecho: Panel de Control Interactivo (Modo Guiado vs Avanzado) */}
-          <div className="lg:col-span-7 bg-surface rounded-3xl p-6 sm:p-8 border border-border shadow-md space-y-6">
+          <div className="xl:col-span-7 bg-surface rounded-3xl p-6 sm:p-8 border border-border shadow-md space-y-6">
             {/* Selector de Modo: Modo Juez (1 Clic) vs Modo Personalización */}
             <div className="flex items-center justify-between pb-4 border-b border-border">
               <div>

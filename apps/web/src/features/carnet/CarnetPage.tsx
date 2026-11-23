@@ -75,10 +75,10 @@ export function CarnetPage() {
       <div
         className={
           'mt-2.5 flex flex-col items-center gap-5.5 ' +
-          'lg:mx-auto lg:max-w-[860px] lg:flex-row lg:items-stretch lg:gap-9'
+          'xl:mx-auto xl:max-w-[860px] xl:flex-row xl:items-stretch xl:gap-9'
         }
       >
-        <div className="flex w-full justify-center lg:max-w-[360px] lg:flex-1">
+        <div className="flex w-full justify-center xl:max-w-[360px] xl:flex-1">
           <SafeBoundary nombre="Ficha del Carnet 3D">
             <TarjetaCarnet
               estudiante={estudiante}
