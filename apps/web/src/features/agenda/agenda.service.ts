@@ -1,7 +1,9 @@
 import { format, isSameDay, parseISO, differenceInCalendarDays } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { supabase } from '@/lib/supabase'
 import type { EventoAgenda, ResumenAgendaDia, TipoEventoAgenda } from './agenda.types'
 const STORAGE_KEY_AGENDA = 'studenthub_agenda_eventos'
+export const STORAGE_KEY_AGENDA_DOCENTE = 'studenthub_agenda_docente_v1'
 /**
  * Genera una lista inicial de eventos realistas para que el estudiante
  * pueda experimentar la agenda de inmediato sin empezar en blanco.
@@ -86,7 +88,7 @@ export function generarEventosSemilla(fechaReferencia: Date = new Date()): Event
  * Además, purga cualquier evento semilla anterior para limpiar el estado del usuario.
  */
 export function obtenerEventos(): EventoAgenda[] {
-  if (typeof window === 'undefined') {
+  if (typeof window === 'undefined' && typeof localStorage === 'undefined') {
     return []
   }
 
@@ -120,6 +122,190 @@ export function obtenerEventos(): EventoAgenda[] {
     return parseados
   } catch {
     return esModoDemo ? generarEventosSemilla() : []
+  }
+}
+
+export function generarAgendaDocenteSemilla(fechaReferencia: Date = new Date()): EventoAgenda[] {
+  const formatearFecha = (diasOffset: number) => {
+    const fecha = new Date(fechaReferencia)
+    fecha.setDate(fecha.getDate() + diasOffset)
+    return format(fecha, 'yyyy-MM-dd')
+  }
+
+  return [
+    {
+      id: 'docente-dw-tarea-1',
+      tipo: 'tarea',
+      titulo: 'Entrega de API REST y Esquema RLS',
+      materia: 'Programación y Desarrollo Web',
+      fecha: formatearFecha(2),
+      hora: '16:00',
+      prioridad: 'alta',
+      completada: false,
+      descripcion: 'Subir repositorio con políticas RLS por especialidad y pruebas unitarias en Vitest.',
+      profesor: 'Prof. Dangelo',
+      especialidad: 'Desarrollo Web',
+      seccionObjetivo: '11-1',
+      docenteId: '00000000-0000-0000-0000-000000000010',
+      origen: 'docente',
+      creadoEn: new Date().toISOString(),
+    },
+    {
+      id: 'docente-dw-examen-1',
+      tipo: 'examen',
+      titulo: 'Evaluación Práctica de React 19 y TypeScript',
+      materia: 'Programación y Desarrollo Web',
+      fecha: formatearFecha(4),
+      hora: '08:00',
+      porcentaje: 20,
+      aula: 'Laboratorio Desarrollo Web 1',
+      temario: [
+        'Hooks personalizados y TanStack Query v5',
+        'Rutas protegidas por rol (RBAC)',
+        'Diseño mobile-first con Tailwind CSS v4',
+      ],
+      descripcion: 'Evaluación práctica individual en laboratorio para todas las secciones de Desarrollo Web.',
+      profesor: 'Prof. Dangelo',
+      especialidad: 'Desarrollo Web',
+      seccionObjetivo: null,
+      docenteId: '00000000-0000-0000-0000-000000000010',
+      origen: 'docente',
+      creadoEn: new Date().toISOString(),
+    },
+    {
+      id: 'docente-dw-aviso-1',
+      tipo: 'recordatorio',
+      titulo: 'Revisión de Anteproyecto Expotécnica',
+      materia: 'Proyecto Integrador Web',
+      fecha: formatearFecha(1),
+      hora: '10:30',
+      descripcion: 'Presentación de avances de arquitectura y maquetación móvil para estudiantes de 12-1.',
+      profesor: 'Prof. Dangelo',
+      especialidad: 'Desarrollo Web',
+      seccionObjetivo: '12-1',
+      docenteId: '00000000-0000-0000-0000-000000000010',
+      origen: 'docente',
+      creadoEn: new Date().toISOString(),
+    },
+  ]
+}
+
+export function obtenerEventosDocenteLocales(especialidad?: string): EventoAgenda[] {
+  if (typeof localStorage === 'undefined') return []
+  const esModoDemo = localStorage.getItem('studenthub_demo_sesion') === 'true'
+
+  let lista: EventoAgenda[] = []
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_AGENDA_DOCENTE)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) {
+        lista = parsed as EventoAgenda[]
+      }
+    } else if (esModoDemo) {
+      lista = generarAgendaDocenteSemilla()
+    }
+  } catch {
+    lista = esModoDemo ? generarAgendaDocenteSemilla() : []
+  }
+
+  if (!especialidad) return lista
+  const espNorm = especialidad.trim().toLowerCase()
+  return lista.filter((e) => (e.especialidad ?? '').trim().toLowerCase() === espNorm)
+}
+
+export function guardarEventosDocenteLocales(eventos: EventoAgenda[]): void {
+  if (typeof localStorage === 'undefined') return
+  try {
+    localStorage.setItem(STORAGE_KEY_AGENDA_DOCENTE, JSON.stringify(eventos))
+  } catch (err) {
+    console.error('Error al guardar agenda docente:', err)
+  }
+  if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+    window.dispatchEvent(new Event('studenthub:agenda-docente-actualizada'))
+  }
+}
+
+export function aplicaEventoDocenteAEstudiante(
+  evento: EventoAgenda,
+  estudiante?: { especialidad?: string | null; grupo?: string | null; seccion?: string | null } | null,
+): boolean {
+  if (!estudiante) return false
+  const espEst = (estudiante.especialidad ?? '').trim().toLowerCase()
+  const espEv = (evento.especialidad ?? '').trim().toLowerCase()
+  if (!espEst || !espEv || espEst !== espEv) return false
+
+  if (!evento.seccionObjetivo || !evento.seccionObjetivo.trim()) return true
+  const seccionEst = (estudiante.grupo || estudiante.seccion || '').trim().toLowerCase()
+  return seccionEst === evento.seccionObjetivo.trim().toLowerCase()
+}
+
+export function obtenerEventosParaEstudiante(
+  estudiante?: { especialidad?: string | null; grupo?: string | null; seccion?: string | null } | null,
+): EventoAgenda[] {
+  const personales = obtenerEventos()
+  if (!estudiante) return personales
+
+  const docentes = obtenerEventosDocenteLocales().filter((ev) =>
+    aplicaEventoDocenteAEstudiante(ev, estudiante),
+  )
+
+  if (docentes.length === 0) return personales
+
+  const ids = new Set(personales.map((p) => p.id))
+  const combinados = [...personales]
+  for (const ev of docentes) {
+    if (!ids.has(ev.id)) {
+      combinados.push(ev)
+    }
+  }
+  return combinados
+}
+
+export async function obtenerEventosDocenteSupabaseParaEstudiante(
+  estudiante?: { especialidad?: string | null; grupo?: string | null; seccion?: string | null } | null,
+): Promise<EventoAgenda[]> {
+  if (!estudiante?.especialidad) return []
+  const esModoDemo =
+    typeof localStorage !== 'undefined' &&
+    localStorage.getItem('studenthub_demo_sesion') === 'true'
+  if (esModoDemo) return []
+
+  try {
+    const { data, error } = await supabase
+      .from('agenda_docente')
+      .select('*')
+      .eq('activo', true)
+      .ilike('especialidad', estudiante.especialidad.trim())
+      .order('fecha', { ascending: true })
+
+    if (error || !data) return []
+
+    return (data as Record<string, unknown>[])
+      .map((f) => ({
+        id: String(f.id),
+        tipo: String(f.tipo) as EventoAgenda['tipo'],
+        titulo: String(f.titulo),
+        materia: String(f.materia),
+        fecha: String(f.fecha),
+        hora: f.hora ? String(f.hora) : undefined,
+        descripcion: f.descripcion ? String(f.descripcion) : undefined,
+        porcentaje: typeof f.porcentaje === 'number' ? f.porcentaje : f.porcentaje ? Number(f.porcentaje) : undefined,
+        temario: Array.isArray(f.temario) ? (f.temario as string[]) : undefined,
+        aula: f.aula ? String(f.aula) : undefined,
+        prioridad: f.prioridad ? (String(f.prioridad) as EventoAgenda['prioridad']) : undefined,
+        profesor: f.profesor ? String(f.profesor) : undefined,
+        bloqueAfectado: f.bloque_afectado ? String(f.bloque_afectado) : undefined,
+        indicacion: f.indicacion ? String(f.indicacion) : undefined,
+        especialidad: String(f.especialidad),
+        seccionObjetivo: f.seccion_objetivo ? String(f.seccion_objetivo) : null,
+        docenteId: f.docente_id ? String(f.docente_id) : undefined,
+        origen: 'docente' as const,
+        creadoEn: String(f.creado_el ?? new Date().toISOString()),
+      }))
+      .filter((ev) => aplicaEventoDocenteAEstudiante(ev, estudiante))
+  } catch {
+    return []
   }
 }
 

@@ -5,7 +5,8 @@
  * manda vive en la base: el padrón decide quién entra, y RLS decide qué ve.
  */
 
-export type RolAcceso = 'estudiante' | 'encargado'
+export type RolAcceso = 'estudiante' | 'encargado' | 'docente'
+export type RolSistema = 'estudiante' | 'docente'
 
 export function normalizarCorreo(correo: string): string {
   return correo.trim().toLowerCase()
@@ -33,6 +34,7 @@ export function dominioPermitido(correo: string, dominio: string | null): boolea
  * Texto de sugerencia (placeholder) según el rol seleccionado.
  */
 export function placeholderCorreoPorRol(rol: RolAcceso): string {
+  if (rol === 'docente') return 'docente@mep.go.cr'
   return rol === 'estudiante' ? 'estudiante@mep.go.cr' : 'encargado@ejemplo.com'
 }
 
@@ -40,6 +42,9 @@ export function placeholderCorreoPorRol(rol: RolAcceso): string {
  * Mensaje de orientación según el rol seleccionado.
  */
 export function ayudaCorreoPorRol(rol: RolAcceso): string {
+  if (rol === 'docente') {
+    return 'Ingresá tu correo institucional docente del MEP autorizado en el sistema para acceder a tu especialidad.'
+  }
   return rol === 'estudiante'
     ? 'Ingresá tu correo estudiantil oficial del MEP para recibir tu código de acceso temporal.'
     : 'Ingresá el correo electrónico personal registrado en la institución como encargado legal o tutor.'

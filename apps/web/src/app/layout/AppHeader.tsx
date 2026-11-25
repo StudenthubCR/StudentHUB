@@ -19,16 +19,18 @@ type Props = {
 
 export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
   const { estudiante, perspectiva, cargando: cargandoEstudiante } = useEstudiante()
-  const { sesion, cerrarSesion } = useSesion()
+  const { sesion, rol, docente, cerrarSesion } = useSesion()
   const { permiso, notificacionesActivas, noLeidas } = useNotificaciones()
   const [modalNotifAbierto, setModalNotifAbierto] = useState(false)
 
+  const esDocente = rol === 'docente' && Boolean(docente)
   const email = (sesion?.user?.email ?? '').trim().toLowerCase()
   const esAdmin =
-    esUsuarioAdmin(email) ||
-    sesion?.user?.app_metadata?.role === 'admin' ||
-    sesion?.user?.user_metadata?.role === 'admin' ||
-    (typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true')
+    !esDocente &&
+    (esUsuarioAdmin(email) ||
+      sesion?.user?.app_metadata?.role === 'admin' ||
+      sesion?.user?.user_metadata?.role === 'admin' ||
+      (typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true'))
 
   return (
     <header
@@ -41,7 +43,7 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
     >
       <div className="flex items-center gap-2 sm:gap-3.5 shrink-0 min-w-0">
         <Link
-          to="/"
+          to={esDocente ? '/docente' : '/'}
           aria-label="Ir al inicio"
           className="flex items-center shrink-0 h-9 sm:h-10 transition-transform active:scale-95 min-w-0"
         >
@@ -50,8 +52,14 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
 
         {sesion && (
           <div className="hidden sm:flex items-center gap-1.5 sm:gap-2">
-            <BadgeRol perspectiva={perspectiva} compacto />
-            <SelectorPerspectiva />
+            {esDocente ? (
+              <BadgeRol rol="docente" especialidad={docente?.especialidadAsignada} compacto />
+            ) : (
+              <>
+                <BadgeRol perspectiva={perspectiva} compacto />
+                <SelectorPerspectiva />
+              </>
+            )}
           </div>
         )}
       </div>
@@ -133,7 +141,22 @@ export function AppHeader({ onAbrirInstalar, esModoInstalado = false }: Props) {
           </button>
         )}
 
-        {cargandoEstudiante ? (
+        {esDocente && docente ? (
+          <Link
+            to="/docente"
+            aria-label={`Panel Docente de ${docente.nombreCompleto}`}
+            className="rounded-full transition-transform duration-250 ease-ui active:scale-95"
+          >
+            <span
+              className={
+                'flex size-9 sm:size-10 items-center justify-center rounded-full border-2 border-primary ' +
+                'bg-primary-solid text-nota font-bold text-white shadow-[0_0_0_3px_var(--color-primary-tint)] md:size-11'
+              }
+            >
+              {obtenerIniciales(docente.nombreCompleto)}
+            </span>
+          </Link>
+        ) : cargandoEstudiante ? (
           <div className="size-9 sm:size-10 rounded-full bg-surface-alt border border-border animate-pulse md:size-11" />
         ) : estudiante ? (
           <Link

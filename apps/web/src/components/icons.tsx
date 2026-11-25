@@ -759,6 +759,30 @@ export function IconoRecargar(props: Props) {
   )
 }
 
+/** Docente / Pizarrón o portafolio académico */
+export function IconoDocente(props: Props) {
+  return (
+    <Base {...props}>
+      <rect width="18" height="12" x="3" y="4" rx="2" />
+      <path d="M2 20h20" />
+      <path d="m8 16 4-4 4 4" />
+      <path d="M7 9h4" />
+      <path d="M7 12h2" />
+    </Base>
+  )
+}
+
+/** Lista de Asistencia / Clipboard con verificación */
+export function IconoListaAsistencia(props: Props) {
+  return (
+    <Base {...props}>
+      <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+      <path d="m9 14 2 2 4-4" />
+    </Base>
+  )
+}
+
 /**
  * Colección de iconos animados con física de resortes de Iconimate (https://iconimate.app/).
  */

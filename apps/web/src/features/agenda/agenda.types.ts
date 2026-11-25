@@ -33,6 +33,12 @@ export type EventoAgenda = {
   bloqueAfectado?: string
   indicacion?: string
   sustituto?: string
+
+  // Alcance docente por especialidad / sección
+  especialidad?: string
+  seccionObjetivo?: string | null
+  docenteId?: string
+  origen?: 'estudiante' | 'docente'
 }
 
 export type FiltroAgenda = 'todos' | 'examen' | 'tarea' | 'ausencia_profesor' | 'recordatorio' | 'completadas'

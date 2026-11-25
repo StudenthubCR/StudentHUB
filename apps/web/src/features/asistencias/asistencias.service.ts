@@ -7,6 +7,8 @@ import type {
 } from './asistencias.types'
 import { ASISTENCIAS_FIXTURE } from './asistencias.fixture'
 
+export const CLAVE_DEMO_ASISTENCIAS_OVERLAY = 'studenthub_demo_asistencias_v1'
+
 type FilaAsistenciaRaw = {
   id: string
   estudiante_id: string
@@ -32,26 +34,97 @@ function mapearFilaAAsistencia(f: FilaAsistenciaRaw): RegistroAsistencia {
 }
 
 /**
+ * Retorna la fecha actual en zona horaria America/Costa_Rica en formato ISO YYYY-MM-DD.
+ */
+export function obtenerFechaHoyCostaRica(referencia: Date = new Date()): string {
+  try {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Costa_Rica',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(referencia)
+  } catch {
+    return referencia.toISOString().slice(0, 10)
+  }
+}
+
+function leerAsistenciasDemoOverlay(): RegistroAsistencia[] {
+  if (typeof localStorage === 'undefined') return []
+  try {
+    const raw = localStorage.getItem(CLAVE_DEMO_ASISTENCIAS_OVERLAY)
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? (parsed as RegistroAsistencia[]) : []
+  } catch {
+    return []
+  }
+}
+
+function guardarAsistenciasDemoOverlay(registros: RegistroAsistencia[]): void {
+  if (typeof localStorage === 'undefined') return
+  try {
+    localStorage.setItem(CLAVE_DEMO_ASISTENCIAS_OVERLAY, JSON.stringify(registros))
+  } catch (err) {
+    console.warn('No se pudo guardar el overlay de asistencias demo:', err)
+  }
+  if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+    window.dispatchEvent(new Event('studenthub:asistencias-actualizadas'))
+  }
+}
+
+function claveNaturalAsistencia(
+  r: Pick<RegistroAsistencia, 'estudianteId' | 'fecha' | 'materia' | 'bloque'>,
+): string {
+  return `${r.estudianteId}::${r.fecha}::${r.materia.trim().toLowerCase()}::${r.bloque.trim().toLowerCase()}`
+}
+
+/**
+ * Fusiona el fixture base con el registro cronológico guardado en modo demo,
+ * ordenado desde la fecha más reciente.
+ */
+export function obtenerAsistenciasDemoCombinadas(): RegistroAsistencia[] {
+  const overlay = leerAsistenciasDemoOverlay()
+  if (overlay.length === 0) return ASISTENCIAS_FIXTURE
+
+  const mapa = new Map<string, RegistroAsistencia>()
+  for (const base of ASISTENCIAS_FIXTURE) {
+    mapa.set(claveNaturalAsistencia(base), base)
+  }
+  for (const nuevo of overlay) {
+    const porId = [...mapa.entries()].find(([, val]) => val.id === nuevo.id)
+    if (porId) {
+      mapa.delete(porId[0])
+    }
+    mapa.set(claveNaturalAsistencia(nuevo), nuevo)
+  }
+
+  return Array.from(mapa.values()).sort((a, b) => b.fecha.localeCompare(a.fecha))
+}
+
+/**
  * Consulta el registro de asistencias de un estudiante, filtrado opcionalmente por periodo.
- * Soporta fallback automático a fixtures en modo demo o ante desconexión.
+ * Soporta fallback automático a fixtures y ediciones locales en modo demo.
  */
 export async function obtenerAsistenciasEstudiante(
   estudianteId: string,
   periodo?: PeriodoAsistencia,
 ): Promise<RegistroAsistencia[]> {
   const esDemo =
-    typeof window !== 'undefined' &&
+    typeof localStorage !== 'undefined' &&
     localStorage.getItem('studenthub_demo_sesion') === 'true'
 
   if (esDemo || !estudianteId) {
-    const fixture = ASISTENCIAS_FIXTURE.filter(
+    const combinadas = obtenerAsistenciasDemoCombinadas()
+    const fixture = combinadas.filter(
       (a) =>
         (!estudianteId || a.estudianteId === estudianteId) &&
         (!periodo || a.periodo === periodo),
     )
-    return fixture.length > 0
-      ? fixture
-      : ASISTENCIAS_FIXTURE.filter((a) => !periodo || a.periodo === periodo)
+    if (fixture.length > 0 || estudianteId) {
+      return fixture
+    }
+    return combinadas.filter((a) => !periodo || a.periodo === periodo)
   }
 
   try {
@@ -64,12 +137,132 @@ export async function obtenerAsistenciasEstudiante(
     const { data, error } = await query.order('fecha', { ascending: false })
 
     if (error || !data || data.length === 0) {
-      return ASISTENCIAS_FIXTURE.filter((a) => !periodo || a.periodo === periodo)
+      const combinadas = obtenerAsistenciasDemoCombinadas()
+      const delEstudiante = combinadas.filter(
+        (a) => a.estudianteId === estudianteId && (!periodo || a.periodo === periodo),
+      )
+      if (delEstudiante.length > 0) return delEstudiante
+      return data && data.length === 0 ? [] : combinadas.filter((a) => !periodo || a.periodo === periodo)
     }
 
     return (data as FilaAsistenciaRaw[]).map(mapearFilaAAsistencia)
   } catch {
-    return ASISTENCIAS_FIXTURE.filter((a) => !periodo || a.periodo === periodo)
+    return obtenerAsistenciasDemoCombinadas().filter(
+      (a) =>
+        (!estudianteId || a.estudianteId === estudianteId) &&
+        (!periodo || a.periodo === periodo),
+    )
+  }
+}
+
+export type GuardarAsistenciaInput = Omit<RegistroAsistencia, 'id'> & { id?: string }
+
+/**
+ * Guarda uno o varios registros de asistencia del pase de lista docente.
+ * En modo demo actualiza localStorage para reflejarse de inmediato en /estudiante.
+ */
+export async function guardarRegistrosAsistencia(
+  registros: GuardarAsistenciaInput[],
+  docenteId?: string,
+): Promise<{ ok: boolean; guardados: RegistroAsistencia[]; error?: string }> {
+  if (!registros || registros.length === 0) {
+    return { ok: false, guardados: [], error: 'No hay estudiantes en el pase de lista.' }
+  }
+
+  const esDemo =
+    typeof localStorage !== 'undefined' &&
+    localStorage.getItem('studenthub_demo_sesion') === 'true'
+
+  if (esDemo) {
+    const combinadas = obtenerAsistenciasDemoCombinadas()
+    let overlayActual = leerAsistenciasDemoOverlay()
+    const guardados: RegistroAsistencia[] = []
+
+    for (const item of registros) {
+      const claveItem = claveNaturalAsistencia(item)
+      const existente = combinadas.find(
+        (a) => (item.id && a.id === item.id) || claveNaturalAsistencia(a) === claveItem,
+      )
+      const idFinal =
+        existente?.id ??
+        item.id ??
+        `asist-${item.estudianteId}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+
+      const registroCompleto: RegistroAsistencia = {
+        id: idFinal,
+        estudianteId: item.estudianteId,
+        fecha: item.fecha,
+        periodo: item.periodo,
+        materia: item.materia.trim(),
+        bloque: item.bloque.trim(),
+        estado: item.estado,
+        justificacion: item.justificacion?.trim() || undefined,
+      }
+
+      overlayActual = overlayActual.filter(
+        (a) => a.id !== idFinal && claveNaturalAsistencia(a) !== claveItem,
+      )
+      overlayActual.unshift(registroCompleto)
+      guardados.push(registroCompleto)
+    }
+
+    guardarAsistenciasDemoOverlay(overlayActual)
+    return { ok: true, guardados }
+  }
+
+  try {
+    const guardados: RegistroAsistencia[] = []
+
+    for (const item of registros) {
+      const filaSql = {
+        estudiante_id: item.estudianteId,
+        fecha: item.fecha,
+        periodo: item.periodo,
+        materia: item.materia.trim(),
+        bloque: item.bloque.trim(),
+        estado: item.estado,
+        justificacion: item.justificacion?.trim() || null,
+        ...(docenteId ? { docente_id: docenteId } : {}),
+      }
+
+      const { data: existente } = await supabase
+        .from('asistencias')
+        .select('id')
+        .eq('estudiante_id', item.estudianteId)
+        .eq('fecha', item.fecha)
+        .eq('materia', item.materia.trim())
+        .eq('bloque', item.bloque.trim())
+        .maybeSingle()
+
+      if (existente?.id) {
+        const { data, error } = await supabase
+          .from('asistencias')
+          .update(filaSql)
+          .eq('id', existente.id)
+          .select('*')
+          .single()
+
+        if (error) return { ok: false, guardados, error: error.message }
+        guardados.push(mapearFilaAAsistencia(data as FilaAsistenciaRaw))
+      } else {
+        const { data, error } = await supabase
+          .from('asistencias')
+          .insert([filaSql])
+          .select('*')
+          .single()
+
+        if (error) return { ok: false, guardados, error: error.message }
+        guardados.push(mapearFilaAAsistencia(data as FilaAsistenciaRaw))
+      }
+    }
+
+    return { ok: true, guardados }
+  } catch (err) {
+    return {
+      ok: false,
+      guardados: [],
+      error: err instanceof Error ? err.message : 'No se pudo guardar el pase de lista.',
+    }
   }
 }
 
@@ -121,7 +314,7 @@ export function calcularResumenAsistencias(registros: RegistroAsistencia[]): Res
     ((asistenciasValidas / totalSesiones) * 100).toFixed(1),
   )
 
-  // Alerta temprana: más de 3 ausencias injustificadas o porcentaje < 85%
+  // Alerta temprana: 3 o más ausencias injustificadas o porcentaje < 85%
   const alertaTemprana = ausenciasInjustificadas >= 3 || porcentajeAsistencia < 85
   let mensajeAlerta: string | undefined
 

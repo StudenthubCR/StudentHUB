@@ -59,6 +59,11 @@ describe('placeholderCorreoPorRol y ayudaCorreoPorRol', () => {
     expect(placeholderCorreoPorRol('encargado')).toContain('@ejemplo.com')
     expect(ayudaCorreoPorRol('encargado')).toContain('encargado legal')
   })
+
+  it('devuelve placeholder y orientación para docente', () => {
+    expect(placeholderCorreoPorRol('docente')).toContain('@mep.go.cr')
+    expect(ayudaCorreoPorRol('docente')).toContain('docente')
+  })
 })
 
 describe('validarCorreoParaRol', () => {

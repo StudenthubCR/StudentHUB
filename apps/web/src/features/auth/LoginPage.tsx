@@ -32,6 +32,7 @@ import {
   type RolAcceso,
 } from './auth.service'
 import { useSesion } from './useSesion'
+import { obtenerPerfilDocenteActual } from '@/features/docente/docente.service'
 
 const CAMPO =
   'w-full rounded-xl border border-border bg-surface px-4 py-3.5 text-cuerpo text-text ' +
@@ -47,7 +48,7 @@ const BOTON_PRIMARIO =
 type Paso = { nombre: 'correo' } | { nombre: 'codigo'; correo: string }
 
 export function LoginPage() {
-  const { sesion, cargando, establecerSesion } = useSesion()
+  const { sesion, cargando, rol, cargandoRol, establecerSesion } = useSesion()
   const { esModoInstalado } = usePwaInstall()
   const [modalInstalarAbierto, setModalInstalarAbierto] = useState(false)
   const location = useLocation()
@@ -244,7 +245,12 @@ export function LoginPage() {
         }
 
         const rutaDestino = (location.state as { desde?: { pathname?: string } })?.desde?.pathname || '/'
-        const destinoSeguro = rutaDestino.startsWith('/') && !rutaDestino.startsWith('//') ? rutaDestino : '/'
+        const destinoBase = rutaDestino.startsWith('/') && !rutaDestino.startsWith('//') ? rutaDestino : '/'
+        const perfilDocente = await obtenerPerfilDocenteActual(
+          resultado.data?.session?.user?.id,
+          resultado.data?.session?.user?.email ?? paso.correo,
+        )
+        const destinoSeguro = perfilDocente && destinoBase === '/' ? '/docente' : destinoBase
         window.location.href = destinoSeguro
       } catch {
         setEnviando(false)
@@ -254,17 +260,17 @@ export function LoginPage() {
     [codigo, establecerSesion, location.state, paso],
   )
 
-  const activarModoDemo = (rol: RolAcceso) => {
+  const activarModoDemo = (rolDestino: RolAcceso) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('studenthub_demo_sesion', 'true')
-      localStorage.setItem('studenthub_demo_rol', rol)
-      localStorage.setItem('studenthub_rol_preferido', rol)
-      window.location.href = '/'
+      localStorage.setItem('studenthub_demo_rol', rolDestino)
+      localStorage.setItem('studenthub_rol_preferido', rolDestino)
+      window.location.href = rolDestino === 'docente' ? '/docente' : '/'
     }
   }
 
-  if (cargando) return null
-  if (sesion) return <Navigate to="/" replace />
+  if (cargando || (Boolean(sesion) && cargandoRol)) return null
+  if (sesion) return <Navigate to={rol === 'docente' ? '/docente' : '/'} replace />
 
   return (
     <div className="relative min-h-screen bg-bg text-text antialiased">

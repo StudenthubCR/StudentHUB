@@ -20,7 +20,11 @@ Documento oficial de arquitectura de persistencia y seguridad de datos para Stud
 3. **Aislamiento Multi-Rol Estricto:**
    - **Estudiante (`estudiante`):** Visualiza y gestiona únicamente su propia ficha personal y confirmaciones del comedor escolar.
    - **Encargado Legal (`encargado`):** Accede en modo lectura supervisada **únicamente** a los registros de los estudiantes con vínculo familiar activo en `encargado_estudiante`.
+   - **Docente (`docente`):** Accede únicamente a estudiantes, calificaciones (`notas`), asistencias (`asistencias`), observaciones (`observaciones_docentes`) y agenda (`agenda_docente`) cuya especialidad coincide estrictamente con su `especialidad_asignada` (ejemplo: **Prof. Dangelo** en **Desarrollo Web**). No puede consultar ni modificar registros de otras especialidades.
    - **Administrador (`admin`):** Gestión institucional centralizada.
+
+> [!NOTE] Migración de Modo Docente
+> El esquema y las políticas RLS específicas del rol docente se encuentran en [`supabase/modo_docente.sql`](file:///c:/Users/erick/OneDrive/Documentos/GitHub/StudentHUB/supabase/modo_docente.sql), el cual es 100% idempotente y se aplica de forma aditiva sin alterar el aislamiento de estudiantes ni encargados.
 
 ---
 
@@ -117,21 +121,71 @@ Registro cronológico de lecciones impartidas y presencialidad estudiantil.
 - `justificacion` (text, nullable) — Detalle de boleta o comprobante aportado
 - `creado_el` (timestamptz)
 
+### 2.9 Tabla `public.docentes` (Cuerpo Docente por Especialidad)
+Directorio de profesores autorizados con alcance restringido a su especialidad técnica.
+- `id` (uuid, PK)
+- `auth_user_id` (uuid, FK -> `auth.users.id`, nullable) — Vinculado automáticamente por trigger al iniciar sesión
+- `correo_institucional` (text, unique) — Correo institucional (ej. placeholder `dangelo@mep.go.cr`)
+- `nombre_completo` (text) — Ej: `Prof. Dangelo`
+- `especialidad_asignada` (text) — Ej: `Desarrollo Web` (clave de aislamiento RLS)
+- `secciones_asignadas` (text[]) — Secciones asignadas opcionales (ej: `['10-1', '11-1', '12-1']`)
+- `activo` (boolean, default true)
+- `creado_el` (timestamptz)
+- `actualizado_el` (timestamptz)
+
+### 2.10 Tabla `public.observaciones_docentes` (Observaciones Pedagógicas)
+Registro formativo y de seguimiento académico emitido por el docente hacia estudiantes de su especialidad.
+- `id` (uuid, PK)
+- `estudiante_id` (uuid, FK -> `estudiantes.id` on delete cascade)
+- `docente_id` (uuid, FK -> `docentes.id` on delete cascade)
+- `periodo` (text) — `I Periodo`, `II Periodo`, `III Periodo`, `Anual`
+- `materia` (text, nullable)
+- `categoria` (text) — `academica`, `asistencia`, `convivencia`, `felicitacion`
+- `observacion` (text)
+- `visible_familia` (boolean, default true)
+- `creado_el` / `actualizado_el` (timestamptz)
+
+### 2.11 Tabla `public.agenda_docente` (Agenda y Avisos de Especialidad)
+Tareas, exámenes, recordatorios y ausencias docentes publicados para estudiantes de una especialidad.
+- `id` (uuid, PK)
+- `docente_id` (uuid, FK -> `docentes.id` on delete cascade)
+- `especialidad` (text) — Debe coincidir estrictamente con `docentes.especialidad_asignada`
+- `seccion_objetivo` (text, nullable) — `NULL` para toda la especialidad o código de sección (`10-1`, `11-1`, `12-1`)
+- `tipo` (text) — `examen`, `tarea`, `ausencia_profesor`, `recordatorio`
+- `titulo`, `materia`, `fecha`, `hora`, `descripcion`
+- `porcentaje`, `temario`, `aula`, `prioridad`, `profesor`, `bloque_afectado`, `indicacion`
+- `activo` (boolean, default true)
+- `creado_el` / `actualizado_el` (timestamptz)
+
+### 2.12 Flujo de Resolución de Rol (`rol: 'estudiante' | 'docente'`)
+1. El docente solicita OTP en `/entrar`; `verificar_correo_padron` valida que el correo exista activo en `public.docentes`.
+2. Al autenticarse en `auth.users`, el trigger `trg_vincular_docente_usuario` sincroniza `docentes.auth_user_id` y registra `'docente'` en `public.user_roles`.
+3. En el cliente (`SesionProvider`), la sesión consulta `public.docentes` (`activo = true`). Si hay coincidencia, resuelve `rol = 'docente'` y carga `DocenteProfile`; en caso contrario resuelve `rol = 'estudiante'` (preservando el flujo unificado estudiante/encargado).
+4. La ruta `/docente` está protegida por `DocenteRutaProtegida`, bloqueando a estudiantes y redirigiendo a docentes hacia `/docente`.
+
 ---
 
 ## 3. Matriz de Políticas RLS (Row Level Security)
 
-| Tabla | Operación | Cuenta Única (Estudiante / Familia) | Rol Administrador |
-| :--- | :--- | :--- | :--- |
-| `estudiantes` | `SELECT` | Propio perfil (`user_id = auth.uid()` o correo) | Todos |
-| `estudiantes` | `INSERT/UPDATE/DELETE` | Bloqueado | Permitido |
-| `notas` | `SELECT` | Propias notas (`estudiante_id = perfil propio`) | Todas |
-| `notas` | `INSERT/UPDATE/DELETE` | Bloqueado | Permitido |
-| `asistencias` | `SELECT` | Propias asistencias (`estudiante_id = perfil propio`) | Todas |
-| `asistencias` | `INSERT/UPDATE/DELETE` | Bloqueado | Permitido |
-| `confirmaciones_comedor` | `SELECT` | Propias confirmaciones | Todas |
-| `confirmaciones_comedor` | `INSERT/UPDATE` | Propia confirmación (sujeto a horario) | Permitido |
-| `grupos` / `instituciones` | `SELECT` | Lectura pública autenticada | Todos |
+| Tabla | Operación | Cuenta Única (Estudiante / Familia) | Rol Docente (`docentes`) | Rol Administrador |
+| :--- | :--- | :--- | :--- | :--- |
+| `docentes` | `SELECT` | Bloqueado | Propio perfil activo | Todos |
+| `docentes` | `INSERT/UPDATE/DELETE` | Bloqueado | Bloqueado | Permitido |
+| `estudiantes` | `SELECT` | Propio perfil (`user_id = auth.uid()` o correo) y vínculo familiar | Solo estudiantes donde `especialidad = especialidad_asignada` | Todos |
+| `estudiantes` | `INSERT/UPDATE/DELETE` | Bloqueado | Bloqueado (solo lectura) | Permitido |
+| `notas` | `SELECT` | Propias notas (`estudiante_id = perfil propio`) | Solo notas de estudiantes de `especialidad_asignada` | Todas |
+| `notas` | `INSERT/UPDATE` | Bloqueado | Solo estudiantes de `especialidad_asignada` (`WITH CHECK`) | Permitido |
+| `notas` | `DELETE` | Bloqueado | Bloqueado | Permitido |
+| `asistencias` | `SELECT` | Propias asistencias (`estudiante_id = perfil propio`) | Solo asistencias de estudiantes de `especialidad_asignada` | Todas |
+| `asistencias` | `INSERT/UPDATE` | Bloqueado | Solo estudiantes de `especialidad_asignada` (`WITH CHECK`) | Permitido |
+| `asistencias` | `DELETE` | Bloqueado | Bloqueado | Permitido |
+| `observaciones_docentes` | `SELECT` | Propias (`visible_familia = true`) | Solo especialidad asignada | Todas |
+| `observaciones_docentes` | `INSERT/UPDATE` | Bloqueado | Solo especialidad asignada y propio `docente_id` | Permitido |
+| `agenda_docente` | `SELECT` | Ítems activos de su especialidad/sección | Propios ítems de su especialidad asignada | Todas |
+| `agenda_docente` | `INSERT/UPDATE` | Bloqueado | Solo `especialidad = especialidad_asignada` y propio `docente_id` | Permitido |
+| `confirmaciones_comedor` | `SELECT` | Propias confirmaciones | Bloqueado | Todas |
+| `confirmaciones_comedor` | `INSERT/UPDATE` | Propia confirmación (sujeto a horario) | Bloqueado | Permitido |
+| `grupos` / `instituciones` | `SELECT` | Lectura pública autenticada | Lectura pública autenticada | Todos |
 
 ---
 

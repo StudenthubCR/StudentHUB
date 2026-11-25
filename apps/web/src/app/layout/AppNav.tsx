@@ -5,7 +5,7 @@ import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import { BadgeRol } from '@/components/BadgeRol'
 import { cn } from '@/lib/cn'
 import { obtenerIniciales } from '@/lib/texto'
-import { NAV_ITEMS } from './nav-items'
+import { DOCENTE_NAV_ITEMS, NAV_ITEMS } from './nav-items'
 
 /**
  * Una sola pieza para las dos formas de navegación de la app actual:
@@ -13,6 +13,9 @@ import { NAV_ITEMS } from './nav-items'
  *   · ≥ 1280px → barra lateral de 264px pegada bajo el header, indicador a la izquierda
  */
 export function AppNav() {
+  const { rol } = useSesion()
+  const items = rol === 'docente' ? DOCENTE_NAV_ITEMS : NAV_ITEMS
+
   return (
     <nav
       aria-label="Navegación principal"
@@ -32,11 +35,11 @@ export function AppNav() {
         'xl:rounded-none xl:border-0 xl:border-r xl:border-border xl:bg-surface',
       )}
     >
-      {NAV_ITEMS.map((item) => (
+      {items.map((item) => (
         <NavLink
           key={item.to}
           to={item.to}
-          end={item.to === '/'}
+          end={Boolean(item.end)}
           className={({ isActive }) =>
             cn(
               'group relative flex flex-1 flex-col items-center justify-center gap-[3px] h-full',
@@ -76,10 +79,7 @@ export function AppNav() {
         </NavLink>
       ))}
 
-      {/* Sólo en escritorio: la barra lateral mide toda la altura de la
-          pantalla y con cuatro ítems quedaban 500px en blanco. La ficha del
-          estudiante al pie la cierra y de paso dice quién está usando la app,
-          que hasta ahora no se decía en ningún lado fuera del carnet. */}
+      {/* Ficha de identidad al pie de la barra lateral en escritorio */}
       <FichaLateral />
     </nav>
   )
@@ -87,9 +87,9 @@ export function AppNav() {
 
 function FichaLateral() {
   const { estudiante, perspectiva, cargando } = useEstudiante()
-  const { sesion, cerrarSesion } = useSesion()
+  const { sesion, rol, cargandoRol, docente, cerrarSesion } = useSesion()
 
-  if (cargando) {
+  if (cargando || cargandoRol) {
     return (
       <div className="mt-auto hidden animate-pulse items-center gap-3 rounded-md border border-border p-2.5 xl:flex">
         <div className="size-9 shrink-0 rounded-full bg-surface-alt" />
@@ -97,6 +97,53 @@ function FichaLateral() {
           <div className="h-3.5 w-24 rounded-sm bg-surface-alt" />
           <div className="h-2.5 w-16 rounded-sm bg-surface-alt" />
         </div>
+      </div>
+    )
+  }
+
+  if (rol === 'docente' && docente) {
+    return (
+      <div className="mt-auto hidden flex-col gap-2 border-t border-border pt-3 xl:flex">
+        <div className="flex items-center justify-between px-1">
+          <BadgeRol rol="docente" especialidad={docente.especialidadAsignada} />
+        </div>
+
+        <NavLink
+          to="/docente"
+          end
+          className={({ isActive }) =>
+            cn(
+              'flex items-center gap-3 rounded-md border border-border p-2.5',
+              'transition-colors duration-250',
+              isActive ? 'bg-primary-tint' : 'hover:bg-surface-alt',
+            )
+          }
+        >
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-border bg-primary-solid text-micro font-bold text-white">
+            {obtenerIniciales(docente.nombreCompleto)}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-menor font-semibold text-text">
+              {docente.nombreCompleto}
+            </span>
+            <span className="block truncate text-menuda text-text-muted">
+              {docente.especialidadAsignada}
+            </span>
+          </span>
+        </NavLink>
+
+        <button
+          type="button"
+          onClick={() => void cerrarSesion()}
+          className={cn(
+            'flex cursor-pointer items-center justify-center gap-2 rounded-md border border-border',
+            'bg-surface px-3 py-2 text-menuda font-semibold text-text-muted transition-all duration-200',
+            'hover:border-border-strong hover:bg-surface-alt hover:text-text active:scale-98',
+          )}
+        >
+          <IconoSalir className="size-3.5" />
+          <span>Cerrar sesión</span>
+        </button>
       </div>
     )
   }

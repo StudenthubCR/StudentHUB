@@ -4,6 +4,8 @@ import { AppLayout } from './layout/AppLayout'
 import { PaginaDeError } from './PaginaDeError'
 import { PaginaNoEncontrada } from './PaginaNoEncontrada'
 import { RutaProtegida } from '@/features/auth/RutaProtegida'
+import { DocenteRutaProtegida } from '@/features/auth/DocenteRutaProtegida'
+import { useSesion } from '@/features/auth/useSesion'
 import { AdminLayout, AdminRutaProtegida } from '@/features/admin'
 
 function CargandoRuta() {
@@ -39,6 +41,28 @@ const ComedorPage = lazy(() => import('@/features/comedor/ComedorPage').then((m)
 const AvisosPage = lazy(() => import('@/features/avisos/AvisosPage').then((m) => ({ default: m.AvisosPage })))
 const LoginPage = lazy(() => import('@/features/auth/LoginPage').then((m) => ({ default: m.LoginPage })))
 const ExpoLandingPage = lazy(() => import('@/features/expo/ExpoLandingPage').then((m) => ({ default: m.ExpoLandingPage })))
+const DocentePage = lazy(() => import('@/features/docente/DocentePage').then((m) => ({ default: m.DocentePage })))
+
+function InicioSegunRol() {
+  const { rol, cargandoRol } = useSesion()
+  if (cargandoRol) return <CargandoRuta />
+  if (rol === 'docente') {
+    return <Navigate to="/docente" replace />
+  }
+  return conSuspense(DashboardPage)
+}
+
+function DocenteNotasRuta() {
+  return <DocentePage tabInicial="notas" />
+}
+
+function DocenteAsistenciasRuta() {
+  return <DocentePage tabInicial="asistencias" />
+}
+
+function DocenteAgendaRuta() {
+  return <DocentePage tabInicial="agenda" />
+}
 
 const AdminDashboardPage = lazy(() => import('@/features/admin/pages/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })))
 const AdminAvisosPage = lazy(() => import('@/features/admin/pages/AdminAvisosPage').then((m) => ({ default: m.AdminAvisosPage })))
@@ -99,7 +123,17 @@ export const router = createBrowserRouter([
     ),
     errorElement: <PaginaDeError />,
     children: [
-      { index: true, element: conSuspense(DashboardPage), handle: { titulo: 'Inicio' } },
+      { index: true, element: <InicioSegunRol />, handle: { titulo: 'Inicio' } },
+      {
+        path: 'docente',
+        element: <DocenteRutaProtegida />,
+        children: [
+          { index: true, element: conSuspense(DocentePage), handle: { titulo: 'Modo Docente · Desarrollo Web' } },
+          { path: 'notas', element: conSuspense(DocenteNotasRuta), handle: { titulo: 'Notas · Modo Docente' } },
+          { path: 'asistencias', element: conSuspense(DocenteAsistenciasRuta), handle: { titulo: 'Asistencias · Modo Docente' } },
+          { path: 'agenda', element: conSuspense(DocenteAgendaRuta), handle: { titulo: 'Agenda · Modo Docente' } },
+        ],
+      },
       { path: 'agenda', element: conSuspense(AgendaPage), handle: { titulo: 'Agenda' } },
       { path: 'estudiante', element: conSuspense(EstudiantePage), handle: { titulo: 'Estudiante' } },
       { path: 'carnet', element: <Navigate to="/estudiante?tab=carnet" replace /> },

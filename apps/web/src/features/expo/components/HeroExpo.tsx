@@ -8,18 +8,41 @@ import {
   IconoCarnet,
   IconoRayo,
   IconoAgenda,
+  IconoDocente,
+  IconoUsuarios,
 } from '@/components/icons'
+import { ESTUDIANTES_MASTER_DEMO } from '@/features/docente/docente.fixture'
 
 type Props = {
   onAbrirInstalar?: () => void
 }
 
+const ESTUDIANTES_DESARROLLO_WEB_EXPO = ESTUDIANTES_MASTER_DEMO.filter(
+  (e) => e.especialidad === 'Desarrollo Web',
+)
+
 export function HeroExpo({ onAbrirInstalar }: Props) {
-  const entrarModoDemo = (rol: 'estudiante' | 'encargado' = 'estudiante') => {
+  const entrarModoDemo = (
+    rol: 'estudiante' | 'encargado' | 'docente' = 'estudiante',
+    estudianteId?: string,
+  ) => {
     localStorage.setItem('studenthub_demo_sesion', 'true')
     localStorage.setItem('studenthub_demo_rol', rol)
     localStorage.removeItem('studenthub_estudiante_activo_id')
-    window.location.href = '/'
+    if (rol === 'estudiante' && estudianteId) {
+      localStorage.setItem('studenthub_demo_estudiante_id', estudianteId)
+    } else {
+      localStorage.removeItem('studenthub_demo_estudiante_id')
+    }
+    window.location.href = rol === 'docente' ? '/docente' : '/'
+  }
+
+  const abrirEstudianteDemo = (estudianteId: string) => {
+    localStorage.setItem('studenthub_demo_sesion', 'true')
+    localStorage.setItem('studenthub_demo_rol', 'estudiante')
+    localStorage.setItem('studenthub_demo_estudiante_id', estudianteId)
+    localStorage.removeItem('studenthub_estudiante_activo_id')
+    window.location.href = '/estudiante?tab=notas'
   }
 
   return (
@@ -127,7 +150,18 @@ export function HeroExpo({ onAbrirInstalar }: Props) {
                 >
                   <span className="inline-flex items-center gap-1.5">
                     <IconoBirrete className="size-3.5" />
-                    <span>Iniciar Simulación (Erick García · 11-1)</span>
+                    <span>Estudiante (Erick García · 11-1)</span>
+                  </span>
+                  <IconoFlechaDerecha className="size-3" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => entrarModoDemo('docente')}
+                  className="w-full text-micro font-black text-slate-950 flex items-center justify-between gap-1.5 bg-amber-300 hover:bg-amber-200 px-3 py-2 rounded-xl transition-all cursor-pointer active:scale-95 shadow-xs"
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <IconoDocente className="size-3.5" />
+                    <span>Prof. Dangelo · Desarrollo Web</span>
                   </span>
                   <IconoFlechaDerecha className="size-3" />
                 </button>
@@ -158,6 +192,118 @@ export function HeroExpo({ onAbrirInstalar }: Props) {
                 <IconoFlechaDerecha className="size-3 group-hover:translate-x-1 transition-transform" />
               </span>
             </a>
+          </div>
+
+          {/* Tarjetas de Perfiles Interactivos (Estudiante, Encargado Legal y Prof. Dangelo) */}
+          <div className="mt-4 pt-4 border-t border-border/80">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-3">
+              <p className="text-etiqueta font-black uppercase tracking-wider text-text">
+                Perfiles de Evaluación en Vivo (CTP Rosario de Naranjo)
+              </p>
+              <span className="text-micro text-text-muted">
+                Los cambios hechos como Prof. Dangelo se reflejan en Desarrollo Web al instante
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              {/* Perfil Estudiante */}
+              <button
+                type="button"
+                onClick={() => entrarModoDemo('estudiante', '00000000-0000-0000-0000-000000000001')}
+                className="flex flex-col justify-between rounded-2xl border border-border bg-surface-alt/60 p-3.5 text-left transition-all hover:border-primary/50 hover:bg-primary-tint/20 cursor-pointer active:scale-98"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <span className="flex size-8 items-center justify-center rounded-xl bg-primary-tint text-primary">
+                      <IconoBirrete className="size-4" />
+                    </span>
+                    <span className="rounded-full bg-primary-tint border border-primary/25 px-2 py-0.5 text-[10px] font-bold text-primary uppercase">
+                      Estudiante
+                    </span>
+                  </div>
+                  <p className="text-nota font-bold text-text">Erick García Burgos</p>
+                  <p className="text-micro text-text-muted mt-0.5">
+                    11-1 · Desarrollo Web · Carnet, notas y comedor
+                  </p>
+                </div>
+                <span className="mt-2.5 inline-flex items-center gap-1 text-micro font-bold text-primary">
+                  <span>Abrir perfil estudiante</span>
+                  <IconoFlechaDerecha className="size-3" />
+                </span>
+              </button>
+
+              {/* Perfil Encargado Legal */}
+              <button
+                type="button"
+                onClick={() => entrarModoDemo('encargado')}
+                className="flex flex-col justify-between rounded-2xl border border-border bg-surface-alt/60 p-3.5 text-left transition-all hover:border-emerald-500/50 hover:bg-emerald-500/10 cursor-pointer active:scale-98"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <span className="flex size-8 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-400">
+                      <IconoUsuarios className="size-4" />
+                    </span>
+                    <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase">
+                      Encargado
+                    </span>
+                  </div>
+                  <p className="text-nota font-bold text-text">María Elena Burgos</p>
+                  <p className="text-micro text-text-muted mt-0.5">
+                    2 hijos vinculados (Desarrollo Web y Contabilidad)
+                  </p>
+                </div>
+                <span className="mt-2.5 inline-flex items-center gap-1 text-micro font-bold text-emerald-700 dark:text-emerald-400">
+                  <span>Abrir vista familiar</span>
+                  <IconoFlechaDerecha className="size-3" />
+                </span>
+              </button>
+
+              {/* Perfil Prof. Dangelo — Docente de Desarrollo Web */}
+              <button
+                type="button"
+                onClick={() => entrarModoDemo('docente')}
+                className="flex flex-col justify-between rounded-2xl border-2 border-amber-500/45 bg-amber-500/10 p-3.5 text-left transition-all hover:border-amber-500 hover:bg-amber-500/15 cursor-pointer active:scale-98 shadow-xs"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <span className="flex size-8 items-center justify-center rounded-xl bg-amber-500/20 text-amber-800 dark:text-amber-300">
+                      <IconoDocente className="size-4" />
+                    </span>
+                    <span className="rounded-full bg-amber-500/20 border border-amber-500/35 px-2 py-0.5 text-[10px] font-black text-amber-900 dark:text-amber-200 uppercase">
+                      Modo Docente
+                    </span>
+                  </div>
+                  <p className="text-nota font-black text-text">
+                    Prof. Dangelo — Docente de Desarrollo Web
+                  </p>
+                  <p className="text-micro text-text-muted mt-0.5">
+                    Padrón Desarrollo Web (10°, 11°, 12°), notas, lista y agenda
+                  </p>
+                </div>
+                <span className="mt-2.5 inline-flex items-center gap-1 text-micro font-black text-amber-800 dark:text-amber-300">
+                  <span>Entrar a Modo Docente</span>
+                  <IconoFlechaDerecha className="size-3" />
+                </span>
+              </button>
+            </div>
+
+            {/* Selector rápido para verificar cualquier estudiante de Desarrollo Web actualizado */}
+            <div className="mt-3 flex flex-wrap items-center gap-1.5">
+              <span className="text-micro font-bold text-text-muted mr-1">
+                Inspeccionar estudiante de Desarrollo Web:
+              </span>
+              {ESTUDIANTES_DESARROLLO_WEB_EXPO.map((est) => (
+                <button
+                  key={est.id}
+                  type="button"
+                  onClick={() => est.id && abrirEstudianteDemo(est.id)}
+                  className="inline-flex items-center gap-1 rounded-lg border border-border bg-surface px-2.5 py-1 text-[11px] font-semibold text-text-muted transition-colors hover:border-primary/40 hover:bg-primary-tint hover:text-primary cursor-pointer"
+                >
+                  <span>{est.nombre.split(' ').slice(0, 2).join(' ')}</span>
+                  <span className="text-micro opacity-75">({est.grupo})</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

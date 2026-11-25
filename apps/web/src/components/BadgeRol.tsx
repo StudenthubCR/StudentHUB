@@ -1,15 +1,34 @@
-import { IconoBirrete, IconoUsuarios, IconoEscudo } from '@/components/icons'
+import { IconoBirrete, IconoDocente, IconoUsuarios, IconoEscudo } from '@/components/icons'
 import type { ModoPerspectiva, RolUsuario } from '@/features/estudiante/estudiante.fixture'
 import { cn } from '@/lib/cn'
 
 type Props = {
-  rol?: RolUsuario
+  rol?: RolUsuario | 'docente'
   perspectiva?: ModoPerspectiva
+  especialidad?: string
   compacto?: boolean
   className?: string
 }
 
-export function BadgeRol({ rol, perspectiva, compacto = false, className }: Props) {
+export function BadgeRol({ rol, perspectiva, especialidad, compacto = false, className }: Props) {
+  if (rol === 'docente') {
+    return (
+      <span
+        className={cn(
+          'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-micro font-bold shadow-2xs transition-all',
+          'bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/35',
+          className,
+        )}
+        title={`Modo Docente${especialidad ? ` · ${especialidad}` : ''}`}
+      >
+        <IconoDocente className="size-3.5 shrink-0" aria-hidden="true" />
+        <span className={compacto ? 'hidden sm:inline' : 'inline'}>
+          {especialidad && !compacto ? `Docente · ${especialidad}` : 'Docente'}
+        </span>
+      </span>
+    )
+  }
+
   // Si viene perspectiva explícita, usarla; si viene rol, mapearlo.
   const modo: ModoPerspectiva = perspectiva ?? (rol === 'encargado' ? 'encargado' : 'ambos')
 

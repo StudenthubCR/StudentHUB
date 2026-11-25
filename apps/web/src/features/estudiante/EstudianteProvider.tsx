@@ -3,6 +3,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { useSesion } from '@/features/auth/useSesion'
 import {
+  ESTUDIANTES_MASTER_DEMO,
+  DOCENTE_DANGELO_DEMO,
+} from '@/features/docente/docente.fixture'
+import {
   ESTUDIANTE_DEMO,
   ESTUDIANTE_DEMO_2,
   ENCARGADO_DEMO,
@@ -103,7 +107,7 @@ type ResultadoCargaPerfil = {
 }
 
 export function EstudianteProvider({ children }: { children: ReactNode }) {
-  const { sesion } = useSesion()
+  const { sesion, rol: rolSistema } = useSesion()
   const queryClient = useQueryClient()
 
   const [idEstudianteSeleccionado, setIdEstudianteSeleccionado] = useState<string | null>(() => {
@@ -133,13 +137,13 @@ export function EstudianteProvider({ children }: { children: ReactNode }) {
 
   // Consulta unificada de perfil y rol del usuario
   const consulta = useQuery<ResultadoCargaPerfil>({
-    queryKey: ['perfil-estudiante-o-encargado', sesion?.user.id ?? null, sesion?.user.email ?? null],
-    enabled: Boolean(sesion),
+    queryKey: ['perfil-estudiante-o-encargado', sesion?.user.id ?? null, sesion?.user.email ?? null, rolSistema],
+    enabled: Boolean(sesion) && rolSistema !== 'docente',
     staleTime: 1000 * 60 * 15,
     retry: 1,
     queryFn: async (): Promise<ResultadoCargaPerfil> => {
-      if (!sesion?.user) {
-        return { rol: 'estudiante', encargado: null, estudiantes: [], esRespaldo: true }
+      if (!sesion?.user || rolSistema === 'docente') {
+        return { rol: 'estudiante', encargado: null, estudiantes: [], esRespaldo: false }
       }
 
       const email = (sesion.user.email ?? '').trim().toLowerCase()
@@ -148,9 +152,24 @@ export function EstudianteProvider({ children }: { children: ReactNode }) {
         typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true'
       const rolDemo =
         typeof window !== 'undefined' ? localStorage.getItem('studenthub_demo_rol') : null
+      const estudianteDemoId =
+        typeof window !== 'undefined' ? localStorage.getItem('studenthub_demo_estudiante_id') : null
 
       // CASO A: Sesión Demo (Jueces / Expotécnica)
-      if (esModoDemo || userId === '00000000-0000-0000-0000-000000000001' || userId === '00000000-0000-0000-0000-000000000002') {
+      if (
+        esModoDemo ||
+        userId === '00000000-0000-0000-0000-000000000001' ||
+        userId === '00000000-0000-0000-0000-000000000002' ||
+        userId === DOCENTE_DANGELO_DEMO.authUserId
+      ) {
+        if (rolDemo === 'docente' || userId === DOCENTE_DANGELO_DEMO.authUserId) {
+          return {
+            rol: 'estudiante',
+            encargado: null,
+            estudiantes: [],
+            esRespaldo: false,
+          }
+        }
         if (rolDemo === 'encargado' || userId === '00000000-0000-0000-0000-000000000002') {
           return {
             rol: 'encargado',
@@ -159,10 +178,13 @@ export function EstudianteProvider({ children }: { children: ReactNode }) {
             esRespaldo: false,
           }
         }
+        const seleccionado = estudianteDemoId
+          ? ESTUDIANTES_MASTER_DEMO.find((e) => e.id === estudianteDemoId) ?? ESTUDIANTE_DEMO
+          : ESTUDIANTE_DEMO
         return {
           rol: 'estudiante',
           encargado: null,
-          estudiantes: [ESTUDIANTE_DEMO],
+          estudiantes: [seleccionado],
           esRespaldo: false,
         }
       }
@@ -396,9 +418,10 @@ export function EstudianteProvider({ children }: { children: ReactNode }) {
     [],
   )
 
-  const estaCargando = Boolean(sesion) && (consulta.isPending || consulta.isLoading)
+  const estaCargando = Boolean(sesion) && rolSistema !== 'docente' && (consulta.isPending || consulta.isLoading)
   const fueraDelPadron =
     Boolean(sesion) &&
+    rolSistema !== 'docente' &&
     !estaCargando &&
     (Boolean(datos?.esRespaldo) || estudiantesVinculados.length === 0)
 

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import type { EventoAgenda, FiltroAgenda, ResumenAgendaDia } from './agenda.types'
 import {
   actualizarEvento,
@@ -6,30 +7,50 @@ import {
   eliminarEvento,
   guardarEvento,
   obtenerAusenciasHoy,
-  obtenerEventos,
+  obtenerEventosDocenteSupabaseParaEstudiante,
+  obtenerEventosParaEstudiante,
   obtenerEventosProximos,
   obtenerResumenAgenda,
   reiniciarEventosEjemplo,
 } from './agenda.service'
 
 export function useAgenda(fechaReferencia: Date = new Date()) {
-  const [eventos, setEventos] = useState<EventoAgenda[]>(() => obtenerEventos())
+  const { estudiante } = useEstudiante()
+  const [eventos, setEventos] = useState<EventoAgenda[]>(() => obtenerEventosParaEstudiante(estudiante))
   const [filtro, setFiltro] = useState<FiltroAgenda>('todos')
   const [fechaSeleccionada, setFechaSeleccionada] = useState<string | null>(null)
   const cargando = false
 
 
   const recargar = useCallback(() => {
-    setEventos(obtenerEventos())
-  }, [])
+    setEventos(obtenerEventosParaEstudiante(estudiante))
+  }, [estudiante])
+
+  useEffect(() => {
+    recargar()
+    let vigente = true
+    void obtenerEventosDocenteSupabaseParaEstudiante(estudiante).then((remotos) => {
+      if (!vigente || remotos.length === 0) return
+      setEventos((actuales) => {
+        const ids = new Set(actuales.map((e) => e.id))
+        const nuevos = remotos.filter((r) => !ids.has(r.id))
+        return nuevos.length > 0 ? [...actuales, ...nuevos] : actuales
+      })
+    })
+    return () => {
+      vigente = false
+    }
+  }, [recargar, estudiante])
 
   useEffect(() => {
     const handler = () => recargar()
     window.addEventListener('studenthub:agenda-actualizada', handler)
+    window.addEventListener('studenthub:agenda-docente-actualizada', handler)
     window.addEventListener('storage', handler)
 
     return () => {
       window.removeEventListener('studenthub:agenda-actualizada', handler)
+      window.removeEventListener('studenthub:agenda-docente-actualizada', handler)
       window.removeEventListener('storage', handler)
     }
   }, [recargar])
