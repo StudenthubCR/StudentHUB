@@ -1,6 +1,7 @@
 import { format, isSameDay, parseISO, differenceInCalendarDays } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { supabase } from '@/lib/supabase'
+import { guardarDatoUsuarioScoped, leerDatoUsuarioScoped } from '@/lib/offlineCache'
 import type { EventoAgenda, ResumenAgendaDia, TipoEventoAgenda } from './agenda.types'
 const STORAGE_KEY_AGENDA = 'studenthub_agenda_eventos'
 export const STORAGE_KEY_AGENDA_DOCENTE = 'studenthub_agenda_docente_v1'
@@ -263,13 +264,24 @@ export function obtenerEventosParaEstudiante(
 }
 
 export async function obtenerEventosDocenteSupabaseParaEstudiante(
-  estudiante?: { especialidad?: string | null; grupo?: string | null; seccion?: string | null } | null,
+  estudiante?: { id?: string; especialidad?: string | null; grupo?: string | null; seccion?: string | null } | null,
 ): Promise<EventoAgenda[]> {
   if (!estudiante?.especialidad) return []
   const esModoDemo =
     typeof localStorage !== 'undefined' &&
     localStorage.getItem('studenthub_demo_sesion') === 'true'
   if (esModoDemo) return []
+
+  const segmentoCache = `agenda_docente_est_${estudiante.id || 'default'}`
+  const enCache = leerDatoUsuarioScoped<EventoAgenda[]>(null, segmentoCache)?.data
+  const estaOffline =
+    typeof navigator !== 'undefined' &&
+    typeof navigator.onLine === 'boolean' &&
+    !navigator.onLine
+
+  if (estaOffline && enCache) {
+    return enCache.filter((ev) => aplicaEventoDocenteAEstudiante(ev, estudiante))
+  }
 
   try {
     const { data, error } = await supabase
@@ -279,9 +291,11 @@ export async function obtenerEventosDocenteSupabaseParaEstudiante(
       .ilike('especialidad', estudiante.especialidad.trim())
       .order('fecha', { ascending: true })
 
-    if (error || !data) return []
+    if (error || !data) {
+      return (enCache ?? []).filter((ev) => aplicaEventoDocenteAEstudiante(ev, estudiante))
+    }
 
-    return (data as Record<string, unknown>[])
+    const mapeados = (data as Record<string, unknown>[])
       .map((f) => ({
         id: String(f.id),
         tipo: String(f.tipo) as EventoAgenda['tipo'],
@@ -304,8 +318,11 @@ export async function obtenerEventosDocenteSupabaseParaEstudiante(
         creadoEn: String(f.creado_el ?? new Date().toISOString()),
       }))
       .filter((ev) => aplicaEventoDocenteAEstudiante(ev, estudiante))
+
+    guardarDatoUsuarioScoped(null, segmentoCache, mapeados)
+    return mapeados
   } catch {
-    return []
+    return (enCache ?? []).filter((ev) => aplicaEventoDocenteAEstudiante(ev, estudiante))
   }
 }
 

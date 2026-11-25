@@ -1,4 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
+import {
+  guardarDatoUsuarioScoped,
+  leerDatoUsuarioScoped,
+  resolverScopeUsuarioActivo,
+} from '@/lib/offlineCache'
 
 export type TemaColorCarnet = {
   id: string
@@ -184,7 +189,12 @@ export function resolverInsignia(
 }
 
 export function usePersonalizacionCarnet() {
+  const scopeUsuario = resolverScopeUsuarioActivo()
   const [personalizacion, setPersonalizacion] = useState<PersonalizacionCarnet>(() => {
+    const scoped = leerDatoUsuarioScoped<Partial<PersonalizacionCarnet>>(scopeUsuario, 'carnet')
+    if (scoped?.data) {
+      return { ...PERSONALIZACION_POR_DEFECTO, ...scoped.data }
+    }
     try {
       const guardado = localStorage.getItem(CLAVE_STORAGE)
       if (guardado) return { ...PERSONALIZACION_POR_DEFECTO, ...JSON.parse(guardado) }
@@ -195,6 +205,16 @@ export function usePersonalizacionCarnet() {
   })
 
   useEffect(() => {
+    const scopeActual = resolverScopeUsuarioActivo()
+    if (scopeActual) {
+      guardarDatoUsuarioScoped(scopeActual, 'carnet', personalizacion)
+      try {
+        localStorage.removeItem(CLAVE_STORAGE)
+      } catch {
+        // Silencioso
+      }
+      return
+    }
     try {
       localStorage.setItem(CLAVE_STORAGE, JSON.stringify(personalizacion))
     } catch {

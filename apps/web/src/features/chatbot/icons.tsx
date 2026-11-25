@@ -160,3 +160,35 @@ export function IconoAyudaChat(props: IconProps) {
   )
 }
 
+/** Ícono para categoría de Notas / Rendimiento académico */
+export function IconoNotasChip(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+    </BaseIcon>
+  )
+}
+
+/** Ícono para categoría de Asistencias */
+export function IconoAsistenciasChip(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M9 11l3 3L22 4" />
+      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+    </BaseIcon>
+  )
+}
+
+/** Ícono de estado sin conexión para la cabecera del asistente */
+export function IconoSinConexionChat(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M2 2l20 20" />
+      <path d="M8.5 16.5a5 5 0 0 1 7-.5" />
+      <path d="M5 12.859a10 10 0 0 1 5.17-2.69" />
+      <line x1="12" y1="20" x2="12.01" y2="20" strokeWidth={2.4} />
+    </BaseIcon>
+  )
+}
+

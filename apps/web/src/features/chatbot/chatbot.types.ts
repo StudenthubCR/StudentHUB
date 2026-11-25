@@ -20,6 +20,9 @@ export type Intencion =
   | 'eventos'
   | 'agenda'
   | 'carnet'
+  | 'notas'
+  | 'asistencias'
+  | 'faq_ctp'
   | 'ayuda'
   | 'saludo'
   | 'desconocido'
@@ -41,6 +44,12 @@ export interface SugerenciaRapida {
   id: string
   etiqueta: string
   consulta: string
-  categoria: 'comedor' | 'horarios' | 'eventos' | 'agenda' | 'carnet'
+  categoria:
+    | 'comedor'
+    | 'horarios'
+    | 'eventos'
+    | 'agenda'
+    | 'carnet'
+    | 'notas'
+    | 'asistencias'
 }
-

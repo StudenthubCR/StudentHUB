@@ -1,4 +1,5 @@
 import { HORARIOS_API_URL } from '@/lib/config'
+import { registrarSincronizacion } from '@/lib/offlineCache'
 import { esGrupoValido, filtrarPorGrupo } from './horario.service'
 import type { FilaHorario } from './horario.types'
 
@@ -54,7 +55,7 @@ async function pedir(consulta: string, signal?: AbortSignal): Promise<FilaHorari
 
 const CLAVE_CACHE_HORARIO_PREFIJO = 'studenthub_cache_horario_'
 
-function recuperarCacheHorario(grupo: string): FilaHorario[] | null {
+export function recuperarCacheHorario(grupo: string): FilaHorario[] | null {
   if (typeof window === 'undefined') return null
   try {
     const raw = localStorage.getItem(`${CLAVE_CACHE_HORARIO_PREFIJO}${grupo.trim().toLowerCase()}`)
@@ -76,6 +77,7 @@ function guardarCacheHorario(grupo: string, filas: FilaHorario[]): void {
       `${CLAVE_CACHE_HORARIO_PREFIJO}${grupo.trim().toLowerCase()}`,
       JSON.stringify(filas),
     )
+    registrarSincronizacion(`horarios:${grupo.trim().toLowerCase()}`)
   } catch {
     // ignorar error de cuota
   }

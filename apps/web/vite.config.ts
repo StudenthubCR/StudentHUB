@@ -72,33 +72,41 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Precaché del shell y las fuentes. Los afiches de noticias entran al
-        // caché bajo demanda: son 90 KB cada uno y sólo se ve uno a la vez.
-        globPatterns: ['**/*.{js,css,html,woff2}'],
+        // Precaché completo del App Shell: HTML, chunks JS/CSS diferidos, fuentes locales, logos e íconos.
+        globPatterns: ['**/*.{js,css,html,woff2,woff,svg,png,webp,ico}'],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//],
         cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
         runtimeCaching: [
           {
-            urlPattern: ({ request }) => request.destination === 'image',
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'studenthub-imagenes',
-              expiration: { maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 30 },
-            },
+            // Privacidad Ley N° 8968: nunca almacenar Auth ni registros privados de Supabase en Service Worker.
+            urlPattern: ({ url }) => url.hostname.endsWith('.supabase.co'),
+            handler: 'NetworkOnly',
           },
           {
-            // Menús del comedor (Apps Script). `StaleWhileRevalidate` como
-            // indica el plan §3.5: la última respuesta buena se muestra de
-            // inmediato — también sin red — y se refresca por detrás. Apps
-            // Script redirige a script.googleusercontent.com, así que hay que
-            // contemplar los dos dominios.
+            // APIs de Google Apps Script (Comedor y Horarios públicos): respuesta instantánea en caché
+            // y revalidación automática en segundo plano al recuperar conexión.
             urlPattern: ({ url }) =>
               url.hostname === 'script.google.com' ||
               url.hostname === 'script.googleusercontent.com',
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'studenthub-comedor',
-              expiration: { maxEntries: 12, maxAgeSeconds: 60 * 60 * 24 * 14 },
+              cacheName: 'studenthub-apps-script',
+              expiration: { maxEntries: 48, maxAgeSeconds: 60 * 60 * 24 * 14 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            // Imágenes y fuentes estáticas locales o remotas
+            urlPattern: ({ request }) =>
+              request.destination === 'image' || request.destination === 'font',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'studenthub-media-fonts',
+              expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 30 },
               cacheableResponse: { statuses: [0, 200] },
             },
           },

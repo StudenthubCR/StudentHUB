@@ -15,6 +15,9 @@ import {
   IconoEventosChip,
   IconoAgendaChip,
   IconoCarnetChip,
+  IconoNotasChip,
+  IconoAsistenciasChip,
+  IconoSinConexionChat,
   IconoBajarFinal,
   IconoLimpiarChat,
   IconoReintentarChat,
@@ -24,7 +27,12 @@ import { useEstudiante } from '@/features/estudiante/useEstudiante'
 import { useHorario } from '@/features/horarios/useHorario'
 import { useMenuSemanal } from '@/features/comedor/useMenuSemanal'
 import { useAgenda } from '@/features/agenda/useAgenda'
+import { obtenerNotasEstudiante } from '@/features/notas/notas.service'
+import type { NotaMateria } from '@/features/notas/notas.types'
+import { obtenerAsistenciasEstudiante } from '@/features/asistencias/asistencias.service'
+import type { RegistroAsistencia } from '@/features/asistencias/asistencias.types'
 import { useReloj } from '@/lib/useReloj'
+import { useEnLinea } from '@/lib/useEnLinea'
 import { SUGERENCIAS_RAPIDAS } from './chatbot.service'
 import { useChatbot } from './useChatbot'
 
@@ -66,11 +74,49 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
   const [textoEntrada, setTextoEntrada] = useState<string>('')
 
   const { estudiante } = useEstudiante()
+  const enLinea = useEnLinea()
   const ahora = useReloj()
   const grupoActivo = estudiante?.grupo ?? '11-1'
   const horario = useHorario(grupoActivo, ahora)
   const comedor = useMenuSemanal(ahora)
   const agenda = useAgenda(ahora)
+
+  const [notasCacheadas, setNotasCacheadas] = useState<NotaMateria[]>([])
+  const [asistenciasCacheadas, setAsistenciasCacheadas] = useState<RegistroAsistencia[]>([])
+
+  const esDocenteDemo =
+    typeof window !== 'undefined' &&
+    localStorage.getItem('studenthub_demo_sesion') === 'true' &&
+    localStorage.getItem('studenthub_demo_rol') === 'docente'
+
+  useEffect(() => {
+    let vigente = true
+    const estudianteId = estudiante?.id
+    if (!estudianteId || esDocenteDemo) {
+      setNotasCacheadas([])
+      setAsistenciasCacheadas([])
+      return
+    }
+
+    const cargarAcademico = () => {
+      void obtenerNotasEstudiante(estudianteId, 'I Periodo').then((lista) => {
+        if (vigente) setNotasCacheadas(lista)
+      })
+      void obtenerAsistenciasEstudiante(estudianteId, 'I Periodo').then((lista) => {
+        if (vigente) setAsistenciasCacheadas(lista)
+      })
+    }
+
+    cargarAcademico()
+    window.addEventListener('studenthub:notas-actualizadas', cargarAcademico)
+    window.addEventListener('studenthub:asistencias-actualizadas', cargarAcademico)
+
+    return () => {
+      vigente = false
+      window.removeEventListener('studenthub:notas-actualizadas', cargarAcademico)
+      window.removeEventListener('studenthub:asistencias-actualizadas', cargarAcademico)
+    }
+  }, [estudiante?.id, esDocenteDemo])
 
   const primerNombre = estudiante?.nombre ? estudiante.nombre.split(' ')[0] : undefined
 
@@ -94,6 +140,9 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
     menusComedor: comedor.menus,
     ahora,
     eventosAgenda: agenda.eventos,
+    notas: notasCacheadas,
+    asistencias: asistenciasCacheadas,
+    esDocente: esDocenteDemo,
   })
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -193,7 +242,16 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
     })
   }
 
-  const renderIconoChip = (categoria: 'comedor' | 'horarios' | 'eventos' | 'agenda' | 'carnet') => {
+  const renderIconoChip = (
+    categoria:
+      | 'comedor'
+      | 'horarios'
+      | 'eventos'
+      | 'agenda'
+      | 'carnet'
+      | 'notas'
+      | 'asistencias',
+  ) => {
     switch (categoria) {
       case 'agenda':
         return <IconoAgendaChip className="size-3.5 text-primary" />
@@ -201,6 +259,10 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
         return <IconoComedorChip className="size-3.5 text-primary" />
       case 'horarios':
         return <IconoHorarioChip className="size-3.5 text-primary" />
+      case 'notas':
+        return <IconoNotasChip className="size-3.5 text-primary" />
+      case 'asistencias':
+        return <IconoAsistenciasChip className="size-3.5 text-primary" />
       case 'eventos':
         return <IconoEventosChip className="size-3.5 text-primary" />
       case 'carnet':
@@ -262,10 +324,17 @@ export function Chatbot({ inicialmenteAbierto = false }: ChatbotProps = {}) {
                 </div>
                 <div>
                   <h3 className="text-menor font-bold leading-tight">Asistente Student HUB</h3>
-                  <div className="flex items-center gap-1.5 text-micro text-white/85">
-                    <span className="size-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
-                    <span>En línea • 100% Offline</span>
-                  </div>
+                  {enLinea ? (
+                    <div className="flex items-center gap-1.5 text-micro text-white/85">
+                      <span className="size-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true" />
+                      <span>En línea • 100% Offline</span>
+                    </div>
+                  ) : (
+                    <div className="mt-0.5 inline-flex items-center gap-1 rounded-full border border-amber-300/40 bg-amber-400/20 px-2 py-0.5 text-[11px] font-bold text-amber-100">
+                      <IconoSinConexionChat className="size-3 shrink-0" />
+                      <span>Modo sin conexión · Caché local</span>
+                    </div>
+                  )}
                 </div>
               </div>
 

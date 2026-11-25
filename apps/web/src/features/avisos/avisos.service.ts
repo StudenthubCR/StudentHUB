@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { registrarSincronizacion } from '@/lib/offlineCache'
 import type { Estudiante } from '@/features/estudiante/estudiante.fixture'
 import type { CategoriaAviso, InstitutionAlert, NuevoAvisoPayload } from './avisos.types'
 import {
@@ -57,6 +58,7 @@ export async function obtenerAvisos(): Promise<InstitutionAlert[]> {
       if (typeof window !== 'undefined') {
         localStorage.setItem(CLAVE_STORAGE, JSON.stringify(data))
       }
+      registrarSincronizacion('pub:avisos')
       return data as InstitutionAlert[]
     }
   } catch {
@@ -290,6 +292,7 @@ export async function obtenerTodosLosAvisosAdmin(): Promise<InstitutionAlert[]> 
       if (typeof window !== 'undefined') {
         localStorage.setItem(CLAVE_STORAGE, JSON.stringify(data))
       }
+      registrarSincronizacion('pub:avisos')
       return data as InstitutionAlert[]
     }
   } catch {

@@ -33,6 +33,8 @@ import {
 } from './auth.service'
 import { useSesion } from './useSesion'
 import { obtenerPerfilDocenteActual } from '@/features/docente/docente.service'
+import { asegurarPropietarioCache, resolverScopeUsuarioActivo } from '@/lib/offlineCache'
+import { limpiarHistorialPrecargaOffline } from '@/lib/offlineWarmer'
 
 const CAMPO =
   'w-full rounded-xl border border-border bg-surface px-4 py-3.5 text-cuerpo text-text ' +
@@ -241,6 +243,8 @@ export function LoginPage() {
         }
 
         if (resultado.data?.session) {
+          asegurarPropietarioCache(resultado.data.session.user.id)
+          limpiarHistorialPrecargaOffline()
           establecerSesion?.(resultado.data.session)
         }
 
@@ -265,6 +269,7 @@ export function LoginPage() {
       localStorage.setItem('studenthub_demo_sesion', 'true')
       localStorage.setItem('studenthub_demo_rol', rolDestino)
       localStorage.setItem('studenthub_rol_preferido', rolDestino)
+      asegurarPropietarioCache(resolverScopeUsuarioActivo())
       window.location.href = rolDestino === 'docente' ? '/docente' : '/'
     }
   }

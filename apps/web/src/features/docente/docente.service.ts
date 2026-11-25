@@ -1,4 +1,9 @@
 import { supabase } from '@/lib/supabase'
+import {
+  guardarDatoUsuarioScoped,
+  leerDatoUsuarioScoped,
+  registrarSincronizacion,
+} from '@/lib/offlineCache'
 import type { Estudiante } from '@/features/estudiante/estudiante.fixture'
 import type { NotaMateria, PeriodoNota } from '@/features/notas/notas.types'
 import {
@@ -75,6 +80,18 @@ function esModoDemoActivo(): boolean {
   )
 }
 
+function estaDispositivoOffline(): boolean {
+  return (
+    typeof navigator !== 'undefined' &&
+    typeof navigator.onLine === 'boolean' &&
+    !navigator.onLine
+  )
+}
+
+function scopeDeDocente(docente: Pick<DocenteProfile, 'id' | 'authUserId'>): string {
+  return docente.authUserId ?? docente.id
+}
+
 type FilaDocenteRaw = {
   id: string
   auth_user_id?: string | null
@@ -116,30 +133,59 @@ export async function obtenerPerfilDocenteActual(
   const emailLimpio = (email ?? '').trim().toLowerCase()
   if (!userId && !emailLimpio) return null
 
+  const scopeCache = userId || emailLimpio
+  const enCache = scopeCache
+    ? leerDatoUsuarioScoped<DocenteProfile | null>(scopeCache, 'perfil_docente')?.data
+    : undefined
+
+  if (estaDispositivoOffline() && enCache !== undefined) {
+    return enCache
+  }
+
   try {
     if (userId) {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('docentes')
         .select('id, auth_user_id, correo_institucional, nombre_completo, especialidad_asignada, secciones_asignadas, activo')
         .eq('auth_user_id', userId)
         .eq('activo', true)
         .maybeSingle<FilaDocenteRaw>()
 
-      if (data) return mapearFilaADocente(data)
+      if (!error && data) {
+        const perfil = mapearFilaADocente(data)
+        if (scopeCache) guardarDatoUsuarioScoped(scopeCache, 'perfil_docente', perfil)
+        return perfil
+      }
+      if (error && enCache !== undefined) {
+        return enCache
+      }
     }
 
     if (emailLimpio) {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('docentes')
         .select('id, auth_user_id, correo_institucional, nombre_completo, especialidad_asignada, secciones_asignadas, activo')
         .ilike('correo_institucional', emailLimpio)
         .eq('activo', true)
         .maybeSingle<FilaDocenteRaw>()
 
-      if (data) return mapearFilaADocente(data)
+      if (!error && data) {
+        const perfil = mapearFilaADocente(data)
+        if (scopeCache) guardarDatoUsuarioScoped(scopeCache, 'perfil_docente', perfil)
+        return perfil
+      }
+      if (error && enCache !== undefined) {
+        return enCache
+      }
+      if (!error && !data && scopeCache) {
+        guardarDatoUsuarioScoped(scopeCache, 'perfil_docente', null)
+      }
     }
   } catch (err) {
     console.warn('No se pudo resolver perfil docente en Supabase:', err)
+    if (enCache !== undefined) {
+      return enCache
+    }
   }
 
   return null
@@ -197,19 +243,34 @@ export async function obtenerEstudiantesDocente(docente: DocenteProfile): Promis
     return filtrarEstudiantesPorDocente(ESTUDIANTES_MASTER_DEMO, docente)
   }
 
-  const { data, error } = await supabase
-    .from('estudiantes')
-    .select('id, user_id, codigo, correo, nombre, especialidad, estado, foto_url, grupos(codigo, nivel, jornada), instituciones(nombre, slug)')
-    .eq('estado', 'activo')
-    .ilike('especialidad', docente.especialidadAsignada.trim())
-    .order('nombre', { ascending: true })
-
-  if (error) {
-    throw new Error(`No se pudo consultar el padrón de ${docente.especialidadAsignada}: ${error.message}`)
+  const scope = scopeDeDocente(docente)
+  const enCache = leerDatoUsuarioScoped<Estudiante[]>(scope, 'docente_estudiantes')?.data
+  if (estaDispositivoOffline() && enCache) {
+    return filtrarEstudiantesPorDocente(enCache, docente)
   }
 
-  const mapeados = ((data ?? []) as FilaEstudianteDocenteRaw[]).map(mapearEstudianteDocente)
-  return filtrarEstudiantesPorDocente(mapeados, docente)
+  try {
+    const { data, error } = await supabase
+      .from('estudiantes')
+      .select('id, user_id, codigo, correo, nombre, especialidad, estado, foto_url, grupos(codigo, nivel, jornada), instituciones(nombre, slug)')
+      .eq('estado', 'activo')
+      .ilike('especialidad', docente.especialidadAsignada.trim())
+      .order('nombre', { ascending: true })
+
+    if (error) {
+      if (enCache) return filtrarEstudiantesPorDocente(enCache, docente)
+      throw new Error(`No se pudo consultar el padrón de ${docente.especialidadAsignada}: ${error.message}`)
+    }
+
+    const mapeados = ((data ?? []) as FilaEstudianteDocenteRaw[]).map(mapearEstudianteDocente)
+    const filtrados = filtrarEstudiantesPorDocente(mapeados, docente)
+    guardarDatoUsuarioScoped(scope, 'docente_estudiantes', filtrados)
+    registrarSincronizacion('docente:estudiantes')
+    return filtrados
+  } catch (err) {
+    if (enCache) return filtrarEstudiantesPorDocente(enCache, docente)
+    throw err
+  }
 }
 
 /**
@@ -232,40 +293,55 @@ export async function obtenerNotasGrupoDocente(
     )
   }
 
-  let query = supabase
-    .from('notas')
-    .select('*')
-    .in('estudiante_id', Array.from(idsPermitidos))
-
-  if (periodo !== 'Anual') {
-    query = query.eq('periodo', periodo)
+  const scope = scopeDeDocente(docente)
+  const seg = `docente_notas_${periodo}`
+  const enCache = leerDatoUsuarioScoped<NotaMateria[]>(scope, seg)?.data
+  if (estaDispositivoOffline() && enCache) {
+    return enCache.filter((n) => idsPermitidos.has(n.estudianteId))
   }
 
-  const { data, error } = await query.order('materia', { ascending: true })
-  if (error) {
-    throw new Error(`Error al consultar calificaciones: ${error.message}`)
-  }
+  try {
+    let query = supabase
+      .from('notas')
+      .select('*')
+      .in('estudiante_id', Array.from(idsPermitidos))
 
-  return (data ?? []).map((f: Record<string, unknown>) => {
-    const notaFinal = Number(f.nota_final) || 0
-    return {
-      id: String(f.id),
-      estudianteId: String(f.estudiante_id),
-      periodo: String(f.periodo) as PeriodoNota,
-      materia: String(f.materia),
-      docente: f.docente ? String(f.docente) : undefined,
-      notaFinal,
-      rubrica: {
-        trabajoCotidiano: Number(f.trabajo_cotidiano) || 0,
-        tareas: Number(f.tareas) || 0,
-        pruebas: Number(f.pruebas) || 0,
-        proyecto: Number(f.proyecto) || 0,
-        asistencia: Number(f.asistencia) || 0,
-      },
-      observaciones: f.observaciones ? String(f.observaciones) : undefined,
-      aprobada: notaFinal >= 70,
+    if (periodo !== 'Anual') {
+      query = query.eq('periodo', periodo)
     }
-  })
+
+    const { data, error } = await query.order('materia', { ascending: true })
+    if (error) {
+      if (enCache) return enCache.filter((n) => idsPermitidos.has(n.estudianteId))
+      throw new Error(`Error al consultar calificaciones: ${error.message}`)
+    }
+
+    const res: NotaMateria[] = (data ?? []).map((f: Record<string, unknown>) => {
+      const notaFinal = Number(f.nota_final) || 0
+      return {
+        id: String(f.id),
+        estudianteId: String(f.estudiante_id),
+        periodo: String(f.periodo) as PeriodoNota,
+        materia: String(f.materia),
+        docente: f.docente ? String(f.docente) : undefined,
+        notaFinal,
+        rubrica: {
+          trabajoCotidiano: Number(f.trabajo_cotidiano) || 0,
+          tareas: Number(f.tareas) || 0,
+          pruebas: Number(f.pruebas) || 0,
+          proyecto: Number(f.proyecto) || 0,
+          asistencia: Number(f.asistencia) || 0,
+        },
+        observaciones: f.observaciones ? String(f.observaciones) : undefined,
+        aprobada: notaFinal >= 70,
+      }
+    })
+    guardarDatoUsuarioScoped(scope, seg, res)
+    return res
+  } catch (err) {
+    if (enCache) return enCache.filter((n) => idsPermitidos.has(n.estudianteId))
+    throw err
+  }
 }
 
 /**
@@ -286,30 +362,45 @@ export async function obtenerAsistenciasGrupoDocente(
     )
   }
 
-  let query = supabase
-    .from('asistencias')
-    .select('*')
-    .in('estudiante_id', Array.from(idsPermitidos))
-
-  if (periodo) {
-    query = query.eq('periodo', periodo)
+  const scope = scopeDeDocente(docente)
+  const seg = `docente_asistencias_${periodo ?? 'todas'}`
+  const enCache = leerDatoUsuarioScoped<RegistroAsistencia[]>(scope, seg)?.data
+  if (estaDispositivoOffline() && enCache) {
+    return enCache.filter((a) => idsPermitidos.has(a.estudianteId))
   }
 
-  const { data, error } = await query.order('fecha', { ascending: false })
-  if (error) {
-    throw new Error(`Error al consultar asistencias: ${error.message}`)
-  }
+  try {
+    let query = supabase
+      .from('asistencias')
+      .select('*')
+      .in('estudiante_id', Array.from(idsPermitidos))
 
-  return (data ?? []).map((f: Record<string, unknown>) => ({
-    id: String(f.id),
-    estudianteId: String(f.estudiante_id),
-    fecha: String(f.fecha),
-    periodo: String(f.periodo) as PeriodoAsistencia,
-    materia: String(f.materia),
-    bloque: String(f.bloque),
-    estado: String(f.estado) as EstadoAsistencia,
-    justificacion: f.justificacion ? String(f.justificacion) : undefined,
-  }))
+    if (periodo) {
+      query = query.eq('periodo', periodo)
+    }
+
+    const { data, error } = await query.order('fecha', { ascending: false })
+    if (error) {
+      if (enCache) return enCache.filter((a) => idsPermitidos.has(a.estudianteId))
+      throw new Error(`Error al consultar asistencias: ${error.message}`)
+    }
+
+    const res: RegistroAsistencia[] = (data ?? []).map((f: Record<string, unknown>) => ({
+      id: String(f.id),
+      estudianteId: String(f.estudiante_id),
+      fecha: String(f.fecha),
+      periodo: String(f.periodo) as PeriodoAsistencia,
+      materia: String(f.materia),
+      bloque: String(f.bloque),
+      estado: String(f.estado) as EstadoAsistencia,
+      justificacion: f.justificacion ? String(f.justificacion) : undefined,
+    }))
+    guardarDatoUsuarioScoped(scope, seg, res)
+    return res
+  } catch (err) {
+    if (enCache) return enCache.filter((a) => idsPermitidos.has(a.estudianteId))
+    throw err
+  }
 }
 
 /**
@@ -399,6 +490,14 @@ export async function guardarNotaDocente(
     }
   }
 
+  if (!esModoDemoActivo() && estaDispositivoOffline()) {
+    return {
+      ok: false,
+      error:
+        'Sin conexión a internet: necesitás red para guardar la calificación en Supabase. Los cambios del formulario permanecen en pantalla.',
+    }
+  }
+
   return guardarNotaEstudiante(
     {
       ...payload,
@@ -426,6 +525,15 @@ export async function guardarAsistenciaDocente(
         guardados: [],
         error: `Acceso denegado: se detectó un estudiante fuera de ${docente.especialidadAsignada}.`,
       }
+    }
+  }
+
+  if (!esModoDemoActivo() && estaDispositivoOffline()) {
+    return {
+      ok: false,
+      guardados: [],
+      error:
+        'Sin conexión a internet: conectate a red para registrar el pase de lista oficial en Supabase.',
     }
   }
 
@@ -478,32 +586,47 @@ export async function obtenerObservacionesDocente(
     )
   }
 
-  let query = supabase
-    .from('observaciones_docentes')
-    .select('*')
-    .in('estudiante_id', Array.from(idsPermitidos))
-
-  if (estudianteId) {
-    query = query.eq('estudiante_id', estudianteId)
+  const scope = scopeDeDocente(docente)
+  const seg = `docente_observaciones_${estudianteId ?? 'todos'}`
+  const enCache = leerDatoUsuarioScoped<ObservacionDocente[]>(scope, seg)?.data
+  if (estaDispositivoOffline() && enCache) {
+    return enCache.filter((o) => idsPermitidos.has(o.estudianteId))
   }
 
-  const { data, error } = await query.order('creado_el', { ascending: false })
-  if (error) {
-    throw new Error(`No se pudieron cargar las observaciones: ${error.message}`)
-  }
+  try {
+    let query = supabase
+      .from('observaciones_docentes')
+      .select('*')
+      .in('estudiante_id', Array.from(idsPermitidos))
 
-  return (data ?? []).map((f: Record<string, unknown>) => ({
-    id: String(f.id),
-    estudianteId: String(f.estudiante_id),
-    docenteId: String(f.docente_id),
-    docenteNombre: docente.nombreCompleto,
-    periodo: String(f.periodo) as ObservacionDocente['periodo'],
-    materia: f.materia ? String(f.materia) : undefined,
-    categoria: String(f.categoria) as CategoriaObservacion,
-    observacion: String(f.observacion),
-    visibleFamilia: Boolean(f.visible_familia),
-    creadoEl: String(f.creado_el),
-  }))
+    if (estudianteId) {
+      query = query.eq('estudiante_id', estudianteId)
+    }
+
+    const { data, error } = await query.order('creado_el', { ascending: false })
+    if (error) {
+      if (enCache) return enCache.filter((o) => idsPermitidos.has(o.estudianteId))
+      throw new Error(`No se pudieron cargar las observaciones: ${error.message}`)
+    }
+
+    const res: ObservacionDocente[] = (data ?? []).map((f: Record<string, unknown>) => ({
+      id: String(f.id),
+      estudianteId: String(f.estudiante_id),
+      docenteId: String(f.docente_id),
+      docenteNombre: docente.nombreCompleto,
+      periodo: String(f.periodo) as ObservacionDocente['periodo'],
+      materia: f.materia ? String(f.materia) : undefined,
+      categoria: String(f.categoria) as CategoriaObservacion,
+      observacion: String(f.observacion),
+      visibleFamilia: Boolean(f.visible_familia),
+      creadoEl: String(f.creado_el),
+    }))
+    guardarDatoUsuarioScoped(scope, seg, res)
+    return res
+  } catch (err) {
+    if (enCache) return enCache.filter((o) => idsPermitidos.has(o.estudianteId))
+    throw err
+  }
 }
 
 export async function crearObservacionDocente(
@@ -527,6 +650,14 @@ export async function crearObservacionDocente(
   const texto = payload.observacion.trim()
   if (!texto) {
     return { ok: false, error: 'Escribí una observación pedagógica antes de guardar.' }
+  }
+
+  if (!esModoDemoActivo() && estaDispositivoOffline()) {
+    return {
+      ok: false,
+      error:
+        'Sin conexión a internet: conectate para guardar la observación pedagógica en Supabase.',
+    }
   }
 
   if (esModoDemoActivo()) {
@@ -601,39 +732,53 @@ export async function obtenerAgendaDocente(docente: DocenteProfile): Promise<Eve
     )
   }
 
-  const { data, error } = await supabase
-    .from('agenda_docente')
-    .select('*')
-    .eq('docente_id', docente.id)
-    .eq('activo', true)
-    .ilike('especialidad', docente.especialidadAsignada.trim())
-    .order('fecha', { ascending: true })
-
-  if (error) {
-    throw new Error(`No se pudo cargar la agenda docente: ${error.message}`)
+  const scope = scopeDeDocente(docente)
+  const enCache = leerDatoUsuarioScoped<EventoAgenda[]>(scope, 'docente_agenda')?.data
+  if (estaDispositivoOffline() && enCache) {
+    return enCache
   }
 
-  return (data ?? []).map((f: Record<string, unknown>) => ({
-    id: String(f.id),
-    tipo: String(f.tipo) as EventoAgenda['tipo'],
-    titulo: String(f.titulo),
-    materia: String(f.materia),
-    fecha: String(f.fecha),
-    hora: f.hora ? String(f.hora) : undefined,
-    descripcion: f.descripcion ? String(f.descripcion) : undefined,
-    porcentaje: typeof f.porcentaje === 'number' ? f.porcentaje : f.porcentaje ? Number(f.porcentaje) : undefined,
-    temario: Array.isArray(f.temario) ? (f.temario as string[]) : undefined,
-    aula: f.aula ? String(f.aula) : undefined,
-    prioridad: f.prioridad ? (String(f.prioridad) as EventoAgenda['prioridad']) : undefined,
-    profesor: f.profesor ? String(f.profesor) : docente.nombreCompleto,
-    bloqueAfectado: f.bloque_afectado ? String(f.bloque_afectado) : undefined,
-    indicacion: f.indicacion ? String(f.indicacion) : undefined,
-    especialidad: String(f.especialidad),
-    seccionObjetivo: f.seccion_objetivo ? String(f.seccion_objetivo) : null,
-    docenteId: String(f.docente_id),
-    origen: 'docente',
-    creadoEn: String(f.creado_el),
-  }))
+  try {
+    const { data, error } = await supabase
+      .from('agenda_docente')
+      .select('*')
+      .eq('docente_id', docente.id)
+      .eq('activo', true)
+      .ilike('especialidad', docente.especialidadAsignada.trim())
+      .order('fecha', { ascending: true })
+
+    if (error) {
+      if (enCache) return enCache
+      throw new Error(`No se pudo cargar la agenda docente: ${error.message}`)
+    }
+
+    const res: EventoAgenda[] = (data ?? []).map((f: Record<string, unknown>) => ({
+      id: String(f.id),
+      tipo: String(f.tipo) as EventoAgenda['tipo'],
+      titulo: String(f.titulo),
+      materia: String(f.materia),
+      fecha: String(f.fecha),
+      hora: f.hora ? String(f.hora) : undefined,
+      descripcion: f.descripcion ? String(f.descripcion) : undefined,
+      porcentaje: typeof f.porcentaje === 'number' ? f.porcentaje : f.porcentaje ? Number(f.porcentaje) : undefined,
+      temario: Array.isArray(f.temario) ? (f.temario as string[]) : undefined,
+      aula: f.aula ? String(f.aula) : undefined,
+      prioridad: f.prioridad ? (String(f.prioridad) as EventoAgenda['prioridad']) : undefined,
+      profesor: f.profesor ? String(f.profesor) : docente.nombreCompleto,
+      bloqueAfectado: f.bloque_afectado ? String(f.bloque_afectado) : undefined,
+      indicacion: f.indicacion ? String(f.indicacion) : undefined,
+      especialidad: String(f.especialidad),
+      seccionObjetivo: f.seccion_objetivo ? String(f.seccion_objetivo) : null,
+      docenteId: String(f.docente_id),
+      origen: 'docente',
+      creadoEn: String(f.creado_el),
+    }))
+    guardarDatoUsuarioScoped(scope, 'docente_agenda', res)
+    return res
+  } catch (err) {
+    if (enCache) return enCache
+    throw err
+  }
 }
 
 export async function guardarItemAgendaDocente(
@@ -651,6 +796,14 @@ export async function guardarItemAgendaDocente(
   }
 
   const seccionLimpia = payload.seccionObjetivo?.trim() || null
+
+  if (!esModoDemoActivo() && estaDispositivoOffline()) {
+    return {
+      ok: false,
+      error:
+        'Sin conexión a internet: conectate para publicar o actualizar actividades en Supabase.',
+    }
+  }
 
   if (esModoDemoActivo()) {
     const actual = obtenerEventosDocenteLocales()
@@ -737,6 +890,13 @@ export async function desactivarItemAgendaDocente(
     const filtrados = obtenerEventosDocenteLocales().filter((e) => e.id !== id)
     guardarEventosDocenteLocales(filtrados)
     return { ok: true }
+  }
+
+  if (estaDispositivoOffline()) {
+    return {
+      ok: false,
+      error: 'Sin conexión a internet: necesitás red para archivar este elemento en Supabase.',
+    }
   }
 
   const { error } = await supabase

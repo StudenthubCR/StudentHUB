@@ -1,18 +1,22 @@
 import { useQuery } from '@tanstack/react-query'
 import { agruparPorDia, aClases, contarLecciones } from './horario.service'
-import { obtenerHorario } from './horarios.api'
+import { obtenerHorario, recuperarCacheHorario } from './horarios.api'
 
 /**
  * Trae el horario de un grupo desde la hoja y lo devuelve ya agrupado por día.
- * El horario cambia una o dos veces al año, así que se cachea con generosidad.
+ * Hidrata al instante desde caché local cuando el usuario abre la app sin conexión.
  */
 export function useHorario(grupo: string | null, hoy: Date) {
+  const enCache = grupo ? recuperarCacheHorario(grupo) ?? undefined : undefined
+
   const consulta = useQuery({
     queryKey: ['horarios', 'grupo', grupo],
     queryFn: ({ signal }) => obtenerHorario(grupo!, signal),
     enabled: grupo !== null,
+    initialData: enCache,
+    initialDataUpdatedAt: enCache ? 0 : undefined,
     staleTime: 1000 * 60 * 60 * 6,
-    gcTime: 1000 * 60 * 60 * 24,
+    gcTime: 1000 * 60 * 60 * 24 * 14,
     retry: 1,
     retryDelay: 1500,
   })

@@ -13,6 +13,10 @@ export function PaginaDeError() {
   const error = useRouteError()
   const [copiado, setCopiado] = useState(false)
   const esNoEncontrada = isRouteErrorResponse(error) && error.status === 404
+  const estaSinRed =
+    typeof navigator !== 'undefined' &&
+    typeof navigator.onLine === 'boolean' &&
+    !navigator.onLine
 
   const nombreError =
     error instanceof Error
@@ -33,6 +37,11 @@ export function PaginaDeError() {
             : 'Error desconocido en tiempo de ejecución'
 
   const stackError = error instanceof Error ? error.stack : undefined
+  const esErrorChunkOffline =
+    estaSinRed ||
+    /ChunkLoadError|Failed to fetch dynamically imported module|Importing a module script failed|Loading chunk/i.test(
+      `${nombreError} ${mensajeError}`,
+    )
 
   // Registro forense incondicional en consola
   console.error('[StudentHUB Error Boundary Captured]:', {
@@ -91,6 +100,19 @@ export function PaginaDeError() {
         <PantallaDeAviso
           titulo="Esta página no existe"
           descripcion="Puede que la dirección esté mal escrita o que la sección todavía no exista."
+          accion={{ texto: 'Ir al inicio', a: '/' }}
+        />
+      </main>
+    )
+  }
+
+  // 1b. Recuperación segura ante fallo de carga de módulo por falta de red
+  if (esErrorChunkOffline) {
+    return (
+      <main className="min-h-screen flex items-center justify-center p-6 bg-bg text-text">
+        <PantallaDeAviso
+          titulo="Módulo no disponible sin conexión"
+          descripcion="No se pudo descargar esta vista porque el dispositivo está sin internet y el módulo aún no estaba precargado en el navegador. Volvé al inicio o reintentá al recuperar señal."
           accion={{ texto: 'Ir al inicio', a: '/' }}
         />
       </main>

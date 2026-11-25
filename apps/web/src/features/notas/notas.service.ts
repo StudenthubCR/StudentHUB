@@ -1,4 +1,9 @@
 import { supabase } from '@/lib/supabase'
+import {
+  guardarDatoUsuarioScoped,
+  leerDatoUsuarioScoped,
+  registrarSincronizacion,
+} from '@/lib/offlineCache'
 import type { NotaMateria, PeriodoNota, ResumenNotas } from './notas.types'
 import { NOTAS_FIXTURE } from './notas.fixture'
 
@@ -114,6 +119,17 @@ export async function obtenerNotasEstudiante(
     return combinadas.filter((n) => !periodo || periodo === 'Anual' || n.periodo === periodo)
   }
 
+  const segmentoCache = `notas:${estudianteId}:${periodo ?? 'Anual'}`
+  const enCache = leerDatoUsuarioScoped<NotaMateria[]>(null, segmentoCache)?.data
+  const estaOffline =
+    typeof navigator !== 'undefined' &&
+    typeof navigator.onLine === 'boolean' &&
+    !navigator.onLine
+
+  if (estaOffline && enCache) {
+    return enCache
+  }
+
   try {
     let query = supabase.from('notas').select('*').eq('estudiante_id', estudianteId)
 
@@ -123,19 +139,33 @@ export async function obtenerNotasEstudiante(
 
     const { data, error } = await query.order('materia', { ascending: true })
 
-    if (error || !data || data.length === 0) {
-      const combinadas = obtenerNotasDemoCombinadas()
-      const delEstudiante = combinadas.filter(
-        (n) =>
-          n.estudianteId === estudianteId &&
-          (!periodo || periodo === 'Anual' || n.periodo === periodo),
-      )
-      if (delEstudiante.length > 0) return delEstudiante
-      return data && data.length === 0 ? [] : combinadas.filter((n) => !periodo || periodo === 'Anual' || n.periodo === periodo)
+    if (!error && Array.isArray(data) && data.length > 0) {
+      const mapeadas = (data as FilaNotaRaw[]).map(mapearFilaANota)
+      guardarDatoUsuarioScoped(null, segmentoCache, mapeadas)
+      registrarSincronizacion(segmentoCache)
+      return mapeadas
     }
 
-    return (data as FilaNotaRaw[]).map(mapearFilaANota)
+    if (error && enCache) {
+      return enCache
+    }
+
+    if (!error && data && data.length === 0) {
+      guardarDatoUsuarioScoped(null, segmentoCache, [])
+    }
+
+    const combinadas = obtenerNotasDemoCombinadas()
+    const delEstudiante = combinadas.filter(
+      (n) =>
+        n.estudianteId === estudianteId &&
+        (!periodo || periodo === 'Anual' || n.periodo === periodo),
+    )
+    if (delEstudiante.length > 0) return delEstudiante
+    return data && data.length === 0
+      ? []
+      : enCache ?? combinadas.filter((n) => !periodo || periodo === 'Anual' || n.periodo === periodo)
   } catch {
+    if (enCache) return enCache
     return obtenerNotasDemoCombinadas().filter(
       (n) =>
         (!estudianteId || n.estudianteId === estudianteId) &&

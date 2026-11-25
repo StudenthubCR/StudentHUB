@@ -5,6 +5,14 @@ import { supabase } from '@/lib/supabase'
 import { DOCENTE_DANGELO_DEMO } from '@/features/docente/docente.fixture'
 import { obtenerPerfilDocenteActual } from '@/features/docente/docente.service'
 import type { DocenteProfile } from '@/features/docente/docente.types'
+import {
+  asegurarPropietarioCache,
+  guardarDatoUsuarioScoped,
+  leerDatoUsuarioScoped,
+  purgarCacheSensibleUsuario,
+  resolverScopeUsuarioActivo,
+} from '@/lib/offlineCache'
+import { limpiarHistorialPrecargaOffline } from '@/lib/offlineWarmer'
 import type { RolSistema } from './auth.service'
 import { SesionContext } from './sesion-context'
 
@@ -115,12 +123,21 @@ export function SesionProvider({ children }: { children: ReactNode }) {
 
     supabase.auth.getSession().then(({ data }) => {
       if (!vigente) return
+      if (data.session?.user?.id) {
+        asegurarPropietarioCache(data.session.user.id, queryClient)
+      }
       setSesion(data.session)
       setCargando(false)
     })
 
-    const { data: suscripcion } = supabase.auth.onAuthStateChange((_evento, nueva) => {
+    const { data: suscripcion } = supabase.auth.onAuthStateChange((evento, nueva) => {
       if (localStorage.getItem('studenthub_demo_sesion') === 'true') return
+      if (evento === 'SIGNED_OUT' || !nueva) {
+        purgarCacheSensibleUsuario(queryClient)
+        limpiarHistorialPrecargaOffline()
+      } else if (nueva.user?.id) {
+        asegurarPropietarioCache(nueva.user.id, queryClient)
+      }
       setSesion(nueva)
       setCargando(false)
       queryClient.invalidateQueries({ queryKey: ['estudiante'] })
@@ -153,8 +170,21 @@ export function SesionProvider({ children }: { children: ReactNode }) {
     }
 
     if (typeof window !== 'undefined' && localStorage.getItem('studenthub_demo_sesion') === 'true') {
+      asegurarPropietarioCache(resolverScopeUsuarioActivo(), queryClient)
       setRol('estudiante')
       setDocente(null)
+      setCargandoRol(false)
+      return
+    }
+
+    asegurarPropietarioCache(sesion.user.id, queryClient)
+    const rolEnCache = leerDatoUsuarioScoped<{ rol: RolSistema; docente: DocenteProfile | null }>(
+      sesion.user.id,
+      'rol_sistema',
+    )
+    if (rolEnCache && typeof navigator !== 'undefined' && navigator.onLine === false) {
+      setRol(rolEnCache.data.rol)
+      setDocente(rolEnCache.data.docente)
       setCargandoRol(false)
       return
     }
@@ -166,16 +196,29 @@ export function SesionProvider({ children }: { children: ReactNode }) {
         if (perfil) {
           setRol('docente')
           setDocente(perfil)
+          guardarDatoUsuarioScoped(sesion.user.id, 'rol_sistema', {
+            rol: 'docente' as RolSistema,
+            docente: perfil,
+          })
         } else {
           setRol('estudiante')
           setDocente(null)
+          guardarDatoUsuarioScoped(sesion.user.id, 'rol_sistema', {
+            rol: 'estudiante' as RolSistema,
+            docente: null,
+          })
         }
         setCargandoRol(false)
       })
       .catch(() => {
         if (!vigente) return
-        setRol('estudiante')
-        setDocente(null)
+        if (rolEnCache) {
+          setRol(rolEnCache.data.rol)
+          setDocente(rolEnCache.data.docente)
+        } else {
+          setRol('estudiante')
+          setDocente(null)
+        }
         setCargandoRol(false)
       })
 
@@ -189,7 +232,13 @@ export function SesionProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('studenthub_demo_rol')
     localStorage.removeItem('studenthub_demo_estudiante_id')
     localStorage.removeItem('studenthub_estudiante_activo_id')
-    await supabase.auth.signOut()
+    purgarCacheSensibleUsuario(queryClient)
+    limpiarHistorialPrecargaOffline()
+    try {
+      await supabase.auth.signOut()
+    } catch {
+      // Garantizar cierre de sesión local incluso sin conexión
+    }
     setSesion(null)
     setRol('estudiante')
     setDocente(null)

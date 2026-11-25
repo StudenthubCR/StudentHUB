@@ -1,4 +1,9 @@
 import { supabase } from '@/lib/supabase'
+import {
+  guardarDatoUsuarioScoped,
+  leerDatoUsuarioScoped,
+  registrarSincronizacion,
+} from '@/lib/offlineCache'
 import type {
   EstadoAsistencia,
   PeriodoAsistencia,
@@ -127,6 +132,17 @@ export async function obtenerAsistenciasEstudiante(
     return combinadas.filter((a) => !periodo || a.periodo === periodo)
   }
 
+  const segmentoCache = `asistencias:${estudianteId}:${periodo ?? 'todas'}`
+  const enCache = leerDatoUsuarioScoped<RegistroAsistencia[]>(null, segmentoCache)?.data
+  const estaOffline =
+    typeof navigator !== 'undefined' &&
+    typeof navigator.onLine === 'boolean' &&
+    !navigator.onLine
+
+  if (estaOffline && enCache) {
+    return enCache
+  }
+
   try {
     let query = supabase.from('asistencias').select('*').eq('estudiante_id', estudianteId)
 
@@ -136,17 +152,31 @@ export async function obtenerAsistenciasEstudiante(
 
     const { data, error } = await query.order('fecha', { ascending: false })
 
-    if (error || !data || data.length === 0) {
-      const combinadas = obtenerAsistenciasDemoCombinadas()
-      const delEstudiante = combinadas.filter(
-        (a) => a.estudianteId === estudianteId && (!periodo || a.periodo === periodo),
-      )
-      if (delEstudiante.length > 0) return delEstudiante
-      return data && data.length === 0 ? [] : combinadas.filter((a) => !periodo || a.periodo === periodo)
+    if (!error && Array.isArray(data) && data.length > 0) {
+      const mapeadas = (data as FilaAsistenciaRaw[]).map(mapearFilaAAsistencia)
+      guardarDatoUsuarioScoped(null, segmentoCache, mapeadas)
+      registrarSincronizacion(segmentoCache)
+      return mapeadas
     }
 
-    return (data as FilaAsistenciaRaw[]).map(mapearFilaAAsistencia)
+    if (error && enCache) {
+      return enCache
+    }
+
+    if (!error && data && data.length === 0) {
+      guardarDatoUsuarioScoped(null, segmentoCache, [])
+    }
+
+    const combinadas = obtenerAsistenciasDemoCombinadas()
+    const delEstudiante = combinadas.filter(
+      (a) => a.estudianteId === estudianteId && (!periodo || a.periodo === periodo),
+    )
+    if (delEstudiante.length > 0) return delEstudiante
+    return data && data.length === 0
+      ? []
+      : enCache ?? combinadas.filter((a) => !periodo || a.periodo === periodo)
   } catch {
+    if (enCache) return enCache
     return obtenerAsistenciasDemoCombinadas().filter(
       (a) =>
         (!estudianteId || a.estudianteId === estudianteId) &&

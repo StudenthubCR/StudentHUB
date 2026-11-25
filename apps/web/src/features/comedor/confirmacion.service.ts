@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase'
+import { encolarConfirmacionComedorOffline } from '@/lib/offlineQueue'
 
 export interface ConfirmacionComedor {
   id: string
@@ -288,8 +289,12 @@ export async function guardarConfirmacionEstudiante(
       .maybeSingle()
 
     if (error) {
-      console.warn('Fallo al persistir confirmación en Supabase:', error.message)
-      // Aunque falle Supabase por red temporal, se conservó localmente
+      console.warn('Fallo al persistir confirmación en Supabase, encolando offline:', error.message)
+      encolarConfirmacionComedorOffline({
+        estudianteId,
+        fecha: fechaDestino,
+        asistencia,
+      })
       return { ok: true, confirmacion: nuevoRegistro }
     }
 
@@ -304,7 +309,12 @@ export async function guardarConfirmacionEstudiante(
       return { ok: true, confirmacion: confirmado }
     }
   } catch (err) {
-    console.warn('Error de red al guardar confirmación en base de datos:', err)
+    console.warn('Error de red al guardar confirmación, encolando para reenvío:', err)
+    encolarConfirmacionComedorOffline({
+      estudianteId,
+      fecha: fechaDestino,
+      asistencia,
+    })
   }
 
   return { ok: true, confirmacion: nuevoRegistro }

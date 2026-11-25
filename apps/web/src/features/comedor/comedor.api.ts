@@ -1,4 +1,5 @@
 import { COMEDOR_API_URL } from '@/lib/config'
+import { registrarSincronizacion } from '@/lib/offlineCache'
 
 /**
  * Una fila tal como la devuelve el Apps Script del comedor
@@ -26,7 +27,7 @@ function esFila(valor: unknown): valor is FilaComedor {
 
 const CLAVE_CACHE_COMEDOR_PREFIJO = 'studenthub_cache_comedor_semana_'
 
-function recuperarCacheComedor(numero: number): FilaComedor[] | null {
+export function recuperarCacheComedor(numero: number): FilaComedor[] | null {
   if (typeof window === 'undefined') return null
   try {
     const raw = localStorage.getItem(`${CLAVE_CACHE_COMEDOR_PREFIJO}${numero}`)
@@ -45,6 +46,7 @@ function guardarCacheComedor(numero: number, filas: FilaComedor[]): void {
   if (typeof window === 'undefined' || filas.length === 0) return
   try {
     localStorage.setItem(`${CLAVE_CACHE_COMEDOR_PREFIJO}${numero}`, JSON.stringify(filas))
+    registrarSincronizacion(`comedor:semana_${numero}`)
   } catch {
     // ignorar error de cuota
   }

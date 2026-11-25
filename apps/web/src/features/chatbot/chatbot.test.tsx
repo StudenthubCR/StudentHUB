@@ -10,6 +10,9 @@ import {
   responderComedor,
   responderHorarios,
   responderCarnet,
+  responderNotas,
+  responderAsistencias,
+  responderFaqCtp,
   responderAyuda,
   responderDesconocido,
   generarMensajeBienvenida,
@@ -827,6 +830,178 @@ describe('Chatbot Agenda Responses — Confirmación, Negación y Cero Emojis', 
       expect(respuestaBot.texto).toContain('Sí, tienes 1 actividad programada')
       expect(respuestaBot.texto).toContain('Profesor ausente')
       expect(respuestaBot.texto.match(EMOJI_REGEX)).toBeNull()
+    }
+  })
+})
+
+describe('Chatbot Offline-First — Notas, Asistencias, Horario en Vivo, Comedor Semanal y FAQs', () => {
+  const ahoraClaseActiva = new Date(2026, 9, 14, 9, 10, 0) // Miércoles 9:10 AM local
+
+  it('detecta nuevas intenciones de notas, asistencias y FAQs sin romper agenda ni carnet', () => {
+    expect(detectarIntencion('¿Cuál es mi promedio?')).toBe('notas')
+    expect(detectarIntencion('¿Tengo materias bajas?')).toBe('notas')
+    expect(detectarIntencion('¿Cuántas ausencias tengo?')).toBe('asistencias')
+    expect(detectarIntencion('¿Cómo está mi asistencia?')).toBe('asistencias')
+    expect(detectarIntencion('¿Hay ausencias de profesor?')).toBe('agenda')
+    expect(detectarIntencion('¿Qué especialidades hay en el CTP Rosario de Naranjo?')).toBe('faq_ctp')
+    expect(detectarIntencion('¿Cómo funciona el modo offline?')).toBe('faq_ctp')
+    expect(detectarIntencion('¿Cómo guardo mi carnet offline?')).toBe('carnet')
+    expect(detectarIntencion('¿Qué clase tengo ahora?')).toBe('horarios')
+    expect(detectarIntencion('¿A qué hora es el receso?')).toBe('horarios')
+  })
+
+  it('responde qué clase está en curso, receso y lee respaldo directo de localStorage en horarios offline', () => {
+    const memoria = new Map<string, string>()
+    const origStorage = globalThis.localStorage
+    const origWin = globalThis.window
+    globalThis.window = {} as Window & typeof globalThis
+    globalThis.localStorage = {
+      getItem: (k: string) => memoria.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        memoria.set(k, v)
+      },
+      removeItem: (k: string) => {
+        memoria.delete(k)
+      },
+      clear: () => memoria.clear(),
+    } as unknown as Storage
+
+    try {
+      memoria.set(
+        'studenthub_cache_horario_11-1',
+        JSON.stringify([
+          {
+            grupo: '11-1',
+            dia: 'Miércoles',
+            hora: '07:00-08:20',
+            materia: 'Matemática',
+            docente: 'Prof. Brenes',
+          },
+          {
+            grupo: '11-1',
+            dia: 'Miércoles',
+            hora: '08:20-08:40',
+            materia: 'Receso',
+          },
+          {
+            grupo: '11-1',
+            dia: 'Miércoles',
+            hora: '08:40-10:00',
+            materia: 'Desarrollo Web',
+            docente: 'Prof. Dangelo',
+          },
+        ]),
+      )
+
+      const resAhora = responderHorarios('¿Qué clase tengo ahora?', [], '11-1', ahoraClaseActiva)
+      expect(resAhora.texto).toContain('Ahora en curso')
+      expect(resAhora.texto).toContain('Desarrollo Web')
+      expect(resAhora.texto).toContain('Prof. Dangelo')
+      expect(resAhora.texto.match(EMOJI_REGEX)).toBeNull()
+
+      const resReceso = responderHorarios('¿A qué hora es el receso?', [], '11-1', ahoraClaseActiva)
+      expect(resReceso.texto).toContain('Receso')
+      expect(resReceso.texto).toContain('08:20')
+      expect(resReceso.texto.match(EMOJI_REGEX)).toBeNull()
+    } finally {
+      globalThis.localStorage = origStorage
+      globalThis.window = origWin
+    }
+  })
+
+  it('responde menú semanal de comedor leyendo respaldo local sin internet', () => {
+    const menus: MenuDia[] = [
+      {
+        fecha: '2026-10-12',
+        plato: 'Arroz con pollo',
+        acompanamiento: 'Ensalada rusa',
+        bebida: 'Té frío',
+        fruta: 'Sandía',
+      },
+      {
+        fecha: '2026-10-13',
+        plato: 'Casado con bistec',
+        acompanamiento: 'Frijoles negros',
+        bebida: 'Fresco de cas',
+        fruta: 'Piña',
+      },
+    ]
+    const resSem = responderComedor(
+      '¿Cuál es el menú de esta semana?',
+      menus,
+      new Date(2026, 9, 14, 10, 0, 0),
+    )
+    expect(resSem.texto).toContain('Menú Semanal del Comedor Institucional')
+    expect(resSem.texto).toContain('Arroz con pollo')
+    expect(resSem.texto).toContain('Casado con bistec')
+    expect(resSem.texto.match(EMOJI_REGEX)).toBeNull()
+  })
+
+  it('responde notas, materias bajas, asistencias y FAQs del CTP Rosario de Naranjo sin emojis', () => {
+    const resNotas = responderNotas(
+      '¿Tengo materias bajas?',
+      [
+        {
+          id: 'n1',
+          estudianteId: 'e1',
+          periodo: 'I Periodo',
+          materia: 'Programación Web',
+          notaFinal: 95,
+          rubrica: { trabajoCotidiano: 38, tareas: 10, pruebas: 32, proyecto: 10, asistencia: 5 },
+          aprobada: true,
+        },
+        {
+          id: 'n2',
+          estudianteId: 'e1',
+          periodo: 'I Periodo',
+          materia: 'Matemática',
+          notaFinal: 64,
+          rubrica: { trabajoCotidiano: 25, tareas: 7, pruebas: 20, proyecto: 8, asistencia: 4 },
+          aprobada: false,
+        },
+      ],
+      'Erick',
+    )
+    expect(resNotas.texto).toContain('Matemática')
+    expect(resNotas.texto).toContain('64.0')
+    expect(resNotas.texto.match(EMOJI_REGEX)).toBeNull()
+
+    const resAsist = responderAsistencias(
+      [
+        { id: '1', estudianteId: 'e1', fecha: '2026-03-01', periodo: 'I Periodo', materia: 'Web', bloque: '1-2', estado: 'ausencia_injustificada' },
+        { id: '2', estudianteId: 'e1', fecha: '2026-03-02', periodo: 'I Periodo', materia: 'Web', bloque: '1-2', estado: 'ausencia_injustificada' },
+        { id: '3', estudianteId: 'e1', fecha: '2026-03-03', periodo: 'I Periodo', materia: 'Web', bloque: '1-2', estado: 'ausencia_injustificada' },
+      ],
+      'Lucía',
+    )
+    expect(resAsist.texto).toContain('Ausencias injustificadas:** 3')
+    expect(resAsist.texto).toContain('Atención')
+    expect(resAsist.texto.match(EMOJI_REGEX)).toBeNull()
+
+    const resFaq = responderFaqCtp('¿Cómo contacto a Orientación o justifico ausencias?')
+    expect(resFaq.texto).toContain('3 días hábiles')
+    expect(resFaq.texto).toContain('Orientación')
+    expect(resFaq.texto.match(EMOJI_REGEX)).toBeNull()
+  })
+
+  it('muestra indicador visual de Modo sin conexión en la cabecera del Chatbot cuando navigator.onLine es false', () => {
+    const origNav = globalThis.navigator
+    Object.defineProperty(globalThis, 'navigator', {
+      value: { onLine: false },
+      configurable: true,
+      writable: true,
+    })
+    try {
+      const htmlOffline = renderToString(<Chatbot inicialmenteAbierto={true} />)
+      expect(htmlOffline).toContain('Modo sin conexión · Caché local')
+      expect(htmlOffline).toContain('<svg')
+      expect(htmlOffline.match(EMOJI_REGEX)).toBeNull()
+    } finally {
+      Object.defineProperty(globalThis, 'navigator', {
+        value: origNav,
+        configurable: true,
+        writable: true,
+      })
     }
   })
 })

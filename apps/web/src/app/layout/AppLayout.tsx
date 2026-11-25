@@ -10,6 +10,7 @@ import { Chatbot } from '@/features/chatbot/Chatbot'
 import { ToastNotificacionFlotante } from '@/features/notificaciones/components/ToastNotificacionFlotante'
 import { useSesion } from '@/features/auth/useSesion'
 import { useEstudiante } from '@/features/estudiante/useEstudiante'
+import { asegurarPropietarioCache, resolverScopeUsuarioActivo } from '@/lib/offlineCache'
 import { BadgeRol } from '@/components/BadgeRol'
 import {
   IconoDescargar,
@@ -43,6 +44,7 @@ export function AppLayout({ children }: { children?: ReactNode }) {
     if (typeof window === 'undefined') return
     localStorage.setItem('studenthub_demo_sesion', 'true')
     localStorage.setItem('studenthub_demo_rol', 'docente')
+    asegurarPropietarioCache(resolverScopeUsuarioActivo())
     window.location.href = '/docente'
   }
 
@@ -51,6 +53,7 @@ export function AppLayout({ children }: { children?: ReactNode }) {
     localStorage.setItem('studenthub_demo_sesion', 'true')
     localStorage.setItem('studenthub_demo_rol', 'estudiante')
     localStorage.removeItem('studenthub_estudiante_activo_id')
+    asegurarPropietarioCache(resolverScopeUsuarioActivo())
     window.location.href = '/estudiante'
   }
 

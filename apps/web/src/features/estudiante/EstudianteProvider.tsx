@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
+import { guardarDatoUsuarioScoped, leerDatoUsuarioScoped } from '@/lib/offlineCache'
 import { useSesion } from '@/features/auth/useSesion'
 import {
   ESTUDIANTES_MASTER_DEMO,
@@ -214,6 +215,19 @@ export function EstudianteProvider({ children }: { children: ReactNode }) {
         }
       }
 
+      const estaOffline =
+        typeof navigator !== 'undefined' &&
+        typeof navigator.onLine === 'boolean' &&
+        !navigator.onLine
+      const perfilCacheado = leerDatoUsuarioScoped<ResultadoCargaPerfil>(
+        userId,
+        'perfil_estudiante',
+      )?.data
+
+      if (estaOffline && perfilCacheado && !perfilCacheado.esRespaldo) {
+        return perfilCacheado
+      }
+
       try {
         // 1. Verificar si el usuario autenticado es un Encargado Legal
         let filaEncargado: FilaEncargadoRaw | null = null
@@ -278,12 +292,14 @@ export function EstudianteProvider({ children }: { children: ReactNode }) {
           }
 
           if (listaEstudiantes.length > 0) {
-            return {
+            const resultadoEncargado: ResultadoCargaPerfil = {
               rol: 'encargado',
               encargado: encargadoObj,
               estudiantes: listaEstudiantes,
               esRespaldo: false,
             }
+            guardarDatoUsuarioScoped(userId, 'perfil_estudiante', resultadoEncargado)
+            return resultadoEncargado
           }
         }
 
@@ -310,12 +326,18 @@ export function EstudianteProvider({ children }: { children: ReactNode }) {
 
         if (filaEstudiante) {
           const est = formatearEstudiante(filaEstudiante, sesion.user.user_metadata?.full_name)
-          return {
+          const resultadoEst: ResultadoCargaPerfil = {
             rol: 'estudiante',
             encargado: null,
             estudiantes: [est],
             esRespaldo: false,
           }
+          guardarDatoUsuarioScoped(userId, 'perfil_estudiante', resultadoEst)
+          return resultadoEst
+        }
+
+        if (perfilCacheado && !perfilCacheado.esRespaldo) {
+          return perfilCacheado
         }
 
         // 3. Respaldo defensivo con datos de sesión
@@ -344,6 +366,9 @@ export function EstudianteProvider({ children }: { children: ReactNode }) {
           esRespaldo: true,
         }
       } catch (err) {
+        if (perfilCacheado && !perfilCacheado.esRespaldo) {
+          return perfilCacheado
+        }
         console.warn('Excepción controlada en EstudianteProvider, usando respaldo:', err)
         const respaldo: Estudiante = {
           id: sesion.user.id,

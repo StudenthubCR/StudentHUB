@@ -1,28 +1,38 @@
 /**
- * Servicio del Asistente Virtual de Student HUB.
+ * Servicio del Asistente Virtual Offline-First de Student HUB (CTP Rosario de Naranjo).
  *
- * Procesa consultas del estudiante mediante reconocimiento de intenciones
- * y genera respuestas estructuradas en tiempo real a partir de fuentes locales:
- * - Eventos y Noticias institucionales (calendario escolar)
- * - Menú del Comedor (con resolución por fecha y ciclo lectivo)
- * - Horarios de Clases (por grupo académico y día de la semana)
- * - Carnet Digital Estudiantil y persistencia sin conexión
+ * Opera 100% en el cliente leyendo exclusivamente de memoria y cachés locales persistentes:
+ * - Agenda personal y sincronizada con docentes (resolución temporal en español)
+ * - Horarios de clases por sección (incluyendo lección actual, siguiente y recesos + respaldo local)
+ * - Menú del comedor institucional (diario y semanal + respaldo ciclo 1..5)
+ * - Calificaciones y resumen académico del estudiante activo (scoped por usuario)
+ * - Asistencias, tardías y alerta temprana REA del estudiante activo (scoped por usuario)
+ * - Carnet Digital 3D y preguntas frecuentes del CTP Rosario de Naranjo
  *
- * Resuelve referencias temporales relativas:
- * - "mañana" / "pasado mañana" -> calcula el día siguiente o subsiguiente
- * - "ayer" / "antier" -> calcula el día anterior o antepasado
- * - Nombres de días ("lunes", "martes", etc.) -> día específico de la semana en curso
- *
- * Funciona de manera 100% autónoma en el cliente, compatible con PWA offline.
+ * Regla de Oro: Cero caracteres emojis o pictogramas Unicode en todo el módulo.
  */
 
 import { addDays, format, isSameDay, parseISO, startOfWeek } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { NOTICIAS, type Noticia } from '@/features/dashboard/noticias.fixture'
 import type { MenuDia } from '@/features/comedor/menu.types'
+import { recuperarCacheComedor } from '@/features/comedor/comedor.api'
+import { filasAMenus, semanaAMostrar, semanaDelCiclo } from '@/features/comedor/menu.service'
 import type { DiaDeClases, Clase } from '@/features/horarios/horario.types'
+import {
+  aClases,
+  agruparPorDia,
+  ahoraEnMinutos,
+  progresoDelDia,
+  unirConsecutivas,
+} from '@/features/horarios/horario.service'
+import { recuperarCacheHorario } from '@/features/horarios/horarios.api'
 import type { EventoAgenda } from '@/features/agenda/agenda.types'
 import { obtenerEventos } from '@/features/agenda/agenda.service'
+import type { NotaMateria } from '@/features/notas/notas.types'
+import { calcularResumenNotas } from '@/features/notas/notas.service'
+import type { RegistroAsistencia } from '@/features/asistencias/asistencias.types'
+import { calcularResumenAsistencias } from '@/features/asistencias/asistencias.service'
 import { responderConsultaAgenda } from './agendaQuery'
 import type {
   DiaObjetivo,
@@ -32,6 +42,51 @@ import type {
 } from './chatbot.types'
 
 export type { MensajeChat } from './chatbot.types'
+
+export interface FaqInstitucional {
+  id: string
+  palabrasClave: string[]
+  titulo: string
+  respuesta: string
+}
+
+export const FAQS_CTP_ROSARIO: FaqInstitucional[] = [
+  {
+    id: 'faq-horarios-colegio',
+    palabrasClave: ['jornada', 'diurno', 'nocturna', 'abre', 'cierra', 'horario del colegio', 'horario general'],
+    titulo: 'Horarios Generales · CTP Rosario de Naranjo',
+    respuesta:
+      'El CTP Rosario de Naranjo opera en jornada **Diurna** (desde las 7:00 a.m.) y **Sección Nocturna** (lecciones vespertinas/nocturnas con ventana de confirmación de cena hasta las 5:30 p.m.). Podés revisar el detalle exacto por sección en el módulo **Horarios**.',
+  },
+  {
+    id: 'faq-especialidades',
+    palabrasClave: ['especialidad', 'especialidades', 'tecnica', 'tecnicas', 'carreras'],
+    titulo: 'Especialidades Técnicas del Colegio',
+    respuesta:
+      'Entre las especialidades del **CTP Rosario de Naranjo** destacan **Desarrollo Web**, **Contabilidad & Finanzas**, **Ciberseguridad**, **Electromecánica**, **Soporte y Configuración de Redes**, **Administración Logística**, **Diseño Publicitario** y **Secretariado Ejecutivo**.',
+  },
+  {
+    id: 'faq-orientacion',
+    palabrasClave: ['orientacion', 'coordinacion', 'secretaria', 'justificar', 'justificacion', 'boleta', 'comprobante'],
+    titulo: 'Justificaciones, Orientación y Coordinación',
+    respuesta:
+      'Según el **Reglamento de Evaluación de los Aprendizajes (REA · MEP)**, las justificaciones formales de ausencias o tardías deben presentarse ante secretaría o coordinación en un plazo máximo de **3 días hábiles**. Para apoyo psicosocial o vocacional acudí al departamento de **Orientación** en horario lectivo.',
+  },
+  {
+    id: 'faq-offline',
+    palabrasClave: ['sin conexion', 'sin internet', 'como funciona offline', 'modo offline', 'sin red', 'cache'],
+    titulo: 'Cómo Funciona el Modo Sin Conexión (PWA)',
+    respuesta:
+      'Student HUB almacena tu aplicación, horarios, menús del comedor, agenda y tus datos académicos recientes cifrados/aislados por sesión en tu dispositivo. Incluso sin Wi-Fi ni saldo podés consultar tus clases, menú, promedios, carnet QR y chatear conmigo sin interrupciones.',
+  },
+  {
+    id: 'faq-privacidad',
+    palabrasClave: ['privacidad', 'seguridad', '8968', 'prodhab', 'datos personales'],
+    titulo: 'Privacidad y Ley N° 8968 (PRODHAB)',
+    respuesta:
+      'Los datos sensibles de estudiantes, encargados y docentes se resguardan exclusivamente con **Row Level Security (RLS)** en PostgreSQL y caché aislado por cuenta de usuario. Al cerrar sesión, toda información personal local se elimina de forma inmediata.',
+  },
+]
 
 /**
  * Normaliza una cadena de texto eliminando tildes, signos diacríticos,
@@ -114,8 +169,71 @@ export function detectarIntencion(texto: string): Intencion {
   const palabrasAyuda = ['ayuda', 'que haces', 'que puedes hacer', 'comandos', 'funciones', 'opciones', 'capacidades']
   if (palabrasAyuda.some((p) => t.includes(p))) return 'ayuda'
 
+  // Preguntas sobre ausencias de profesores o explícitas de agenda van primero a Agenda
+  if (
+    t.includes('profesor ausente') ||
+    t.includes('docente ausente') ||
+    t.includes('ausencias de profesor') ||
+    t.includes('ausencia de profesor') ||
+    t.includes('ausencias de docente')
+  ) {
+    return 'agenda'
+  }
+
+  // FAQs específicas cuando preguntan cómo funciona el modo offline / orientación / especialidades
+  if (
+    t.includes('sin conexion') ||
+    t.includes('sin internet') ||
+    t.includes('modo offline') ||
+    t.includes('como funciona offline') ||
+    t.includes('orientacion') ||
+    t.includes('coordinacion') ||
+    t.includes('especialidad') ||
+    t.includes('rosario de naranjo') ||
+    t.includes('8968') ||
+    t.includes('prodhab')
+  ) {
+    return 'faq_ctp'
+  }
+
+  // Calificaciones y promedios
+  const palabrasNotas = [
+    'promedio',
+    'nota',
+    'notas',
+    'calificacion',
+    'calificaciones',
+    'materia baja',
+    'materias bajas',
+    'reprobe',
+    'reprobada',
+    'reprobadas',
+    'boletin',
+    'rubrica',
+  ]
+  if (palabrasNotas.some((p) => t.includes(p))) return 'notas'
+
+  // Carnet digital
   const palabrasCarnet = ['carnet', 'qr', 'credencial', 'offline', 'identificacion', 'foto', 'descargar carnet', 'guardar carnet']
   if (palabrasCarnet.some((p) => t.includes(p))) return 'carnet'
+
+  // Asistencia estudiantil personal (si no menciona "agenda")
+  const palabrasAsistencias = [
+    'asistencia',
+    'asistencias',
+    'tardia',
+    'tardias',
+    'ausencias tengo',
+    'ausencia tengo',
+    'cuantas ausencias',
+    'mis ausencias',
+    'injustificada',
+    'injustificadas',
+    'alerta temprana',
+  ]
+  if (!t.includes('agenda') && palabrasAsistencias.some((p) => t.includes(p))) {
+    return 'asistencias'
+  }
 
   // Términos explícitos y directos de la Agenda Estudiantil personal
   const palabrasAgendaExplicitas = [
@@ -136,8 +254,6 @@ export function detectarIntencion(texto: string): Intencion {
     'proyectos',
     'ausencia',
     'ausencias',
-    'profesor ausente',
-    'docente ausente',
     'recordatorio',
     'recordatorios',
     'evaluacion',
@@ -168,9 +284,33 @@ export function detectarIntencion(texto: string): Intencion {
     return 'eventos'
   }
 
+  // Horario general del colegio -> FAQ
+  if (t.includes('horario del colegio') || t.includes('horario general')) {
+    return 'faq_ctp'
+  }
+
   // Horario de lecciones y materias
-  const palabrasHorarios = ['horario', 'clase', 'clases', 'materia', 'materias', 'leccion', 'lecciones', 'aula', 'profesor', 'tengo', 'toca']
+  const palabrasHorarios = [
+    'horario',
+    'clase',
+    'clases',
+    'materia',
+    'materias',
+    'leccion',
+    'lecciones',
+    'aula',
+    'profesor',
+    'tengo',
+    'toca',
+    'receso',
+    'descanso',
+  ]
   if (palabrasHorarios.some((p) => t.includes(p))) return 'horarios'
+
+  // Coincidencia final con palabras clave de FAQs
+  if (FAQS_CTP_ROSARIO.some((faq) => faq.palabrasClave.some((p) => t.includes(p)))) {
+    return 'faq_ctp'
+  }
 
   return 'desconocido'
 }
@@ -233,14 +373,51 @@ export function responderAgenda(
   return responderConsultaAgenda(texto, eventosAgenda, ahora)
 }
 
+function obtenerMenusConFallbackLocal(menus: MenuDia[], ahora: Date): MenuDia[] {
+  if (menus && menus.length > 0) return menus
+  const dias = semanaAMostrar(ahora)
+  const lunes = dias[0]
+  if (!lunes) return []
+  const numero = semanaDelCiclo(lunes)
+  const enCache = recuperarCacheComedor(numero)
+  if (!enCache || enCache.length === 0) return []
+  return filasAMenus(enCache, lunes)
+}
+
 /**
- * Responde consultas sobre el menú del comedor para hoy, mañana, ayer o cualquier día de la semana.
+ * Responde consultas sobre el menú del comedor para hoy, mañana, ayer, día específico o semana completa.
  */
 export function responderComedor(
   texto: string,
   menus: MenuDia[],
   ahora: Date,
 ): RespuestaChat {
+  const menusEfectivos = obtenerMenusConFallbackLocal(menus, ahora)
+  const t = normalizar(texto)
+
+  // Consulta por menú semanal completo
+  if (
+    t.includes('esta semana') ||
+    t.includes('semanal') ||
+    t.includes('toda la semana') ||
+    t.includes('menu de la semana')
+  ) {
+    if (menusEfectivos.length === 0) {
+      return {
+        texto:
+          'No hay un menú semanal guardado en caché local todavía. Ingresá un momento al módulo **Comedor** con conexión para descargarlo.',
+      }
+    }
+    const lineas = menusEfectivos.map((m) => {
+      const nombreDia = format(parseISO(m.fecha), 'EEEE d', { locale: es })
+      const diaCap = nombreDia.charAt(0).toUpperCase() + nombreDia.slice(1)
+      return `• **${diaCap}:** ${m.plato} *(Acomp.: ${m.acompanamiento}; Bebida: ${m.bebida})*`
+    })
+    return {
+      texto: `**Menú Semanal del Comedor Institucional:**\n\n${lineas.join('\n')}`,
+    }
+  }
+
   const diaObj = resolverDiaObjetivo(texto, ahora)
   const diaNombreFormateado = diaObj.nombreDia.charAt(0).toUpperCase() + diaObj.nombreDia.slice(1)
 
@@ -260,11 +437,11 @@ export function responderComedor(
   }
 
   // Buscar menú por fecha exacta
-  let menuObjetivo = menus.find((m) => isSameDay(parseISO(m.fecha), diaObj.fecha))
+  let menuObjetivo = menusEfectivos.find((m) => isSameDay(parseISO(m.fecha), diaObj.fecha))
 
   // Si no coincide la fecha exacta, buscar por día de la semana
   if (!menuObjetivo) {
-    menuObjetivo = menus.find((m) => {
+    menuObjetivo = menusEfectivos.find((m) => {
       const nombre = normalizar(format(parseISO(m.fecha), 'EEEE', { locale: es }))
       return nombre === diaObj.nombreDia
     })
@@ -295,8 +472,22 @@ export function responderComedor(
   }
 }
 
+function obtenerHorariosConFallbackLocal(
+  diasHorario: DiaDeClases[],
+  grupo: string,
+  ahora: Date,
+): DiaDeClases[] {
+  if (diasHorario && diasHorario.length > 0) return diasHorario
+  if (!grupo) return []
+  const enCache = recuperarCacheHorario(grupo)
+  if (!enCache || enCache.length === 0) return []
+  return agruparPorDia(aClases(enCache), ahora)
+}
+
 /**
- * Responde consultas sobre los horarios de clases para hoy, mañana, ayer o un día específico.
+ * Responde consultas sobre los horarios de clases:
+ * - Lección actual / siguiente / hora de receso o cena
+ * - Horario de hoy, mañana, ayer o un día específico de la semana
  */
 export function responderHorarios(
   texto: string,
@@ -304,14 +495,79 @@ export function responderHorarios(
   grupo: string,
   ahora: Date,
 ): RespuestaChat {
-  if (!diasHorario || diasHorario.length === 0) {
+  const diasEfectivos = obtenerHorariosConFallbackLocal(diasHorario, grupo, ahora)
+
+  if (!diasEfectivos || diasEfectivos.length === 0) {
     return {
       texto: `No hay horarios registrados actualmente para el grupo **${grupo}**. Puedes verificar la sección de **Horarios** en el menú principal.`,
     }
   }
 
+  const t = normalizar(texto)
   const diaObj = resolverDiaObjetivo(texto, ahora)
   const diaNombreFormateado = diaObj.nombreDia.charAt(0).toUpperCase() + diaObj.nombreDia.slice(1)
+
+  // Consulta en vivo sobre lección actual, próxima o receso (si no pidió otro día explícitamente)
+  const preguntaEnVivo =
+    !diaObj.esExplicito &&
+    (t.includes('ahora') ||
+      t.includes('en este momento') ||
+      t.includes('siguiente') ||
+      t.includes('proxima') ||
+      t.includes('receso') ||
+      t.includes('descanso'))
+
+  if (preguntaEnVivo) {
+    if (diaObj.esFinDeSemana) {
+      return {
+        texto: `Hoy es **${diaNombreFormateado}** (fin de semana), por lo que no hay lecciones ni recesos activos para el grupo **${grupo}**.`,
+      }
+    }
+    const diaHoy = diasEfectivos.find((d) => normalizar(d.dia) === diaObj.nombreDia)
+    if (!diaHoy || diaHoy.clases.length === 0) {
+      return {
+        texto: `No hay lecciones cargadas para hoy (${diaNombreFormateado}) en el grupo **${grupo}**.`,
+      }
+    }
+
+    const bloques = diaHoy.bloques.length > 0 ? diaHoy.bloques : unirConsecutivas(diaHoy.clases)
+
+    if (t.includes('receso') || t.includes('descanso')) {
+      const recesos = bloques.filter((b) => b.esReceso || /receso|almuerzo|cena|descanso/i.test(b.materia))
+      if (recesos.length === 0) {
+        return {
+          texto: `No figuran bloques marcados como receso o alimentación explícita en el horario de hoy del grupo **${grupo}**.`,
+        }
+      }
+      const detalleRecesos = recesos
+        .map((r) => `• **${r.materia}:** ${r.inicio}${r.fin ? ` - ${r.fin}` : ''}`)
+        .join('\n')
+      return {
+        texto: `**Pausas y Recesos de Hoy (Grupo ${grupo}):**\n\n${detalleRecesos}`,
+      }
+    }
+
+    const prog = progresoDelDia(bloques, ahoraEnMinutos(ahora))
+    const actual = prog.actual !== null ? bloques[prog.actual] : null
+    const siguiente = prog.siguiente !== null ? bloques[prog.siguiente] : null
+
+    if (actual || siguiente) {
+      const partes: string[] = [`**Estado Actual de Clases — Grupo ${grupo}:**`]
+      if (actual) {
+        partes.push(
+          `• **Ahora en curso:** ${actual.materia} (${actual.inicio}${actual.fin ? ` - ${actual.fin}` : ''})${actual.docente ? ` *(Docente: ${actual.docente})*` : ''}`,
+        )
+      } else {
+        partes.push('• **Ahora:** No estás dentro de un bloque lectivo en este instante.')
+      }
+      if (siguiente) {
+        partes.push(
+          `• **Siguiente bloque:** ${siguiente.materia} (${siguiente.inicio}${siguiente.fin ? ` - ${siguiente.fin}` : ''})${siguiente.docente ? ` *(Docente: ${siguiente.docente})*` : ''}`,
+        )
+      }
+      return { texto: partes.join('\n\n') }
+    }
+  }
 
   // Si cae en fin de semana
   if (diaObj.esFinDeSemana) {
@@ -329,7 +585,7 @@ export function responderHorarios(
   }
 
   // Buscar el día en los horarios del grupo
-  const diaEncontrado = diasHorario.find(
+  const diaEncontrado = diasEfectivos.find(
     (d) => normalizar(d.dia) === diaObj.nombreDia,
   )
 
@@ -358,6 +614,123 @@ export function responderHorarios(
 }
 
 /**
+ * Responde consultas sobre calificaciones y promedio MEP usando caché aislado del estudiante.
+ */
+export function responderNotas(
+  texto: string,
+  notas: NotaMateria[] = [],
+  nombreEstudiante?: string,
+  esDocente = false,
+): RespuestaChat {
+  if (esDocente) {
+    return {
+      texto:
+        '**Gestión de Calificaciones (Modo Docente):**\n\nPodés consultar y editar las notas MEP (40/10/35/10/5) de todas las secciones de Desarrollo Web en la pestaña **Notas** (`/docente/notas`).',
+    }
+  }
+
+  if (!notas || notas.length === 0) {
+    return {
+      texto:
+        'Aún no hay calificaciones guardadas en caché local para tu cuenta. Abrí la pestaña **Notas** en **Hub Estudiantil** para consultar tu boletín por periodo.',
+    }
+  }
+
+  const resumen = calcularResumenNotas(notas)
+  const bajas = notas.filter((n) => n.notaFinal < 70)
+  const t = normalizar(texto)
+  const titular = nombreEstudiante ? ` de ${nombreEstudiante}` : ''
+
+  if (t.includes('baja') || t.includes('riesgo') || t.includes('reprob')) {
+    if (bajas.length === 0) {
+      return {
+        texto: `**Rendimiento Académico${titular}:**\n\nNo tenés materias por debajo de 70. Todas tus **${resumen.totalMaterias}** materias evaluadas están aprobadas con un promedio general de **${resumen.promedioGeneral.toFixed(1)}**.`,
+      }
+    }
+    const listaBajas = bajas
+      .map((b) => `• **${b.materia}:** ${b.notaFinal.toFixed(1)} *(Nota mínima MEP: 70)*`)
+      .join('\n')
+    return {
+      texto: `**Materias en Seguimiento (< 70)${titular}:**\n\n${listaBajas}\n\nPromedio general actual: **${resumen.promedioGeneral.toFixed(1)}**.`,
+    }
+  }
+
+  const detalleTop = notas
+    .slice(0, 5)
+    .map((n) => `• **${n.materia}:** ${n.notaFinal.toFixed(1)}`)
+    .join('\n')
+
+  return {
+    texto:
+      `**Resumen de Calificaciones (I Periodo)${titular}:**\n\n` +
+      `• **Promedio general:** ${resumen.promedioGeneral.toFixed(1)} / 100\n` +
+      `• **Materias aprobadas:** ${resumen.materiasAprobadas} de ${resumen.totalMaterias}\n` +
+      (resumen.materiasEnRiesgo > 0
+        ? `• **Materias < 70:** ${resumen.materiasEnRiesgo}\n\n`
+        : '\n') +
+      `**Detalle en caché:**\n${detalleTop}`,
+  }
+}
+
+/**
+ * Responde consultas sobre asistencias, tardías y alerta temprana REA usando caché aislado.
+ */
+export function responderAsistencias(
+  asistencias: RegistroAsistencia[] = [],
+  nombreEstudiante?: string,
+  esDocente = false,
+): RespuestaChat {
+  if (esDocente) {
+    return {
+      texto:
+        '**Pase de Lista (Modo Docente):**\n\nRegistrá presentes, tardías y ausencias por bloque horario desde la pestaña **Asistencias** (`/docente/asistencias`).',
+    }
+  }
+
+  if (!asistencias || asistencias.length === 0) {
+    return {
+      texto:
+        'Aún no hay registros de asistencia en caché local para tu cuenta. Ingresá a **Hub Estudiantil** en la pestaña **Asistencias** para sincronizar tu historial.',
+    }
+  }
+
+  const res = calcularResumenAsistencias(asistencias)
+  const titular = nombreEstudiante ? ` de ${nombreEstudiante}` : ''
+
+  return {
+    texto:
+      `**Registro de Asistencia${titular}:**\n\n` +
+      `• **Asistencia válida:** ${res.porcentajeAsistencia}% (${res.totalSesiones} lecciones registradas)\n` +
+      `• **Presentes:** ${res.presentes} | **Tardías:** ${res.tardias}\n` +
+      `• **Ausencias injustificadas:** ${res.ausenciasInjustificadas} | **Justificadas:** ${res.ausenciasJustificadas}\n\n` +
+      (res.alertaTemprana
+        ? `**Atención:** ${res.mensajeAlerta}`
+        : '**Estado:** Regularidad académica al día conforme al Reglamento REA del MEP.'),
+  }
+}
+
+/**
+ * Responde preguntas frecuentes institucionales del CTP Rosario de Naranjo.
+ */
+export function responderFaqCtp(texto: string): RespuestaChat {
+  const t = normalizar(texto)
+  const encontrada = FAQS_CTP_ROSARIO.find((faq) =>
+    faq.palabrasClave.some((p) => t.includes(p)),
+  )
+
+  if (encontrada) {
+    return {
+      texto: `**${encontrada.titulo}**\n\n${encontrada.respuesta}`,
+    }
+  }
+
+  const listado = FAQS_CTP_ROSARIO.map((f) => `• **${f.titulo}:** ${f.respuesta}`).join('\n\n')
+  return {
+    texto: `**Preguntas Frecuentes · CTP Rosario de Naranjo:**\n\n${listado}`,
+  }
+}
+
+/**
  * Responde consultas sobre el carnet digital estudiantil.
  */
 export function responderCarnet(): RespuestaChat {
@@ -376,13 +749,13 @@ export function responderCarnet(): RespuestaChat {
 export function responderAyuda(): RespuestaChat {
   return {
     texto:
-      `**Asistente Virtual de Student HUB**\n\n` +
-      `Puedo ayudarte con información en tiempo real sobre:\n` +
+      `**Asistente Virtual de Student HUB (100% Offline)**\n\n` +
+      `Puedo ayudarte sin necesidad de conexión sobre:\n` +
       `• **Agenda:** "¿Hay actividades hoy?", "¿Qué hay en la agenda para mañana?", "¿Tengo tareas o exámenes pendientes?"\n` +
-      `• **Comedor:** "¿Qué hay de almuerzo mañana?", "¿Qué hubo ayer?", "¿Menú del viernes?"\n` +
-      `• **Horarios:** "¿Qué clases tengo mañana?", "¿Qué tuve ayer?", "¿Horario del martes?"\n` +
-      `• **Eventos:** "¿Qué noticias hay?", "¿Cuándo es la ExpoTécnica?"\n` +
-      `• **Carnet:** "¿Cómo descargo mi carnet offline?"\n\n` +
+      `• **Horarios:** "¿Qué clase tengo ahora?", "¿A qué hora es el receso?", "¿Horario del martes?"\n` +
+      `• **Comedor:** "¿Qué hay de almuerzo mañana?", "¿Cuál es el menú de esta semana?"\n` +
+      `• **Notas y Asistencias:** "¿Cuál es mi promedio?", "¿Tengo materias bajas?", "¿Cuántas ausencias tengo?"\n` +
+      `• **Eventos, Carnet y CTP:** "¿Cuándo es la ExpoTécnica?", "¿Cómo contacto a Orientación?"\n\n` +
       `Escribe tu consulta o presiona una de las opciones sugeridas.`,
   }
 }
@@ -398,7 +771,7 @@ export function responderDesconocido(): RespuestaChat {
       `• "¿Hay actividades hoy en la agenda?"\n` +
       `• "¿Qué hay de almuerzo hoy?"\n` +
       `• "¿Cuáles son mis clases de hoy?"\n` +
-      `• "¿Qué eventos hay en el colegio?"\n` +
+      `• "¿Cuál es mi promedio?" o "¿Cuántas ausencias tengo?"\n` +
       `• "¿Cómo guardo mi carnet offline?"`,
   }
 }
@@ -410,12 +783,12 @@ export function generarMensajeBienvenida(primerNombre?: string): string {
   const saludoNombre = primerNombre ? `, ${primerNombre}` : ''
   return (
     `**¡Hola${saludoNombre}! Soy el Asistente Virtual de Student HUB.**\n\n` +
-    `Estoy listo para ayudarte con:\n` +
+    `Estoy listo para ayudarte incluso sin internet con:\n` +
     `• Tareas, exámenes y actividades de tu agenda\n` +
-    `• Menú oficial del comedor estudiantil\n` +
-    `• Horario de lecciones y materias de tu grupo\n` +
-    `• Eventos oficiales y ferias institucionales\n` +
-    `• Uso y descarga de tu carnet digital offline\n\n` +
+    `• Menú diario y semanal del comedor estudiantil\n` +
+    `• Horario de lecciones, clase actual y materias de tu grupo\n` +
+    `• Resumen de tus notas, ausencias y carnet digital\n` +
+    `• Información general del CTP Rosario de Naranjo\n\n` +
     `¿En qué puedo orientarte hoy?`
   )
 }
@@ -441,6 +814,18 @@ export const SUGERENCIAS_RAPIDAS: SugerenciaRapida[] = [
     etiqueta: 'Clases mañana',
     consulta: '¿Qué clases tengo mañana?',
     categoria: 'horarios',
+  },
+  {
+    id: 'sug-promedio',
+    etiqueta: 'Mi promedio',
+    consulta: '¿Cuál es mi promedio?',
+    categoria: 'notas',
+  },
+  {
+    id: 'sug-asistencia',
+    etiqueta: 'Mis ausencias',
+    consulta: '¿Cuántas ausencias tengo?',
+    categoria: 'asistencias',
   },
   {
     id: 'sug-eventos',

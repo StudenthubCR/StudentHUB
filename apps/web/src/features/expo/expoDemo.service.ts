@@ -1,4 +1,5 @@
 import { ESTUDIANTES_MASTER_DEMO } from '@/features/docente/docente.fixture'
+import { asegurarPropietarioCache, resolverScopeUsuarioActivo } from '@/lib/offlineCache'
 
 export type RolDemoExpo = 'estudiante' | 'encargado' | 'docente' | 'admin'
 
@@ -26,6 +27,7 @@ export function lanzarPerfilDemo({
     localStorage.setItem('studenthub_demo_admin', 'true')
     localStorage.removeItem('studenthub_demo_estudiante_id')
     localStorage.removeItem('studenthub_estudiante_activo_id')
+    asegurarPropietarioCache(resolverScopeUsuarioActivo())
     window.location.href = destino ?? '/admin'
     return
   }
@@ -40,6 +42,7 @@ export function lanzarPerfilDemo({
     localStorage.removeItem('studenthub_demo_estudiante_id')
   }
 
+  asegurarPropietarioCache(resolverScopeUsuarioActivo())
   window.location.href = destino ?? (rol === 'docente' ? '/docente' : '/')
 }
 

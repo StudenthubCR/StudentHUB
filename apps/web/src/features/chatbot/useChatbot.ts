@@ -7,6 +7,9 @@ import {
   responderComedor,
   responderHorarios,
   responderCarnet,
+  responderNotas,
+  responderAsistencias,
+  responderFaqCtp,
   responderAyuda,
   responderDesconocido,
   generarMensajeBienvenida,
@@ -16,6 +19,8 @@ import type { MenuDia } from '@/features/comedor/menu.types'
 import type { DiaDeClases } from '@/features/horarios/horario.types'
 import type { EventoAgenda } from '@/features/agenda/agenda.types'
 import { obtenerEventos } from '@/features/agenda/agenda.service'
+import type { NotaMateria } from '@/features/notas/notas.types'
+import type { RegistroAsistencia } from '@/features/asistencias/asistencias.types'
 
 interface UseChatbotProps {
   primerNombre?: string
@@ -24,6 +29,9 @@ interface UseChatbotProps {
   menusComedor: MenuDia[]
   ahora: Date
   eventosAgenda?: EventoAgenda[]
+  notas?: NotaMateria[]
+  asistencias?: RegistroAsistencia[]
+  esDocente?: boolean
 }
 
 export function useChatbot({
@@ -33,6 +41,9 @@ export function useChatbot({
   menusComedor,
   ahora,
   eventosAgenda,
+  notas = [],
+  asistencias = [],
+  esDocente = false,
 }: UseChatbotProps) {
   const mensajeInicial: MensajeChat = {
     id: 'bienvenida',
@@ -215,6 +226,15 @@ export function useChatbot({
           case 'horarios':
             respuesta = responderHorarios(textoLimpio, horariosDias, grupoActivo, ahora)
             break
+          case 'notas':
+            respuesta = responderNotas(textoLimpio, notas, primerNombre, esDocente)
+            break
+          case 'asistencias':
+            respuesta = responderAsistencias(asistencias, primerNombre, esDocente)
+            break
+          case 'faq_ctp':
+            respuesta = responderFaqCtp(textoLimpio)
+            break
           case 'carnet':
             respuesta = responderCarnet()
             break
@@ -259,7 +279,7 @@ export function useChatbot({
         enviandoRef.current = false
       }
     },
-    [ahora, desplazarAlFinal, grupoActivo, horariosDias, menusComedor, eventosAgenda],
+    [ahora, desplazarAlFinal, grupoActivo, horariosDias, menusComedor, eventosAgenda, notas, asistencias, primerNombre, esDocente],
   )
 
   /**
