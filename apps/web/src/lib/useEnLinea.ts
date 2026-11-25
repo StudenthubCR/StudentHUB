@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { obtenerUltimaSincronizacion } from './offlineCache'
 
 function leerNavigatorOnline(): boolean {
-  if (typeof window === 'undefined' || typeof navigator === 'undefined') return true
+  if (typeof navigator === 'undefined') return true
   return typeof navigator.onLine === 'boolean' ? navigator.onLine : true
 }
 
