@@ -1,80 +1,38 @@
-import { Link } from 'react-router-dom'
-import { IconoFlechaDerecha } from '@/components/icons'
+import { IconoEscudo } from '@/components/icons'
 
 export function CreditosExpo() {
+  const year = new Date().getFullYear()
+
   return (
-    <footer className="py-14 border-t border-border bg-surface text-text">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 pb-10 border-b border-border">
-          {/* Logo y resumen */}
-          <div className="xl:col-span-6 space-y-3">
-            <div className="flex h-10 items-center">
-              <img
-                src="/studenthub-logo.webp"
-                alt="StudentHUB"
-                className="h-9 w-auto object-contain dark:hidden"
-              />
-              <img
-                src="/studenthub-logo-dark.webp"
-                alt="StudentHUB"
-                className="h-9 w-auto object-contain hidden dark:block"
-              />
-            </div>
-            <p className="text-nota text-text-muted max-w-md leading-relaxed">
-              Plataforma digital estudiantil diseñada para modernizar la gestión colegial, carnetización y servicios de comedor en los Colegios Técnicos Profesionales de Costa Rica.
+    <footer className="border-t border-border bg-surface dark:bg-[#060B19] py-10 sm:py-14">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex flex-col items-center md:items-start text-center md:text-left">
+            <img
+              src="/studenthub-logo.webp"
+              alt="Logo StudentHUB"
+              className="h-9 w-auto object-contain block dark:hidden"
+            />
+            <img
+              src="/studenthub-logo-dark.webp"
+              alt="Logo StudentHUB"
+              className="h-9 w-auto object-contain hidden dark:block"
+            />
+            <p className="mt-2.5 text-menor text-text-muted max-w-md">
+              Ecosistema Estudiantil, Familiar y Docente desarrollado para la{' '}
+              <strong className="text-text">Expotécnica 2026</strong> del{' '}
+              <strong className="text-text">CTP Rosario de Naranjo</strong>.
             </p>
-            <div className="flex items-center gap-2 pt-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-0.5 text-micro font-bold text-emerald-600">
-                <span className="size-1.5 rounded-full bg-emerald-500 inline-block" />
-                Versión 2026 · Expotécnica Oficial
-              </span>
+          </div>
+
+          <div className="flex flex-col items-center md:items-end text-center md:text-right gap-1.5">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-micro font-bold text-emerald-700 dark:text-emerald-300">
+              <IconoEscudo className="size-3.5" />
+              <span>Cumplimiento Ley N° 8968 · PRODHAB CR</span>
             </div>
-          </div>
-
-          {/* Ficha Institucional */}
-          <div className="xl:col-span-3 space-y-2">
-            <h4 className="text-etiqueta font-bold uppercase tracking-wider text-text">
-              Institución y Especialidad
-            </h4>
-            <ul className="space-y-1.5 text-nota text-text-muted">
-              <li>Colegio Técnico Profesional (CTP)</li>
-              <li>Especialidad en Desarrollo Web & Software</li>
-              <li>Educación Técnica y Vocacional (MEP)</li>
-              <li>Ciclo Lectivo 2026</li>
-            </ul>
-          </div>
-
-          {/* Enlaces de Acceso */}
-          <div className="xl:col-span-3 space-y-3">
-            <h4 className="text-etiqueta font-bold uppercase tracking-wider text-text">
-              Acceso al Sistema
-            </h4>
-            <p className="text-menuda text-text-muted">
-              ¿Eres estudiante matriculado o docente?
+            <p className="text-micro text-text-muted">
+              Especialidad Desarrollo Web · {year}
             </p>
-            <Link
-              to="/entrar"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-nota font-bold text-white hover:bg-primary-dark shadow-xs transition-all"
-            >
-              <span>Ingresar a Student HUB</span>
-              <IconoFlechaDerecha className="size-4" />
-            </Link>
-          </div>
-        </div>
-
-        {/* Barra inferior de derechos */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-menuda text-text-muted">
-          <p>
-            © 2026 Student HUB. Desarrollado con dedicación para la educación técnica pública de Costa Rica.
-          </p>
-          <div className="flex items-center gap-4">
-            <a href="#hero" className="hover:text-primary transition-colors">
-              Volver arriba ↑
-            </a>
-            <span>·</span>
-            <a href="#ficha-tecnica" className="hover:text-primary transition-colors">
-              Ficha Técnica
-            </a>
           </div>
         </div>
       </div>

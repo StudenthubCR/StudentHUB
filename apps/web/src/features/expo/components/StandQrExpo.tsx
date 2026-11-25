@@ -1,139 +1,76 @@
-import { useState, useEffect } from 'react'
+import { useRef } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
-import { IconoCodigoQR, IconoDescargar, IconoCompartir, IconoCheck } from '@/components/icons'
+import {
+  IconoCheck,
+  IconoCodigoQR,
+  IconoDispositivo,
+  IconoRayo,
+} from '@/components/icons'
+import { useScrollRevealExpoAnime } from '../useExpoAnime'
 
-type Props = {
-  onAbrirInstalar?: () => void
-}
+export function StandQrExpo() {
+  const seccionRef = useRef<HTMLElement>(null)
+  useScrollRevealExpoAnime(seccionRef, '[data-qr-reveal]')
 
-export function StandQrExpo({ onAbrirInstalar }: Props) {
-  const [urlActual, setUrlActual] = useState('https://studenthub.cr/expo')
-  const [copiado, setCopiado] = useState(false)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setUrlActual(window.location.href)
-    }
-  }, [])
-
-  const copiarEnlace = async () => {
-    try {
-      await navigator.clipboard.writeText(urlActual)
-      setCopiado(true)
-      setTimeout(() => setCopiado(false), 2500)
-    } catch {
-      setCopiado(true)
-      setTimeout(() => setCopiado(false), 2500)
-    }
-  }
+  const urlActual =
+    typeof window !== 'undefined' && window.location.origin
+      ? `${window.location.origin}/expo`
+      : 'https://studenthub.pages.dev/expo'
 
   return (
-    <section id="stand-qr" className="py-16 sm:py-24 bg-surface-alt/40 border-y border-border">
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
-        <div className="rounded-3xl border border-primary/20 bg-surface p-6 sm:p-12 shadow-xl relative overflow-hidden">
-          {/* Decoración luminosa */}
-          <div className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full bg-primary/10 blur-3xl" />
-
-          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-center">
-            {/* Lado izquierdo: Instrucciones y botones */}
-            <div className="xl:col-span-7 space-y-5">
-              <div className="inline-flex items-center gap-2 rounded-full bg-primary-tint border border-primary/20 px-3 py-0.5 text-micro font-bold uppercase tracking-wider text-primary">
-                <IconoCodigoQR className="size-3.5" />
-                <span>Interactúa en Vivo</span>
-              </div>
-
-              <h2 className="text-2xl sm:text-4xl font-black text-text leading-tight">
-                Pruébalo en tu Propio Teléfono
-              </h2>
-
-              <p className="text-base text-text-muted leading-relaxed">
-                Apunta con la cámara de tu celular al código QR de la derecha. Podrás navegar por el simulador,
-                probar el giro 3D de la tarjeta y guardarla en tu pantalla de inicio como una aplicación nativa.
-              </p>
-
-              {/* 3 pasos */}
-              <div className="space-y-3 pt-2">
-                <div className="flex items-center gap-3">
-                  <span className="flex size-7 items-center justify-center rounded-full bg-primary text-white text-nota font-bold shrink-0">
-                    1
-                  </span>
-                  <span className="text-nota font-medium text-text">
-                    Abre la cámara de tu celular (iOS o Android).
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="flex size-7 items-center justify-center rounded-full bg-primary text-white text-nota font-bold shrink-0">
-                    2
-                  </span>
-                  <span className="text-nota font-medium text-text">
-                    Escanea el código QR que se muestra aquí al lado.
-                  </span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="flex size-7 items-center justify-center rounded-full bg-primary text-white text-nota font-bold shrink-0">
-                    3
-                  </span>
-                  <span className="text-nota font-medium text-text">
-                    ¡Listo! Navega el portal o instálalo como PWA con un solo toque.
-                  </span>
-                </div>
-              </div>
-
-              {/* Botones de acción */}
-              <div className="flex flex-wrap gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={copiarEnlace}
-                  className="flex items-center gap-2 rounded-full border border-border bg-surface-alt px-5 py-2.5 text-nota font-bold text-text hover:border-primary/40 hover:bg-surface shadow-xs transition-all active:scale-98 cursor-pointer"
-                >
-                  {copiado ? (
-                    <>
-                      <IconoCheck className="size-4 text-emerald-500" aria-hidden="true" />
-                      <span>Enlace Copiado</span>
-                    </>
-                  ) : (
-                    <>
-                      <IconoCompartir className="size-4 text-primary" aria-hidden="true" />
-                      <span>Copiar Enlace</span>
-                    </>
-                  )}
-                </button>
-
-                {onAbrirInstalar && (
-                  <button
-                    type="button"
-                    onClick={onAbrirInstalar}
-                    className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-nota font-bold text-white hover:bg-primary-dark shadow-md shadow-primary/25 transition-all active:scale-98 cursor-pointer"
-                  >
-                    <IconoDescargar className="size-4" />
-                    <span>Instalar en este Dispositivo</span>
-                  </button>
-                )}
-              </div>
+    <section
+      ref={seccionRef}
+      id="stand-qr"
+      className="border-t border-border bg-surface-alt/40 dark:bg-[#0B1224]/70 py-16 sm:py-20"
+    >
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div
+          data-qr-reveal
+          className="rounded-3xl border border-border bg-surface dark:bg-[#0F172A]/90 p-6 sm:p-10 shadow-sm grid grid-cols-1 md:grid-cols-12 gap-8 items-center"
+        >
+          <div className="md:col-span-7 space-y-4">
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary-tint px-3.5 py-1 text-micro font-extrabold uppercase tracking-wider text-primary dark:border-sky-400/30 dark:bg-sky-400/10 dark:text-sky-300">
+              <IconoCodigoQR className="size-3.5" />
+              <span>Experiencia en Stand</span>
             </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-text">
+              Escaneá y Probá StudentHUB en tu Teléfono
+            </h2>
+            <p className="text-menor sm:text-base text-text-muted leading-relaxed">
+              Los jueces y visitantes de Expotécnica 2026 pueden abrir este portal directamente en
+              su celular e instalar la PWA en segundos para probar el Carnet Digital, el Chatbot
+              offline y Modo Docente.
+            </p>
+            <ul className="space-y-2 text-menuda text-text">
+              <li className="flex items-start gap-2">
+                <IconoCheck className="size-4 text-emerald-500 shrink-0 mt-0.5" />
+                <span>Diseño adaptado a móviles desde 375px con barra inferior nativa</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <IconoDispositivo className="size-4 text-primary dark:text-sky-300 shrink-0 mt-0.5" />
+                <span>Compatible con Android Chrome, iOS Safari y navegadores de escritorio</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <IconoRayo className="size-4 text-amber-500 shrink-0 mt-0.5" />
+                <span>Acceso directo a perfiles demo sin registro</span>
+              </li>
+            </ul>
+          </div>
 
-            {/* Lado derecho: Tarjeta de QR interactiva grande */}
-            <div className="xl:col-span-5 flex flex-col items-center justify-center">
-              <div className="rounded-3xl border-2 border-primary/20 bg-white p-6 shadow-2xl flex flex-col items-center justify-center">
-                <div className="p-2 bg-white rounded-2xl shadow-inner border border-slate-100">
-                  <QRCodeSVG
-                    value={urlActual}
-                    size={200}
-                    level="H"
-                    includeMargin
-                    className="rounded-xl"
-                  />
-                </div>
-                <div className="mt-4 text-center">
-                  <span className="text-etiqueta font-bold uppercase tracking-wider text-slate-900 block">
-                    Escanea con tu Cámara
-                  </span>
-                  <span className="text-micro font-mono text-slate-700 mt-0.5 block max-w-[200px] truncate">
-                    {urlActual}
-                  </span>
-                </div>
-              </div>
+          <div className="md:col-span-5 flex flex-col items-center justify-center">
+            <div className="rounded-3xl border border-border bg-white p-5 shadow-md">
+              <QRCodeSVG
+                value={urlActual}
+                size={184}
+                level="M"
+                bgColor="#FFFFFF"
+                fgColor="#060B19"
+                title="Código QR hacia el portal Expotécnica de StudentHUB"
+              />
             </div>
+            <p className="mt-3 text-center text-micro font-bold text-text-muted">
+              CTP Rosario de Naranjo · Portal /expo
+            </p>
           </div>
         </div>
       </div>

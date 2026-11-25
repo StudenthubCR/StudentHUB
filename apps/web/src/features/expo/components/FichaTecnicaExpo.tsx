@@ -1,158 +1,110 @@
-import { IconoEscudo, IconoEngranaje, IconoCandado, IconoDispositivo } from '@/components/icons'
+import { useRef } from 'react'
 import {
-  LogoReact,
-  LogoTypeScript,
-  LogoVite,
-  LogoTailwind,
-  LogoSupabase,
-  LogoPostgres,
-  LogoCloudflare,
-  LogoPwa,
-} from './TechLogos'
+  IconoCheck,
+  IconoDispositivo,
+  IconoDocente,
+  IconoEscudo,
+  IconoRayo,
+} from '@/components/icons'
+import { useScrollRevealExpoAnime } from '../useExpoAnime'
 
 export function FichaTecnicaExpo() {
+  const seccionRef = useRef<HTMLElement>(null)
+  useScrollRevealExpoAnime(seccionRef, '[data-ficha-reveal]')
+
   const pilares = [
     {
-      titulo: 'Frontend Moderno & Reactivo',
-      icono: <IconoDispositivo className="size-5 text-blue-500" />,
-      logos: [
-        <LogoReact key="react" className="size-5" />,
-        <LogoTypeScript key="ts" className="size-5" />,
-        <LogoVite key="vite" className="size-5" />,
-        <LogoTailwind key="tw" className="size-5" />,
-      ],
-      items: [
-        { label: 'Framework', valor: 'React 19 (SPA) + TypeScript 5.9' },
-        { label: 'Empaquetador', valor: 'Vite 7 (Fast HMR & Tree-shaking)' },
-        { label: 'Motor de Estilos', valor: 'Tailwind CSS v4 con @theme nativo' },
-        { label: 'Estrategia PWA', valor: 'Service Workers con Stale-While-Revalidate' },
+      titulo: 'Privacidad por Diseño (Ley N° 8968)',
+      icono: <IconoEscudo className="size-6 text-primary dark:text-sky-300" />,
+      detalle:
+        'Separación estricta entre feeds públicos de horarios/menú y datos sensibles en PostgreSQL.',
+      puntos: [
+        'Tablas estudiantes, notas, asistencias, docentes y agenda_docente protegidas con RLS',
+        'El estudiante y encargado solo leen sus registros autorizados en solo-lectura',
+        'Cero almacenamiento de datos personales en hojas públicas de cálculo',
       ],
     },
     {
-      titulo: 'Backend & Base de Datos Segura',
-      icono: <IconoEngranaje className="size-5 text-emerald-500" />,
-      logos: [
-        <LogoPostgres key="pg" className="size-5" />,
-        <LogoSupabase key="sb" className="size-5" />,
-      ],
-      items: [
-        { label: 'Base de Datos', valor: 'PostgreSQL administrado vía Supabase' },
-        { label: 'Control de Acceso', valor: 'Row Level Security (RLS) a nivel de fila' },
-        { label: 'Aislamiento', valor: 'Esquema multi-institución (multi-tenant)' },
-        { label: 'Caché & Estado', valor: 'TanStack React Query v5' },
+      titulo: 'Modo Docente con Privilegio Mínimo',
+      icono: <IconoDocente className="size-6 text-amber-600 dark:text-amber-300" />,
+      detalle:
+        'Cada docente se autentica sobre su tabla asignada y especialidad sin acceso cruzado.',
+      puntos: [
+        'Prof. Dangelo accesa exclusivamente al padrón de Desarrollo Web (10-1, 11-1, 12-1)',
+        'Edición de calificaciones MEP 40/10/35/10/5 y pase de lista por bloque horario',
+        'Exclusión verificada de Contabilidad, Ciberseguridad, Redes y Electromecánica',
       ],
     },
     {
-      titulo: 'Seguridad & Protección MEP (Ley 8968)',
-      icono: <IconoEscudo className="size-5 text-purple-500" />,
-      logos: [
-        <IconoEscudo key="escudo" className="size-5 text-purple-500" />,
-        <IconoCandado key="candado" className="size-5 text-purple-500" />,
-      ],
-      items: [
-        { label: 'Cumplimiento Legal', valor: 'Ley 8968 (Protección de datos de menores)' },
-        { label: 'Roles Soportados', valor: 'Estudiante + Encargado Legal (M:N RLS)' },
-        { label: 'Identidad Segura', valor: 'Validación OTP sin contraseñas estáticas' },
-        { label: 'Aislamiento Familiar', valor: 'Encargados solo leen estudiantes vinculados' },
+      titulo: 'Arquitectura PWA Offline-First',
+      icono: <IconoDispositivo className="size-6 text-emerald-600 dark:text-emerald-300" />,
+      detalle:
+        'Service Worker pre-cacheado con estrategias específicas y respaldo local en navegador.',
+      puntos: [
+        'Lectura de carnet 3D, horario del grupo, agenda y chatbot sin conexión celular',
+        'Indicador claro cuando se navega sin red para evitar falsas expectativas',
+        'Animaciones Anime.js aisladas en el chunk diferido de /expo para arranque veloz',
       ],
     },
     {
-      titulo: 'Sostenibilidad & Presupuesto ¢0',
-      icono: <IconoCandado className="size-5 text-amber-500" />,
-      logos: [
-        <LogoCloudflare key="cf" className="size-5" />,
-        <LogoPwa key="pwa" className="size-5" />,
-      ],
-      items: [
-        { label: 'Infraestructura', valor: 'Cloudflare Pages en Edge Network global' },
-        { label: 'Costo Operativo', valor: '¢0 mensuales para la institución pública' },
-        { label: 'Optimización', valor: 'Assets WebP de alto rendimiento (< 500 KB)' },
-        { label: 'Impacto Verde', valor: 'Eliminación del 100% del plástico en carnets' },
+      titulo: 'Experiencia Responsiva & Accesible',
+      icono: <IconoRayo className="size-6 text-sky-600 dark:text-sky-300" />,
+      detalle:
+        'Interfaz diseñada mobile-first para teléfonos (<1280px) y panel amplio en escritorio (>=1280px).',
+      puntos: [
+        'Soporte nativo de tema claro y oscuro con alto contraste WCAG',
+        'Iconografía SVG limpia accesible sin dependencias frágiles ni emojis',
+        'Respeto automático a preferencias del sistema prefers-reduced-motion',
       ],
     },
   ]
 
   return (
-    <section id="ficha-tecnica" className="py-16 sm:py-24">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        {/* Encabezado */}
-        <div className="text-center max-w-3xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 px-3 py-0.5 text-micro font-bold uppercase tracking-wider text-purple-600">
-            <span>Para Jueces y Docentes Evaluadores</span>
+    <section
+      ref={seccionRef}
+      id="arquitectura"
+      className="border-t border-border bg-surface-alt/35 dark:bg-[#0B1224]/70 py-16 sm:py-20"
+    >
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div data-ficha-reveal className="mx-auto max-w-3xl text-center mb-12">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary-tint px-3.5 py-1 text-micro font-extrabold uppercase tracking-wider text-primary dark:border-sky-400/30 dark:bg-sky-400/10 dark:text-sky-300">
+            <span>Ficha Técnica de Ingeniería</span>
           </div>
           <h2 className="mt-3 text-2xl sm:text-4xl font-black text-text">
-            Ficha Técnica y Arquitectura del Proyecto
+            Seguridad, Escalabilidad y Resiliencia Escolar
           </h2>
-          <p className="mt-3 text-base text-text-muted">
-            Un diseño de ingeniería de software robusto, escalable y con estricto apego a estándares de seguridad y privacidad educativa.
+          <p className="mt-3 text-base text-text-muted leading-relaxed">
+            Cuatro pilares que garantizan que StudentHUB opere de forma segura para menores de
+            edad y estable frente a red escolar intermitente.
           </p>
         </div>
 
-        {/* Grid de Pilares Técnicos */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {pilares.map((pilar, idx) => (
-            <div
-              key={idx}
-              className="rounded-3xl border border-border bg-surface p-6 sm:p-7 shadow-xs hover:border-primary/30 transition-all hover:shadow-md"
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {pilares.map((pilar) => (
+            <article
+              key={pilar.titulo}
+              data-ficha-reveal
+              className="rounded-3xl border border-border bg-surface dark:bg-[#0F172A]/85 p-6 shadow-xs transition-all hover:border-primary/40"
             >
-              <div className="flex items-center justify-between gap-3 pb-4 border-b border-border">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-10 items-center justify-center rounded-2xl bg-surface-alt border border-border">
-                    {pilar.icono}
-                  </div>
-                  <h3 className="text-base sm:text-lg font-bold text-text">{pilar.titulo}</h3>
-                </div>
-
-                {/* Logos de las herramientas */}
-                <div className="flex items-center gap-1.5 bg-surface-alt/70 px-2.5 py-1.5 rounded-xl border border-border/60">
-                  {pilar.logos.map((logo, lIdx) => (
-                    <span key={lIdx} className="transition-transform hover:scale-110">
-                      {logo}
-                    </span>
-                  ))}
+              <div className="flex items-center gap-3">
+                <span className="flex size-11 items-center justify-center rounded-2xl border border-border bg-surface-alt dark:bg-slate-900">
+                  {pilar.icono}
+                </span>
+                <div>
+                  <h3 className="text-lg font-black text-text">{pilar.titulo}</h3>
                 </div>
               </div>
-
-              <div className="mt-4 space-y-3">
-                {pilar.items.map((it, iIdx) => (
-                  <div
-                    key={iIdx}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between text-nota py-1.5 border-b border-border/40 last:border-0"
-                  >
-                    <span className="font-medium text-text-muted">{it.label}</span>
-                    <span className="font-semibold text-text font-mono text-menuda sm:text-nota mt-0.5 sm:mt-0">
-                      {it.valor}
-                    </span>
-                  </div>
+              <p className="mt-3 text-menor text-text-muted leading-relaxed">{pilar.detalle}</p>
+              <ul className="mt-4 space-y-2 border-t border-border/70 pt-3.5 text-menuda text-text">
+                {pilar.puntos.map((punto) => (
+                  <li key={punto} className="flex items-start gap-2">
+                    <IconoCheck className="mt-0.5 size-3.5 shrink-0 text-emerald-500" />
+                    <span>{punto}</span>
+                  </li>
                 ))}
-              </div>
-            </div>
+              </ul>
+            </article>
           ))}
-        </div>
-
-        {/* Nota especial para los jueces sobre el Plan de Modernización */}
-        <div className="mt-8 rounded-3xl border border-primary/20 bg-primary-tint/40 p-6 text-text">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <span className="inline-block px-2.5 py-0.5 rounded-full bg-primary text-white text-micro font-bold uppercase tracking-wider mb-2">
-                Evaluación Expotécnica 2026
-              </span>
-              <h4 className="text-lg font-bold text-text">
-                Auditoría Técnica, Calidad de Código y Pruebas
-              </h4>
-              <p className="text-nota text-text-muted mt-1 max-w-2xl">
-                El proyecto incluye suite de pruebas unitarias con Vitest, tipado estricto con TypeScript,
-                estrategia de migración sin interrupción del servicio (Strangler Pattern) y zero-compromise
-                en accesibilidad y contraste WCAG AA.
-              </p>
-            </div>
-            <a
-              href="#stand-qr"
-              className="shrink-0 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-nota font-bold text-white hover:bg-primary-dark shadow-xs transition-colors"
-            >
-              <span>Ver en Vivo</span>
-            </a>
-          </div>
         </div>
       </div>
     </section>

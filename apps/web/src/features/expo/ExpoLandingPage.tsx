@@ -1,59 +1,51 @@
 import { useState } from 'react'
 import { ExpoNavbar } from './components/ExpoNavbar'
 import { HeroExpo } from './components/HeroExpo'
-import { TechStackExpo } from './components/TechStackExpo'
+import { PerfilesDemoExpo } from './components/PerfilesDemoExpo'
+import { ModulosExpo } from './components/ModulosExpo'
 import { SimuladorCarnetExpo } from './components/SimuladorCarnetExpo'
 import { ProblemaSolucionExpo } from './components/ProblemaSolucionExpo'
-import { ModulosExpo } from './components/ModulosExpo'
+import { TechStackExpo } from './components/TechStackExpo'
 import { FichaTecnicaExpo } from './components/FichaTecnicaExpo'
 import { RubricaEvaluacionExpo } from './components/RubricaEvaluacionExpo'
 import { StandQrExpo } from './components/StandQrExpo'
 import { CreditosExpo } from './components/CreditosExpo'
 import { ModalInstalarApp } from '@/features/pwa/ModalInstalarApp'
 
+/**
+ * Portal Público de Presentación de Expotécnica 2026 — CTP Rosario de Naranjo.
+ * Carga de forma diferida (lazy chunk) incluyendo Anime.js únicamente dentro de /expo.
+ */
 export function ExpoLandingPage() {
   const [modalInstalarAbierto, setModalInstalarAbierto] = useState(false)
 
+  const abrirInstalar = () => setModalInstalarAbierto(true)
+  const cerrarInstalar = () => setModalInstalarAbierto(false)
+
   return (
-    <div className="min-h-screen bg-bg text-text selection:bg-primary/20 selection:text-primary">
-      {/* Barra de Navegación Fija */}
-      <ExpoNavbar onAbrirInstalar={() => setModalInstalarAbierto(true)} />
+    <div className="min-h-screen w-full overflow-x-hidden bg-bg text-text dark:bg-[#060B19]">
+      <ExpoNavbar onAbrirInstalar={abrirInstalar} />
 
-      {/* Contenido de la Landing */}
       <main>
-        {/* 1. Hero Principal con Guía en 3 Pasos para Jueces */}
-        <HeroExpo onAbrirInstalar={() => setModalInstalarAbierto(true)} />
-
-        {/* 2. Stack Tecnológico (Logos oficiales) */}
-        <TechStackExpo />
-
-        {/* 3. Simulador Interactivo del Carnet con Presets para Jueces */}
-        <SimuladorCarnetExpo />
-
-        {/* 4. Comparativa Problema vs Solución */}
-        <ProblemaSolucionExpo />
-
-        {/* 5. Showcase Interactivo de Módulos */}
+        <HeroExpo onAbrirInstalar={abrirInstalar} />
+        <PerfilesDemoExpo />
         <ModulosExpo />
-
-        {/* 6. Ficha Técnica de Arquitectura y Seguridad */}
+        <SimuladorCarnetExpo />
+        <ProblemaSolucionExpo />
+        <TechStackExpo />
         <FichaTecnicaExpo />
-
-        {/* 7. Rúbrica Oficial de Evaluación y FAQ para Jueces */}
         <RubricaEvaluacionExpo />
-
-        {/* 8. Sección de Escaneo en el Stand */}
-        <StandQrExpo onAbrirInstalar={() => setModalInstalarAbierto(true)} />
+        <StandQrExpo />
       </main>
 
-      {/* Pie de Página y Créditos */}
       <CreditosExpo />
 
-      {/* Modal Reutilizado de Instalación PWA */}
       <ModalInstalarApp
         abierto={modalInstalarAbierto}
-        alCerrar={() => setModalInstalarAbierto(false)}
+        alCerrar={cerrarInstalar}
       />
     </div>
   )
 }
+
+export default ExpoLandingPage

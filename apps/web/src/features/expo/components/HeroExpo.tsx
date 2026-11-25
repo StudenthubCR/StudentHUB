@@ -1,371 +1,268 @@
+import { useRef } from 'react'
 import {
-  IconoFlechaDerecha,
-  IconoCodigoQR,
-  IconoEscudo,
-  IconoDispositivo,
-  IconoReloj,
   IconoBirrete,
   IconoCarnet,
-  IconoRayo,
-  IconoAgenda,
+  IconoCodigoQR,
+  IconoDispositivo,
   IconoDocente,
-  IconoUsuarios,
+  IconoEscudo,
+  IconoFlechaDerecha,
+  IconoRayo,
 } from '@/components/icons'
-import { ESTUDIANTES_MASTER_DEMO } from '@/features/docente/docente.fixture'
+import {
+  lanzarPerfilDemo,
+  METRICAS_HERO_EXPO,
+} from '../expoDemo.service'
+import { useHeroExpoAnime } from '../useExpoAnime'
 
 type Props = {
   onAbrirInstalar?: () => void
 }
 
-const ESTUDIANTES_DESARROLLO_WEB_EXPO = ESTUDIANTES_MASTER_DEMO.filter(
-  (e) => e.especialidad === 'Desarrollo Web',
-)
-
 export function HeroExpo({ onAbrirInstalar }: Props) {
-  const entrarModoDemo = (
-    rol: 'estudiante' | 'encargado' | 'docente' = 'estudiante',
-    estudianteId?: string,
-  ) => {
-    localStorage.setItem('studenthub_demo_sesion', 'true')
-    localStorage.setItem('studenthub_demo_rol', rol)
-    localStorage.removeItem('studenthub_estudiante_activo_id')
-    if (rol === 'estudiante' && estudianteId) {
-      localStorage.setItem('studenthub_demo_estudiante_id', estudianteId)
-    } else {
-      localStorage.removeItem('studenthub_demo_estudiante_id')
-    }
-    window.location.href = rol === 'docente' ? '/docente' : '/'
-  }
-
-  const abrirEstudianteDemo = (estudianteId: string) => {
-    localStorage.setItem('studenthub_demo_sesion', 'true')
-    localStorage.setItem('studenthub_demo_rol', 'estudiante')
-    localStorage.setItem('studenthub_demo_estudiante_id', estudianteId)
-    localStorage.removeItem('studenthub_estudiante_activo_id')
-    window.location.href = '/estudiante?tab=notas'
-  }
+  const heroRef = useRef<HTMLElement>(null)
+  useHeroExpoAnime(heroRef)
 
   return (
-    <section id="hero" className="relative pt-24 pb-14 sm:pt-32 sm:pb-20 overflow-hidden">
-      {/* Luces de fondo sutiles y vibrantes */}
-      <div className="pointer-events-none absolute top-10 left-1/2 -translate-x-1/2 -z-10 h-[480px] w-full max-w-6xl rounded-full bg-gradient-to-tr from-primary/20 via-blue-500/15 to-purple-500/10 blur-[100px]" />
-      <div className="pointer-events-none absolute top-48 -right-24 -z-10 size-96 rounded-full bg-emerald-500/10 blur-[120px]" />
+    <section
+      ref={heroRef}
+      id="hero"
+      className="relative overflow-hidden pt-24 pb-14 sm:pt-30 sm:pb-20 dark:bg-[#060B19]"
+    >
+      {/* Fondo Ambiental y Malla Vectorial Animada por Anime.js */}
+      <div
+        data-hero-orb
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-10 left-1/2 -z-10 h-[440px] w-full max-w-5xl -translate-x-1/2 rounded-full bg-gradient-to-tr from-[#2563EB]/20 via-[#38BDF8]/15 to-indigo-500/10 blur-[96px]"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-32 -right-24 -z-10 size-80 rounded-full bg-emerald-500/10 blur-[110px]"
+      />
 
-      <div className="mx-auto max-w-5xl px-4 text-center sm:px-6">
-        {/* Badge Expotécnica */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary-tint/80 backdrop-blur-md px-4 py-1.5 text-etiqueta sm:text-nota font-bold text-primary shadow-xs animate-fade-in">
-          <span className="flex size-2 rounded-full bg-emerald-500 animate-ping" />
-          <span>EXPOTÉCNICA 2026</span>
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 1200 320"
+        fill="none"
+        className="pointer-events-none absolute inset-x-0 top-14 -z-10 mx-auto w-full max-w-6xl opacity-35 dark:opacity-25"
+      >
+        <path
+          d="M 40 240 Q 280 80 600 170 T 1160 70"
+          stroke="url(#expoHeroLineA)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          className="expo-draw-line"
+        />
+        <path
+          d="M 80 280 Q 410 170 720 220 T 1120 140"
+          stroke="url(#expoHeroLineB)"
+          strokeWidth="1.2"
+          strokeDasharray="6 6"
+          strokeLinecap="round"
+          className="expo-draw-line"
+        />
+        <defs>
+          <linearGradient id="expoHeroLineA" x1="40" y1="240" x2="1160" y2="70" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#2563EB" stopOpacity="0" />
+            <stop offset="0.5" stopColor="#38BDF8" stopOpacity="0.85" />
+            <stop offset="1" stopColor="#2563EB" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="expoHeroLineB" x1="80" y1="280" x2="1120" y2="140" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#38BDF8" stopOpacity="0" />
+            <stop offset="0.5" stopColor="#10B981" stopOpacity="0.65" />
+            <stop offset="1" stopColor="#38BDF8" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
+        {/* Badge Institucional Oficial */}
+        <div
+          data-hero-stagger
+          className="inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-[#2563EB]/30 bg-primary-tint/85 px-4 py-1.5 text-etiqueta sm:text-nota font-bold text-primary shadow-xs backdrop-blur-md dark:border-sky-400/30 dark:bg-sky-400/10 dark:text-sky-300"
+        >
+          <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span>CTP Rosario de Naranjo</span>
           <span className="text-text-muted">·</span>
-          <span className="text-text-muted font-medium">Stand de Innovación Tecnológica</span>
+          <span>Expotécnica 2026</span>
         </div>
 
-        {/* Título Principal con Gradiente Textual */}
-        <h1 className="mt-5 text-3xl font-extrabold tracking-tight text-text sm:text-5xl lg:text-6xl leading-[1.12]">
-          El Ecosistema Digital para <br className="hidden sm:inline" />
-          <span className="bg-gradient-to-r from-primary via-blue-500 to-indigo-600 bg-clip-text text-transparent">
-            Colegios Técnicos Profesionales
+        {/* Marca Visual Hero */}
+        <div data-hero-stagger className="mt-5 flex justify-center">
+          <img
+            src="/studenthub-logo.webp"
+            alt="Logo oficial StudentHUB"
+            className="h-12 sm:h-14 w-auto object-contain block dark:hidden"
+          />
+          <img
+            src="/studenthub-logo-dark.webp"
+            alt="Logo oficial StudentHUB"
+            className="h-12 sm:h-14 w-auto object-contain hidden dark:block"
+          />
+        </div>
+
+        {/* Titular Principal */}
+        <h1
+          data-hero-stagger
+          className="mt-4 text-3xl sm:text-5xl lg:text-[3.5rem] font-black tracking-tight text-text leading-[1.1]"
+        >
+          Plataforma Integral Estudiantil,{' '}
+          <span className="bg-gradient-to-r from-[#2563EB] via-[#38BDF8] to-indigo-500 bg-clip-text text-transparent">
+            Familiar y Docente en un Toque
           </span>
         </h1>
 
-        {/* Subtítulo */}
-        <p className="mx-auto mt-5 max-w-2xl text-base sm:text-lg text-text-muted leading-relaxed">
-          Reemplazamos el carnet de papel por una credencial digital interactiva con QR dinámico,
-          agenda escolar, filas de comedor y horarios en vivo. Diseñado para funcionar <strong>offline</strong> y
-          con <strong>¢0 costo para el MEP</strong>.
+        <p
+          data-hero-stagger
+          className="mx-auto mt-4 max-w-3xl text-base sm:text-lg text-text-muted leading-relaxed"
+        >
+          Carnet digital 3D con QR verificable, boletín de calificaciones MEP, alerta temprana de
+          asistencias, <strong>Modo Docente para Prof. Dangelo</strong>, agenda sincronizada,
+          asistente virtual offline, horarios Diurno/Nocturno y reserva de comedor. Todo listo para
+          probar al instante sin registro ni fricción.
         </p>
 
-        {/* CENTRO RÁPIDO PARA JUECES (3 Pasos en 60 Segundos) - Estilo Glassmorphism Premium */}
-        <div className="mt-8 mx-auto max-w-3xl rounded-3xl border border-primary/35 bg-surface/75 backdrop-blur-2xl p-4 sm:p-6 shadow-[0_12px_40px_rgba(0,0,0,0.12)] relative text-left ring-1 ring-primary/20">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3.5 border-b border-border/80">
-            <div className="flex items-center gap-2.5">
-              <span className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-light text-white shadow-sm" aria-hidden="true">
-                <IconoBirrete className="size-5" />
-              </span>
-              <div>
-                <h2 className="text-base sm:text-lg font-black text-text leading-tight">
-                  Guía de Evaluación Rápida para Jueces
-                </h2>
-                <p className="text-menuda text-text-muted mt-0.5">
-                  Evaluá las 3 dimensiones clave del proyecto en menos de 2 minutos:
-                </p>
-              </div>
-            </div>
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-tint text-primary text-micro font-black uppercase tracking-wider shrink-0 border border-primary/25 shadow-2xs">
-              <span className="size-1.5 rounded-full bg-primary animate-pulse" />
-              <span>3 Pasos Rápidos</span>
-            </span>
-          </div>
+        {/* CTAs Primarios de Demostración en 1 Clic */}
+        <div
+          data-hero-stagger
+          className="mt-7 flex flex-wrap items-center justify-center gap-3"
+        >
+          <button
+            type="button"
+            onClick={() =>
+              lanzarPerfilDemo({
+                rol: 'estudiante',
+                estudianteId: '00000000-0000-0000-0000-000000000001',
+                destino: '/',
+              })
+            }
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#2563EB] to-[#0284C7] px-6 py-3.5 text-nota sm:text-dato font-black text-white shadow-lg shadow-blue-600/30 transition-all hover:-translate-y-0.5 hover:brightness-110 active:scale-95 cursor-pointer"
+          >
+            <IconoBirrete className="size-5" />
+            <span>Probar como Estudiante / Encargado</span>
+            <IconoFlechaDerecha className="size-4" />
+          </button>
 
-          {/* 3 Pasos en Botones Interactivos */}
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {/* Paso 1 */}
-            <a
-              href="#simulador"
-              className="flex flex-col justify-between p-4 rounded-2xl border border-border bg-surface-alt/70 hover:border-primary/50 hover:bg-primary-tint/25 transition-all duration-200 group cursor-pointer shadow-xs hover:-translate-y-0.5"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <IconoCarnet className="size-5 text-primary" aria-hidden="true" />
-                  <span className="text-micro font-mono font-black text-primary px-2 py-0.5 rounded-md bg-primary-tint border border-primary/20">
-                    PASO 1
-                  </span>
-                </div>
-                <h3 className="text-nota font-bold text-text group-hover:text-primary transition-colors">
-                  Simulador 3D
-                </h3>
-                <p className="text-menuda text-text-muted mt-1 leading-snug">
-                  Probá los 4 casos guiados: Web, Neón, SOS médico y Comedor.
-                </p>
-              </div>
-              <span className="mt-3.5 text-micro font-bold text-primary flex items-center gap-1">
-                <span>Ir al simulador</span>
-                <IconoFlechaDerecha className="size-3 group-hover:translate-x-1 transition-transform" />
-              </span>
-            </a>
-
-            {/* Paso 2 (CTA Principal Destacado con Gradiente Vibrante y Soporte Dual de Roles) */}
-            <div
-              className="flex flex-col justify-between p-4 rounded-2xl bg-gradient-to-br from-primary via-blue-600 to-indigo-700 text-white text-left transition-all duration-200 group shadow-lg shadow-primary/30 ring-2 ring-white/30"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <IconoRayo className="size-5 text-amber-300" aria-hidden="true" />
-                  <span className="text-micro font-mono font-black text-white bg-white/20 backdrop-blur-xs px-2 py-0.5 rounded-md border border-white/30 uppercase tracking-wider">
-                    PASO 2 · 1 CLIC
-                  </span>
-                </div>
-                <h3 className="text-nota font-black text-white leading-tight">
-                  App Real en Vivo
-                </h3>
-                <p className="text-menuda text-white/90 mt-1 leading-snug">
-                  Probá Student HUB en vivo con el nuevo Hub Estudiantil (Carnet 3D, Notas y Asistencias).
-                </p>
-              </div>
-              <div className="mt-3.5 flex flex-col gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => entrarModoDemo('estudiante')}
-                  className="w-full text-micro font-black text-white flex items-center justify-between gap-1.5 bg-black/25 hover:bg-black/35 backdrop-blur-xs px-3 py-2 rounded-xl transition-all cursor-pointer active:scale-95"
-                >
-                  <span className="inline-flex items-center gap-1.5">
-                    <IconoBirrete className="size-3.5" />
-                    <span>Estudiante (Erick García · 11-1)</span>
-                  </span>
-                  <IconoFlechaDerecha className="size-3" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => entrarModoDemo('docente')}
-                  className="w-full text-micro font-black text-slate-950 flex items-center justify-between gap-1.5 bg-amber-300 hover:bg-amber-200 px-3 py-2 rounded-xl transition-all cursor-pointer active:scale-95 shadow-xs"
-                >
-                  <span className="inline-flex items-center gap-1.5">
-                    <IconoDocente className="size-3.5" />
-                    <span>Prof. Dangelo · Desarrollo Web</span>
-                  </span>
-                  <IconoFlechaDerecha className="size-3" />
-                </button>
-              </div>
-            </div>
-
-            {/* Paso 3 */}
-            <a
-              href="#rubrica"
-              className="flex flex-col justify-between p-4 rounded-2xl border border-border bg-surface-alt/70 hover:border-primary/50 hover:bg-primary-tint/25 transition-all duration-200 group cursor-pointer shadow-xs hover:-translate-y-0.5"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <IconoAgenda className="size-5 text-primary" aria-hidden="true" />
-                  <span className="text-micro font-mono font-black text-primary px-2 py-0.5 rounded-md bg-primary-tint border border-primary/20">
-                    PASO 3
-                  </span>
-                </div>
-                <h3 className="text-nota font-bold text-text group-hover:text-primary transition-colors">
-                  Rúbrica & Ley 8968
-                </h3>
-                <p className="text-menuda text-text-muted mt-1 leading-snug">
-                  Consultá el desglose técnico, privacidad de menores y FAQ.
-                </p>
-              </div>
-              <span className="mt-3.5 text-micro font-bold text-primary flex items-center gap-1">
-                <span>Ver rúbrica</span>
-                <IconoFlechaDerecha className="size-3 group-hover:translate-x-1 transition-transform" />
-              </span>
-            </a>
-          </div>
-
-          {/* Tarjetas de Perfiles Interactivos (Estudiante, Encargado Legal y Prof. Dangelo) */}
-          <div className="mt-4 pt-4 border-t border-border/80">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-3">
-              <p className="text-etiqueta font-black uppercase tracking-wider text-text">
-                Perfiles de Evaluación en Vivo (CTP Rosario de Naranjo)
-              </p>
-              <span className="text-micro text-text-muted">
-                Los cambios hechos como Prof. Dangelo se reflejan en Desarrollo Web al instante
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-              {/* Perfil Estudiante */}
-              <button
-                type="button"
-                onClick={() => entrarModoDemo('estudiante', '00000000-0000-0000-0000-000000000001')}
-                className="flex flex-col justify-between rounded-2xl border border-border bg-surface-alt/60 p-3.5 text-left transition-all hover:border-primary/50 hover:bg-primary-tint/20 cursor-pointer active:scale-98"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <span className="flex size-8 items-center justify-center rounded-xl bg-primary-tint text-primary">
-                      <IconoBirrete className="size-4" />
-                    </span>
-                    <span className="rounded-full bg-primary-tint border border-primary/25 px-2 py-0.5 text-[10px] font-bold text-primary uppercase">
-                      Estudiante
-                    </span>
-                  </div>
-                  <p className="text-nota font-bold text-text">Erick García Burgos</p>
-                  <p className="text-micro text-text-muted mt-0.5">
-                    11-1 · Desarrollo Web · Carnet, notas y comedor
-                  </p>
-                </div>
-                <span className="mt-2.5 inline-flex items-center gap-1 text-micro font-bold text-primary">
-                  <span>Abrir perfil estudiante</span>
-                  <IconoFlechaDerecha className="size-3" />
-                </span>
-              </button>
-
-              {/* Perfil Encargado Legal */}
-              <button
-                type="button"
-                onClick={() => entrarModoDemo('encargado')}
-                className="flex flex-col justify-between rounded-2xl border border-border bg-surface-alt/60 p-3.5 text-left transition-all hover:border-emerald-500/50 hover:bg-emerald-500/10 cursor-pointer active:scale-98"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <span className="flex size-8 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-400">
-                      <IconoUsuarios className="size-4" />
-                    </span>
-                    <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase">
-                      Encargado
-                    </span>
-                  </div>
-                  <p className="text-nota font-bold text-text">María Elena Burgos</p>
-                  <p className="text-micro text-text-muted mt-0.5">
-                    2 hijos vinculados (Desarrollo Web y Contabilidad)
-                  </p>
-                </div>
-                <span className="mt-2.5 inline-flex items-center gap-1 text-micro font-bold text-emerald-700 dark:text-emerald-400">
-                  <span>Abrir vista familiar</span>
-                  <IconoFlechaDerecha className="size-3" />
-                </span>
-              </button>
-
-              {/* Perfil Prof. Dangelo — Docente de Desarrollo Web */}
-              <button
-                type="button"
-                onClick={() => entrarModoDemo('docente')}
-                className="flex flex-col justify-between rounded-2xl border-2 border-amber-500/45 bg-amber-500/10 p-3.5 text-left transition-all hover:border-amber-500 hover:bg-amber-500/15 cursor-pointer active:scale-98 shadow-xs"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <span className="flex size-8 items-center justify-center rounded-xl bg-amber-500/20 text-amber-800 dark:text-amber-300">
-                      <IconoDocente className="size-4" />
-                    </span>
-                    <span className="rounded-full bg-amber-500/20 border border-amber-500/35 px-2 py-0.5 text-[10px] font-black text-amber-900 dark:text-amber-200 uppercase">
-                      Modo Docente
-                    </span>
-                  </div>
-                  <p className="text-nota font-black text-text">
-                    Prof. Dangelo — Docente de Desarrollo Web
-                  </p>
-                  <p className="text-micro text-text-muted mt-0.5">
-                    Padrón Desarrollo Web (10°, 11°, 12°), notas, lista y agenda
-                  </p>
-                </div>
-                <span className="mt-2.5 inline-flex items-center gap-1 text-micro font-black text-amber-800 dark:text-amber-300">
-                  <span>Entrar a Modo Docente</span>
-                  <IconoFlechaDerecha className="size-3" />
-                </span>
-              </button>
-            </div>
-
-            {/* Selector rápido para verificar cualquier estudiante de Desarrollo Web actualizado */}
-            <div className="mt-3 flex flex-wrap items-center gap-1.5">
-              <span className="text-micro font-bold text-text-muted mr-1">
-                Inspeccionar estudiante de Desarrollo Web:
-              </span>
-              {ESTUDIANTES_DESARROLLO_WEB_EXPO.map((est) => (
-                <button
-                  key={est.id}
-                  type="button"
-                  onClick={() => est.id && abrirEstudianteDemo(est.id)}
-                  className="inline-flex items-center gap-1 rounded-lg border border-border bg-surface px-2.5 py-1 text-[11px] font-semibold text-text-muted transition-colors hover:border-primary/40 hover:bg-primary-tint hover:text-primary cursor-pointer"
-                >
-                  <span>{est.nombre.split(' ').slice(0, 2).join(' ')}</span>
-                  <span className="text-micro opacity-75">({est.grupo})</span>
-                </button>
-              ))}
-            </div>
-          </div>
+          <button
+            type="button"
+            onClick={() =>
+              lanzarPerfilDemo({
+                rol: 'docente',
+                destino: '/docente',
+              })
+            }
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-amber-500/60 bg-amber-400/20 px-6 py-3.5 text-nota sm:text-dato font-black text-amber-950 dark:border-amber-400/50 dark:bg-amber-400/15 dark:text-amber-200 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-amber-400/30 active:scale-95 cursor-pointer"
+          >
+            <IconoDocente className="size-5" />
+            <span>Probar Modo Docente — Prof. Dangelo</span>
+            <IconoFlechaDerecha className="size-4" />
+          </button>
         </div>
 
-        {/* Botones secundarios (Escaneo en Stand & PWA) */}
-        <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+        {/* Enlaces Rápidos de Exploración */}
+        <div
+          data-hero-stagger
+          className="mt-4 flex flex-wrap items-center justify-center gap-2.5 text-micro font-bold"
+        >
+          <a
+            href="#perfiles-demo"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/85 dark:bg-[#0F172A]/85 px-4 py-2 text-text transition-all hover:border-primary/50 hover:text-primary"
+          >
+            <IconoRayo className="size-3.5 text-primary dark:text-sky-400" />
+            <span>Ver todos los perfiles demo</span>
+          </a>
+          <a
+            href="#simulador"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/85 dark:bg-[#0F172A]/85 px-4 py-2 text-text transition-all hover:border-primary/50 hover:text-primary"
+          >
+            <IconoCarnet className="size-3.5 text-primary dark:text-sky-400" />
+            <span>Simulador Carnet 3D</span>
+          </a>
           <a
             href="#stand-qr"
-            className="flex items-center gap-2 rounded-full border border-border bg-surface/80 backdrop-blur-xs px-5 py-2.5 text-nota font-bold text-text shadow-xs transition-all hover:border-primary/50 hover:bg-surface-alt active:scale-98"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/85 dark:bg-[#0F172A]/85 px-4 py-2 text-text transition-all hover:border-primary/50 hover:text-primary"
           >
-            <IconoCodigoQR className="size-4 text-primary" />
-            <span>Escanear en Stand con tu Celular</span>
+            <IconoCodigoQR className="size-3.5 text-primary dark:text-sky-400" />
+            <span>Escanear QR en Stand</span>
           </a>
-
           {onAbrirInstalar && (
             <button
               type="button"
               onClick={onAbrirInstalar}
-              className="flex items-center gap-2 rounded-full border border-primary/30 bg-primary-tint/80 backdrop-blur-xs px-5 py-2.5 text-nota font-bold text-primary transition-all hover:bg-primary-tint-strong active:scale-98 cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary-tint/85 px-4 py-2 text-primary dark:border-sky-400/30 dark:bg-sky-400/10 dark:text-sky-300 transition-all hover:bg-primary-tint-strong cursor-pointer"
             >
-              <IconoDispositivo className="size-4" />
+              <IconoDispositivo className="size-3.5" />
               <span>Instalar PWA</span>
             </button>
           )}
         </div>
 
-        {/* Tarjetas de Métricas de Impacto con Micro-animación y diseño refinado */}
-        <div className="mt-12 grid grid-cols-2 gap-3.5 sm:grid-cols-4 sm:gap-4.5 text-left">
-          <div className="rounded-3xl border border-border/80 bg-surface/80 p-4.5 shadow-xs backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-primary/40">
-            <div className="flex size-9.5 items-center justify-center rounded-2xl bg-primary-tint text-primary mb-2.5 shadow-2xs">
-              <IconoDispositivo className="size-4.5" />
-            </div>
-            <div className="text-xl sm:text-2xl font-black text-text tracking-tight">100%</div>
-            <div className="text-etiqueta font-bold text-primary uppercase tracking-wider">Offline-First</div>
-            <p className="text-menuda text-text-muted mt-0.5">Funciona sin saldo en el aula gracias a PWA</p>
-          </div>
+        {/* Panel de Métricas Cinéticas Animadas con Anime.js */}
+        <div className="mt-12 grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5 text-left">
+          {METRICAS_HERO_EXPO.map((metrica) => {
+            const estilosAcento = {
+              blue: {
+                caja: 'dark:border-blue-500/25 hover:border-blue-500/50',
+                iconoBg: 'bg-blue-500/15 text-[#2563EB] dark:text-[#38BDF8]',
+                etiqueta: 'text-[#2563EB] dark:text-[#38BDF8]',
+                Icono: IconoRayo,
+              },
+              sky: {
+                caja: 'dark:border-sky-400/25 hover:border-sky-400/50',
+                iconoBg: 'bg-sky-500/15 text-sky-600 dark:text-sky-300',
+                etiqueta: 'text-sky-600 dark:text-sky-300',
+                Icono: IconoBirrete,
+              },
+              emerald: {
+                caja: 'dark:border-emerald-500/25 hover:border-emerald-500/50',
+                iconoBg: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
+                etiqueta: 'text-emerald-600 dark:text-emerald-400',
+                Icono: IconoDispositivo,
+              },
+              amber: {
+                caja: 'dark:border-amber-500/25 hover:border-amber-500/50',
+                iconoBg: 'bg-amber-500/15 text-amber-600 dark:text-amber-300',
+                etiqueta: 'text-amber-700 dark:text-amber-300',
+                Icono: IconoEscudo,
+              },
+            }[metrica.acento]
 
-          <div className="rounded-3xl border border-border/80 bg-surface/80 p-4.5 shadow-xs backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-emerald-500/40">
-            <div className="flex size-9.5 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-600 mb-2.5 shadow-2xs">
-              <IconoReloj className="size-4.5" />
-            </div>
-            <div className="text-xl sm:text-2xl font-black text-text tracking-tight">&lt; 1 seg</div>
-            <div className="text-etiqueta font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Validación QR</div>
-            <p className="text-menuda text-text-muted mt-0.5">Agiliza el paso al comedor y portón escolar</p>
-          </div>
+            const IconoMetrica = estilosAcento.Icono
 
-          <div className="rounded-3xl border border-border/80 bg-surface/80 p-4.5 shadow-xs backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-amber-500/40">
-            <div className="flex size-9.5 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-600 mb-2.5 shadow-2xs">
-              <span className="text-lg font-black leading-none">¢</span>
-            </div>
-            <div className="text-xl sm:text-2xl font-black text-text tracking-tight">¢0 Costo</div>
-            <div className="text-etiqueta font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Presupuesto MEP</div>
-            <p className="text-menuda text-text-muted mt-0.5">Ahorro anual en plástico y cartulinas de carnet</p>
-          </div>
+            return (
+              <div
+                key={metrica.id}
+                data-hero-card
+                className={`rounded-3xl border border-border/90 bg-surface/85 dark:bg-[#0F172A]/85 p-4 sm:p-5 shadow-xs backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${estilosAcento.caja}`}
+              >
+                <div className={`mb-2.5 flex size-9 items-center justify-center rounded-2xl ${estilosAcento.iconoBg}`}>
+                  <IconoMetrica className="size-4.5" />
+                </div>
 
-          <div className="rounded-3xl border border-border/80 bg-surface/80 p-4.5 shadow-xs backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-purple-500/40">
-            <div className="flex size-9.5 items-center justify-center rounded-2xl bg-purple-500/15 text-purple-600 mb-2.5 shadow-2xs">
-              <IconoEscudo className="size-4.5" />
-            </div>
-            <div className="text-xl sm:text-2xl font-black text-text tracking-tight">Ley 8968</div>
-            <div className="text-etiqueta font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Privacidad Menores</div>
-            <p className="text-menuda text-text-muted mt-0.5">Row Level Security y datos encriptados</p>
-          </div>
+                {typeof metrica.valorNumerico === 'number' ? (
+                  <div
+                    data-counter-target={metrica.valorNumerico}
+                    data-counter-prefix={metrica.prefijo ?? ''}
+                    data-counter-suffix={metrica.sufijo ?? ''}
+                    className="text-2xl sm:text-3xl font-black tracking-tight text-text"
+                  >
+                    {`${metrica.prefijo ?? ''}${metrica.valorNumerico}${metrica.sufijo ?? ''}`}
+                  </div>
+                ) : (
+                  <div className="text-2xl sm:text-3xl font-black tracking-tight text-text">
+                    {metrica.valorTextoEstatico}
+                  </div>
+                )}
+
+                <div className={`mt-0.5 text-micro font-extrabold uppercase tracking-wider ${estilosAcento.etiqueta}`}>
+                  {metrica.etiqueta}
+                </div>
+                <p className="mt-1 text-menuda text-text-muted leading-snug">
+                  {metrica.detalle}
+                </p>
+              </div>
+            )
+          })}
         </div>
       </div>
     </section>
